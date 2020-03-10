@@ -1,3 +1,4 @@
+\subsection{Inference on M2}
 
 \begin{figure}[h]
     \centering
@@ -10,16 +11,38 @@
 
 \input{tables/summary_stats_m2.txt}
 
-\input{tables/chi_sq_stats.txt}
+\begin{figure}[h]
+    \centering
+    \vspace{-3cm}
+    \includegraphics[width=0.8\textwidth]{figures/example_subimages.png}    
+    \vspace{-3cm}
+    \caption{Estimated catalogs on four 10$\times$10 subimages from 
+    M2. Blue dots are Hubble stars brighter than the 22nd magnitude. 
+    Starnet, Portillos, and DAOPHOT estimated stars are in 
+    red, cyan, and orange x's, respectively. }
+    \label{fig:example_subimages}
+\end{figure}
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.99\textwidth]{figures/psf_profiles.png}
-    \caption{Estimated versus true PSF profiles on M2. The Hubble PSF was
-    obtained by optimizing the likelihood conditioned on locations and fluxes
-    from the Hubble catalog. }
-    \label{fig:psf_profiles}
+    \vspace{-3cm}
+    \includegraphics[width=0.8\textwidth]{figures/example_subimages_samples.png}    
+    \vspace{-3cm}
+    \caption{Four 10$\times$10 subimages from 
+    M2. Blue dots are Hubble stars brighter than the 22nd magnitude. 
+    We print display the posterior samples from our variational 
+    posterior (left) and from the MCMC chain of Portillos (right). }
+    \label{fig:example_subimages_sampled}
 \end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.99\textwidth]{figures/z-score_calibration.png}    
+    \caption{The calibration of uncertainties in our variational posterior. Conditional on the true number of stars, we compute the z-score of the true location or log flux evaluated at our 
+    variational posterior. }
+    \label{fig:z-score_calibration}
+\end{figure}
+
 
 \begin{figure}[h]
     \centering
@@ -34,6 +57,20 @@
     \caption{Color magnitude diagrams on M2. }
     \label{fig:cmd_m2}
 \end{figure}
+
+
+\subsection{Estimation of model parameters}
+\input{tables/chi_sq_stats.txt}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.99\textwidth]{figures/psf_profiles.png}
+    \caption{Estimated versus true PSF profiles on M2. The Hubble PSF was
+    obtained by optimizing the likelihood conditioned on locations and fluxes
+    from the Hubble catalog. }
+    \label{fig:psf_profiles}
+\end{figure}
+
 
 % \multicolumn{1}{p{5cm}}{\raggedleft Chi sq. \\ (with Hubble back.)}
 % \caption{
