@@ -1,0 +1,45 @@
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.99\textwidth]{figures/summary_statistics_m2.png}
+    \caption{True positive rate and positive predicted value of various cataloging
+    procedures on M2, plotted against magnitude percentile.
+    Smaller magnitudes correspond to brighter stars. }
+    \label{fig:summary_stats}
+\end{figure}
+
+\input{tables/summary_stats_m2.txt}
+
+\input{tables/chi_sq_stats.txt}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.99\textwidth]{figures/psf_profiles.png}
+    \caption{Estimated versus true PSF profiles on M2. The Hubble PSF was
+    obtained by optimizing the likelihood conditioned on locations and fluxes
+    from the Hubble catalog. }
+    \label{fig:psf_profiles}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.99\textwidth]{figures/luminosity_fun.png}
+    \caption{Source magnitude histograms on M2. }
+    \label{fig:luminosity_fun_m2}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.99\textwidth]{figures/cmd.png}
+    \caption{Color magnitude diagrams on M2. }
+    \label{fig:cmd_m2}
+\end{figure}
+
+% \multicolumn{1}{p{5cm}}{\raggedleft Chi sq. \\ (with Hubble back.)}
+% \caption{
+% Chi-squared statistics for SDSS, wake-sleep, and Hubble estimated model parameters.
+% The chi-squared statistic is defined as
+% $\sum_{bij}\frac{([\text{obs.image}]_{bij} - [\text{recon.image}]_{bij})^2}{[\text{recon.image}]_{bij}}$.
+% In the middle column, ``model parameters" refer to both background and PSF.
+% In the right column, we fix the background to the Hubble estimate, and examine
+% chi-squared statistics as the PSF varies.}
