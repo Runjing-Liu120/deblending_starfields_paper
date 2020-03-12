@@ -69,16 +69,25 @@ $(N, \ell, f)$ is given by
 \subsubsection{Patch distributions}
 We describe the distribution on each patch, $q_\eta(N^k, \ell^k, f^k | X)$. 
 Dropping the patch index $k$ in this subsection,
-\begin{align*}
+\begin{align}
     N &\sim \text{Categorical}(\omega; 0, ..., N_{max}) \label{eq:var_distr_n}\\
 	\ell_{N, i} &\sim \text{LogitNormal}(\mu_{\ell_{N, i}}, \text{diag}(\nu_{\ell_{N, i}}) )\label{eq:var_distr_loc}\\
 	f_{N, i} &\sim \text{LogNormal}(\mu_{f_{N, i}}, \sigma^2_{f_{N, i}}) \label{eq:var_distr_f}
-\end{align*}
+\end{align}
 for $i = 1, ..., N$; $N = 1, ..., N_{max}$, and the latent variables also fully factorize within each patch. Note that in the true posterior, $N$ has support on the nonnegative integers; in practice, we truncate at an $N_{max}$ large. 
 
 \subsubsection{Neural network architecture}
-The parameters of the variational distribution (equation~\ref{eq:var_distr_n}-\ref{eq:var_distr_f}) are given by the output of a 
-neural network. 
+The parameters of the variational distribution (equations~\ref{eq:var_distr_n}-\ref{eq:var_distr_f}) are given by the output of a neural network. The neural network takes as input the $s \times s$ patch, plus some surrounding pixels. 
+For the problem of cataloging crowded starfields, we take $s = 2$ and pad the patch with three pixels. The architecture is shown schematically in figure~\ref{fig:starnet_arch}. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.4\textwidth]{figures/starnet_archetecture2.png}    
+    \vspace{-0.5cm}
+    \caption{}
+    \label{fig:starnet_arch}
+\end{figure}
+
 
 % \subsection{Estimation of the catalogue}
 % In previous work \cite{Brewer_2013, Portillo_2017, Feder_2019}, the posterior on
