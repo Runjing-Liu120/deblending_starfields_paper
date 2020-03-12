@@ -1,0 +1,46 @@
+To generate a $H \times W$ pixel image, we first draw stars from a marked Poisson process
+on the plane. Explicitly, we first draw the number of stars $N$
+\begin{align}
+	N &\sim \text{Poisson}(\mu HW)
+\end{align}
+and independently, for every $N = 1, 2, ... $, we draw locations and fluxes
+\begin{align}
+  \ell_{N, i} &\sim \text{Uniform}([0, H] \times [0, W]) \quad \forall i = 1, ..., N \\
+  f_{N, i}^{0} & \sim \text{Pareto}(f_{min}, \alpha) \quad \forall i = 1, ..., N
+\end{align}
+Note that we have a triangular array of latent variables; there is a set of
+locations and fluxes for each $N$.
+
+For images with $B$ bands, we also draw $B - 1$ colors,
+\begin{align}
+  c_{N, i}^{b}  & \sim \mathcal{N}(\mu_c, \sigma^2_c) \quad \forall b = 1, ..., B - 1; i = 1, ..., N.
+\end{align}
+The relation between flux and color is as follows: 
+given flux in the first band $f^0$ and color $c^b$, 
+the flux in the $b$th band $f^b$ is $f^0 \times 10^{c^b / 2.5}$.
+
+After having sampled $N$,
+we index into the $N$th row of the triangular array of latent variables
+and use this set of locations, fluxes, and colors to produce an image.
+The expected number of photoelectrons to arrive at pixel $(h,w)$ in band $b$ is given by
+\begin{align}
+  \lambda^b_{hw} = I^{b}_{hw} + \sum_{i = 1}^N f_{N, i}^b \mathcal{P}^b\big(h - \ell_{N, i}[1], w - \ell_{N,i}[2]\big)
+  \label{eq:expected_intensity}
+\end{align}
+where $I^{b}_{hw}$ is the background intensity, which we allow to vary by pixel and band,
+and $\mathcal{P}^b$ is the point spread function (PSF) for band $b$. The PSF
+is a function $\mathcal{P}^b : [0, H] \times [0, W] \mapsto \Reals^+$,
+describing how a stellar point source appears
+on our image. We shall see in the sequel that these model
+parameters $I^{b}_{hw}$ and $\mathcal{P}^b$ can be estimated jointly with
+the latent variables.
+
+Making an appeal to the law of rare events, we model the
+observed number of photoelectrons at pixel $(h,w)$ and band $b$ as Poisson
+with mean $\lambda^b_{hw}$. Since $\lambda^b_{hw}$ is large,
+we take the Gaussian approximation to the Poisson.
+Thus, the observed pixel intensities are drawn
+\begin{align}
+  X_{hw}^b | f, \ell, N \overset{ind}{\sim} \mathcal{N}(\lambda^b_{hw}, \lambda^b_{hw}).
+\end{align}
+
