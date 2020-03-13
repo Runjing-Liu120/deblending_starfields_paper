@@ -1,0 +1,80 @@
+The generative model from section~\ref{sec:gen_model} requires
+the specification of a PSF and a sky background. 
+For the subimage of M2 we examine, 
+we take the background at pixel $(i, j)$ to be an affine function in $i$ and $j$, so 
+\begin{align}
+    I_{ij}^{b} = \beta_0^{b} + \beta_1^{b} \times i + \beta_2^{b} \times j
+\end{align}
+where $(\beta_0^{b}, \beta_1^{b}, \beta_2^{b})$ are model parameters to be estimated, and 
+vary by band $b$. 
+
+
+We model the PSF as a weighted average between a Gaussian ``core" and power-law ``wings" as described in~\cite{Xin2018psf}. For a given band, the PSF is modeled as 
+\begin{align}
+    \mathcal{P}(x, y) = \frac{\exp(\frac{-r^2}{2\sigma_1^2}) + 
+                            b \exp(\frac{-r^2}{2\sigma_2^2}) + 
+                            p_0(1 + \frac{r^2}{\beta\sigma^2_P})^{-\beta/2} }{1 + b + p_0},
+\end{align}
+where $r^2 = x^2 + y^2$. Though not shown here, we allow the model parameters 
+$(\sigma_1^2, \sigma_2^2, \sigma_P^2, \beta, p_0)$ to vary by band as well. 
+
+We concatenate all model parameters into a real-valued vector $\phi$. Our likelihood, and therefore posterior, now depends on $\phi$. We denote this dependence with a subscript, $\Prob_\phi$. 
+
+We can simultaneously find an approximate posterior and 
+estimate model parameters by jointly optimizing 
+\begin{align}
+(\eta^*, \phi^*) = \argmin_{\phi, \eta} \; \mathrm{KL}\big (q_{\eta}(N, \ell, f |X) \| P_{\phi}(N, \ell, f | X)\big)\label{eq:em_obj}
+\end{align}
+Alternatively, variational EM~\cite{Jordan_intro_vi, neal2000varem, Beal2002varem} alternates between two objectives,
+\begin{align}
+    \text{{\bf E-step: }} & 
+    \eta_{t} = \argmin_\eta \; \mathrm{KL}\big (q_{\eta    }(N, \ell, f |X) \| \Prob_{\phi_{t - 1}}(N, \ell, f | X)\big)
+    \label{eq:e_step}
+    \\
+    \text{{\bf M-step: }} & \phi_{t} = \argmin_{\phi} \; \mathrm{KL}\big (q_{\eta_t}(N, \ell, f |X) \| \Prob_{\phi}(N, \ell, f | X)\big), 
+    \label{eq:m_step}
+\end{align}
+for iterations $t = 1, ..., T$. Variational EM can be viewed as coordinate descent on the KL, with each step alternating between updating $\eta$ and $\phi$. 
+
+The E-step objective is exactly same as the KL objective in variational inference, equation~\ref{eq:kl_objective}, for fixed model parameters $\phi$. 
+In other words, for fixed model parameters $\phi$, we are seeking the variational distribution closest the the true posterior under $\phi$. 
+
+Recalling that minimizing the KL divergence is equivalent to maximizing the ELBO (equation~\eqref{eq:elbo}), the M-step is equivalent to solving 
+\begin{align}
+    \Expect_{q_\eta(N, \ell, f | X)}\Big[\log\Prob_\phi(X, N, \ell, f)\Big],
+\end{align}
+a lower bound on the data log-likelihood $\log \Prob_\phi(X)$. 
+
+% \subsection{Estimation of the catalogue}
+% In previous work \cite{Brewer_2013, Portillo_2017, Feder_2019}, the posterior on
+% the latent variables $(N, \ell, f, c)$ was approximated using MCMC. In \cite{Portillo_2017, Feder_2019},
+% a method was proposed to further reduce the posterior samples to a single point estimate
+% which they call a {\itshape condensed catalogue}.
+%
+% While MCMC allows for the careful quantification of uncertainties, its computational cost
+% is prohibitively large for large scale astronomical surveys. One possible alternative
+% is to characterize the posterior using the maximum a posteriori estimate. Using the
+% generative model from section~\ref{sec:gen_model}, the joint loglikelihood is
+% \begin{align}
+%   \log \mathcal{L}(N, \ell, f,& c) \stackrel{c}{=} \overbrace{\sum_{b = 1}^B \sum_{w = 1}^W \sum_{h = 1}^H
+%         \Big\{-\frac{1}{2}\log{\lambda_{hw}^b} - \frac{(x_{hw}^b - \lambda_{hw}^b)^2}{2\lambda_{hw}^b}\Big\}}^
+%         \text{Gaussian likelihood} + ...\notag\\
+%         & ... + \underbrace{N\log(\mu HW) + \log N!}_\text{Poisson prior on $N$} -
+%         \underbrace{\sum_{i = 1}^N (\alpha + 1)\log f_{N, i}^b}_\text{Pareto prior on fluxes} +
+%         \underbrace{\sum_{b = 1}^B \sum_{i = 1}^N \frac{(c_{N, i}^b - \mu_c)^2}{2\sigma_c^2}}_\text{Gaussian prior on color}
+% \end{align}
+%
+% To maximize this joint-loglikelihood, we must optimize over a discrete random variable $N$,
+% so the usual gradient-based optimization methods do not apply. Indeed, it would require
+% optimizing the locations, fluxes, and colors for each $N$ independently, and comparing
+% the resulting log-likelihoods across $N$.
+%
+% We propose a method to approximate the maximum a posteriori estimate. Let
+% $f:x \mapsto (\hat N, \hat \ell)$ be the function that maps data $x$ to the MAP estimates of
+% the $N$ and $\ell$. In our procedure, we first train a neural network $q$ to approximate $f$.
+% Thus, obtaining estimates for $N$ and $\ell$ at inference time is a computationally efficient
+% forward pass through a neural network. With estimates in hand for $N$ and $\ell$,
+% optimizing for $f$ can be done quickly with a few (quasi)-Newton steps; recalling
+% our model for the photoelctron counts, equation~\eqref{eq:expected_intensity}, we see that
+% are are simply regressing the observed image onto a linear combination of PSFs,
+% and the coefficients of this linear combination are the desired fluxes.

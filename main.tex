@@ -13,7 +13,7 @@
 \newcommand{\blind}{0}
 
 \usepackage{amsfonts}
-\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\Prob}{P}
 \newcommand{\Expect}{\mathbb{E}}
 \newcommand{\Reals}{\mathbb{R}}
 \newcommand{\KL}{\textrm{KL}}
@@ -25,6 +25,8 @@
 \addtolength{\textheight}{-.3in}%
 \addtolength{\topmargin}{-.8in}%
 
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
 
 \begin{document}
 
@@ -81,9 +83,21 @@ The text of your abstract. 200 or fewer words.
 \label{sec:var_inference}
 \input{3-var_inference}
 
+\subsection{Estimation of model parameters}
+\label{sec:model_params}
+\input{3b-model_params}
+
+\subsection{Wake-sleep training}
+\label{sec:wake_sleep}
+\input{3c-wake_sleep}
+
+\section{Related work}
+\label{sec:related_work}
+\input{4-related_work}
+
 \section{Results}
 \label{sec:results}
-\input{results.tex}
+\input{5-results}
 
 
 \bibliographystyle{unsrt}

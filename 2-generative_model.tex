@@ -7,6 +7,7 @@ and independently, for every $N = 1, 2, ... $, we draw locations and fluxes
 \begin{align}
   \ell_{N, i} &\sim \text{Uniform}([0, H] \times [0, W]) \quad \forall i = 1, ..., N \\
   f_{N, i}^{0} & \sim \text{Pareto}(f_{min}, \alpha) \quad \forall i = 1, ..., N
+  \label{eq:flux_prior}
 \end{align}
 Note that we have a triangular array of latent variables; there is a set of
 locations and fluxes for each $N$.
