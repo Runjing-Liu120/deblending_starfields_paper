@@ -1,0 +1,36 @@
+\subsection{Connection with variational EM}
+% Wake sleep was originally proposed by~\cite{Hinton1995wake_sleep}, and revisited in~\cite{bornschein2014reweighted, le2018revisiting}. \cite{le2018revisiting} proposed wake-sleep as a viable alternative to the reparameterization trick when training discrete-distribution latent variable models. 
+
+% We also note the connection between wake-sleep and variational EM~\cite{Jordan_intro_vi, neal2000varem, Beal2002varem}. For iterations $t = 1, ..., T$, variational EM alternates between two objectives: 
+% \begin{align}
+%     \text{{\bf E-step: }} & 
+%     \eta_{t} = \argmin_\eta \; \mathrm{KL}\big (q_{\eta    }(N, \ell, f |X) \| P_{\phi_{t - 1}}(N, \ell, f | X)\big)
+%     \label{eq:e_step}
+%     \\
+%     \text{{\bf M-step: }} & \phi_{t} = \argmin_{\phi} \; \mathrm{KL}\big (q_{\eta_t}(N, \ell, f |X) \| P_{\phi}(N, \ell, f | X)\big)
+%     \label{eq:m_step}
+% \end{align}
+% The M-step in variational EM and the wake phase in wake-sleep are the same (compare equations~\eqref{eq:wake_kl} and \eqref{eq:m_step}). 
+% Variational EM can be viewed as coordinate descent on the KL, with each step alternating between updating $\eta$ and $\phi$. The overall objective is 
+% \begin{align}
+% (\eta^*, \phi^*) = \argmin_{\phi, \eta} \; \mathrm{KL}\big (q_{\eta}(N, \ell, f |X) \| P_{\phi}(N, \ell, f | X)\big)\label{eq:em_obj}
+% \end{align}
+
+% The sleep phase is analogous to the E-step (compare equation~\eqref{eq:sleep_kl} and \eqref{eq:e_step}). 
+% The sleep phase objective reverses the arguments of the KL in the E-step so it becomes more amenable to stochastic gradient methods. However, wake-sleep is no longer optimizing a single objective as in equation~\ref{eq:em_obj}. 
+
+% \subsection{Cataloging of stellar fields}
+% TODO
+
+SDSS has a default cataloger, PHOTO~\cite{lupton2001sdss}. It timed out on the crowded starfield that we examine, M2. 
+
+DAOPHOT~\cite{stetson2987daophot} is an algorithmic routine designed for crowded starfields. To detect stars, the observed image is convolved with a Gaussian kernel. The convolved image is scanned for peaks above a given threshold, which are then labeled as stars. \cite{An_2008_m2} applied DAOPHOT to catalog M2, and we refer to this as the DAOPHOT catalog in our comparisons. 
+
+\cite{Brewer_2013, Portillo_2017, Feder_2019} employed probabilistic cataloging, and inference was using MCMC. In the most recent work \cite{Feder_2019}, a runtime of 30min was reported to catalog a $100 \times 100$ subimage of M2. In the sequel, we will compare the catalog produced from their MCMC procedure against the catalog produced by our variational posterior. We will show that our method is several orders of magnitude faster at inference time. 
+
+Our generative model is most similar to \cite{Portillo_2017, Feder_2019}, except they used an exponential prior on the number of stars instead of Poisson. 
+In \cite{Brewer_2013}, a broken power-law prior was used for the flux, and further hyper-priors are placed on the parameters of the broken power-law. The parameters of the broken power-law are treated as latent variables. In our case, this would be analogous to placing a hyper-prior on $\alpha$ from equation~\eqref{eq:flux_prior}. 
+Alternatively, though not explored in this work, we can treat our prior parameter as a model parameter and optimize them in the wake phase. The same principle applies to the Poisson prior parameter, $\mu$. 
+
+Finally, \cite{Portillo_2017, Feder_2019} use the default SDSS estimates. As will be shown in the sequel, the default SDSS estimates for the PSF and background can be improved for a better model fit. $\cite{Brewer_2013}$ treats the PSF parameters as latent variables in their MCMC chain. In contrast, 
+our we estimate model parameters in the wake phase. 
