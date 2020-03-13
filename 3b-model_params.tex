@@ -15,7 +15,7 @@ We model the PSF as a weighted average between a Gaussian ``core" and power-law 
                             b \exp(\frac{-r^2}{2\sigma_2^2}) + 
                             p_0(1 + \frac{r^2}{\beta\sigma^2_P})^{-\beta/2} }{1 + b + p_0},
 \end{align}
-where $r^2 = x^2 + y^2$. Though not shown here, we allow the model parameters 
+where $r^2 = x^2 + y^2$. Though not explicit here, we allow the model parameters 
 $(\sigma_1^2, \sigma_2^2, \sigma_P^2, \beta, p_0)$ to vary by band as well. 
 
 We concatenate all model parameters into a real-valued vector $\phi$. Our likelihood, and therefore posterior, now depends on $\phi$. We denote this dependence with a subscript, $\Prob_\phi$. 
@@ -25,7 +25,7 @@ estimate model parameters by jointly optimizing
 \begin{align}
 (\eta^*, \phi^*) = \argmin_{\phi, \eta} \; \mathrm{KL}\big (q_{\eta}(N, \ell, f |X) \| P_{\phi}(N, \ell, f | X)\big)\label{eq:em_obj}
 \end{align}
-Alternatively, variational EM~\cite{Jordan_intro_vi, neal2000varem, Beal2002varem} alternates between two objectives,
+Variational EM~\cite{Jordan_intro_vi, neal2000varem, Beal2002varem} optimizes this objective with block coordinate descent on $\eta$ and $\phi$. Explicitly, 
 \begin{align}
     \text{{\bf E-step: }} & 
     \eta_{t} = \argmin_\eta \; \mathrm{KL}\big (q_{\eta    }(N, \ell, f |X) \| \Prob_{\phi_{t - 1}}(N, \ell, f | X)\big)
@@ -34,16 +34,18 @@ Alternatively, variational EM~\cite{Jordan_intro_vi, neal2000varem, Beal2002vare
     \text{{\bf M-step: }} & \phi_{t} = \argmin_{\phi} \; \mathrm{KL}\big (q_{\eta_t}(N, \ell, f |X) \| \Prob_{\phi}(N, \ell, f | X)\big), 
     \label{eq:m_step}
 \end{align}
-for iterations $t = 1, ..., T$. Variational EM can be viewed as coordinate descent on the KL, with each step alternating between updating $\eta$ and $\phi$. 
+for iterations $t = 1, ..., T$. 
 
 The E-step objective is exactly same as the KL objective in variational inference, equation~\ref{eq:kl_objective}, for fixed model parameters $\phi$. 
 In other words, for fixed model parameters $\phi$, we are seeking the variational distribution closest the the true posterior under $\phi$. 
 
-Recalling that minimizing the KL divergence is equivalent to maximizing the ELBO (equation~\eqref{eq:elbo}), the M-step is equivalent to solving 
+Recall that minimizing the KL divergence is equivalent to maximizing the ELBO (equation~\eqref{eq:elbo}). We can thus rewrite the M-step as 
 \begin{align}
-    \Expect_{q_\eta(N, \ell, f | X)}\Big[\log\Prob_\phi(X, N, \ell, f)\Big],
-\end{align}
-a lower bound on the data log-likelihood $\log \Prob_\phi(X)$. 
+    \text{{\bf M-step: }} \phi_{t} &= \argmax_{\phi} \; \Expect_{q_{\eta}(N, \ell, f | X)}\Big[\log \Prob_\phi(X, N, \ell, f) - \log q_\eta(N, \ell, f)\Big] \\
+    &= \argmax_{\phi} \; \Expect_{q_{\eta}(N, \ell, f | X)}\Big[\log \Prob_\phi(X, N, \ell, f)\Big]    \label{eq:m_step}
+\end{align} 
+To estimate model parameters, the goal is to optimize $\log \Prob_\phi(X)$; however, 
+since the marginal log-likelihood is intractable, we optimize a lower bound as a surrogate for the marginal log-likelihood. 
 
 % \subsection{Estimation of the catalogue}
 % In previous work \cite{Brewer_2013, Portillo_2017, Feder_2019}, the posterior on

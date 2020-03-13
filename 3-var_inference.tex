@@ -1,7 +1,9 @@
 We have thus far described the likelihood,
 $\Prob(X | N, \ell, f)$, and specified the prior, $\Prob(N, \ell, f)$. 
-For simplicity, we use $\ell$, $f$ without subscripts  
-denote the entire triangular array of latent variables. 
+For moment, we treat the model parameters, the background and PSF, as known and fixed
+(we can use the SDSS estimates, for example). In section~\ref{sec:model_params}, we extend to unknown 
+model parameters and estimate them as part of our inference procedure. 
+
 We seek the posterior distribution 
 $\Prob(N, \ell, f | X)$. In most nontrivial probabilistic models, including ours, the exact posterior distribution is intractable.
 

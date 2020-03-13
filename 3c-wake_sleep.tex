@@ -8,61 +8,71 @@ analytic updates. Examples include black-box variational inference (BBVI)~\cite{
 and automatic-differentiation variational inference (ADVI)~\cite{kucukelbir2016automatic}. The latter 
 is closely related to the reparameterization trick that \cite{kingma2013autoencoding, rezende2014stochastic} proposed to train deep generative models using the KL objective. 
 These approaches all sample latent variables from $q_\eta$ and produce an unbiased estimate 
-for the gradient of the ELBO (equation~\eqref{eq:elbo}); the optimization is done with stochastic gradient descent. 
+for the gradient of the KL; the optimization is done with stochastic gradient descent. 
 
 However, the reparameterization trick does not apply when a latent variable is discrete, in our case, the number of stars $N$. Alternatively, the REINFORCE estimator~\cite{Williams1992reinforce}, which BBVI adapts, produces an unbiased stochastic gradient for both continuous and discrete latent variables. However, it often suffers from high variance in practice and the resulting stochastic optimization is slow. 
 
-Thus, we propose an alternative objective function inspired by 
-the wake-sleep algorithm originally proposed by~\cite{Hinton1995wake_sleep}. 
-In the {\itshape sleep phase}, we optimize  
+Stochastic gradients are difficult to compute in the E-step because the integrating distribution depends on the optimization parameter, $\eta$. 
+The wake-sleep algorithm, originally proposed by~\cite{Hinton1995wake_sleep}, replaces the 
+E-step objective with 
 \begin{align}
-    \argmin_{\eta} \Expect_{\tilde X \sim \Prob(\tilde X)}\Big[\KL(\Prob(N, \ell, f | \tilde X) \| q_\eta(N, \ell, f | \tilde X)\Big]. 
+    \argmin_{\eta} \Expect_{\tilde X \sim \Prob(\tilde X)}\Big[\KL(\Prob_\phi(N, \ell, f | \tilde X) \| q_\eta(N, \ell, f | \tilde X)\Big]
     \label{eq:sleep_obj}
 \end{align}
+called the {\itshape sleep phase}. We will see in section~\ref{sec:sleep_details} that a simple gradient estimator can be derived for the sleep phase objective, without 
+reparameterization or REINFORCE. 
 
-We comment on two key differences between the sleep objective and the classical variational inference objective (equation~\ref{eq:kl_objective}). First note the difference in ordering of arguments to the $\KL$. 
-While optimizing $\KL(q\|p)$ in equation~\eqref{eq:kl_objective} does not depend on the intractable 
-data likelihood $\Prob(X)$, the $\KL$ with arguments reversed does. 
+We comment on two key differences between the sleep objective and the E-step (equation~\eqref{eq:e_step}). First note the difference in ordering of arguments to the $\KL$. 
+While optimizing $\KL(q\|p)$ in equation~\eqref{eq:e_step} does not depend on the intractable 
+data likelihood $\Prob_\phi(X)$, the $\KL$ with arguments reversed does. 
 As will be detailed in section~\ref{sec:sleep_details}, the outer expectation over the data makes this optimization objective tractable with various desirable properties. 
 
-The expectation over the data also gives different meaning to the sleep objective. The classical VI objective seeks to minimize the $\KL$ between $P(N, \ell, f | X)$ and $q(N, \ell, f | X)$ {\itshape for fixed, observed data $X$}, 
-in this case the $H\times W$ image. In contrast, the sleep objective seeks to minimize the $\KL$ {\itshape averaged over all possible data. }
+The expectation over the data also gives different meaning to the sleep objective. The E-step objective seeks $\eta$ to minimize the $\KL$ between $P_\phi(N, \ell, f | X)$ and $q_\eta(N, \ell, f | X)$ {\itshape for fixed, observed data $X$}, 
+in this case the $H\times W$ image. In contrast, the sleep objective seeks to minimize the $\KL$ {\itshape averaged over all possible data. } In other words, are target is no longer an approximate posterior for observed data, but rather an approximate posterior that is ``good on average" over possible data .
 
-Moreover, ``possible data" is defined under our generative model from section~\ref{sec:gen_model}. In order for $q(N, \ell, f | X)$ to be a good approximation to
-the true posterior when $X$ is observed data, then it is imperative that our generative model $\Prob(X)$ well-approximates the true underlying data-generating mechanism. 
+Moreover, ``possible data" is defined under our generative model from section~\ref{sec:gen_model}. In order for $q_\eta(N, \ell, f | X)$ to be a good approximation to
+the true posterior when $X$ is observed data, then it is imperative that our generative model $\Prob_\phi(X)$ well-approximates the true underlying data-generating mechanism. 
 
-In our setting, we tune two model parameters in the data generating process: the background intensity $I$, and the PSF $\mathcal{P}$. The background at pixel $(i, j)$ is taken to be an affine function in $i$ and $j$; we PSF is modeled as a weighted average between a Gaussian ``core" and power-law ``wings" as in~\cite{Xin2018psf}. See appendix REF for details. We concatenate all model parameters into a real-valued vector denoted $\phi$. 
-
-For fixed $q_\eta$, these model parameters are estimated in the {\itshape wake-phase} by solving 
+Therefore, a {\itshape wake phase} is employed to tune the model parameters. The wake-phase objective is
 \begin{align}
-    \phi_{t} = \argmax_{\phi} \; \Expect_{q_{\eta}(N, \ell, f | X)}\Big[\log \Prob_\phi(X, N, \ell, f)\Big]. 
+    \phi_{t} = \argmax_{\phi} \; \Expect_{q_{\eta}(N, \ell, f | X)}\Big[\log \Prob_\phi(X, N, \ell, f)\Big], 
     \label{eq:wake_elbo}
 \end{align}
-Note that here, the expectation is taken over the latent variables under $q_\eta$, while the data $X$ is fixed at its observed value. 
+which is equivalent to the M-step in variational EM (equation~\ref{eq:m_step}). 
 
-Equation~\eqref{eq:wake_elbo} is equivalent to maximizing the ELBO in equation~\eqref{eq:elbo} with respect to model parameters $\phi$. 
-Since maximizing the ELBO is equivalent to 
-minimizing the $\KL$, we can also express the wake-phase objective as 
+Note that stochastic gradients are easy to compute in the wake phase (M-step). Because the integrating distribution does not depend on the optimization parameter $\phi$ in the wake phase, unbiased stochastic gradients are computed simply as 
 \begin{align}
-    \phi_{t} = \argmin_{\phi} \; \mathrm{KL}\Big[\,q_\eta(N, \ell, f | X)\, \| \,\Prob_\phi(N, \ell, f | X )\,\Big]. 
+    \nabla_\phi \log\Prob_\phi(N, \ell, f) \quad \text{ for } (N, \ell, f)\sim q_\eta
+    \label{eq:mstep_grad}
 \end{align}
+While the E-step is not conducive to simple gradient estimators, we will see in section~\ref{sec:sleep_details} that our sleep-phase objective
+results in a gradient estimator similar to the estimator shown in equation~\eqref{eq:mstep_grad}. However,
+we note that a consequence of replacing the E-step with the sleep phase is that wake-sleep no longer targets a singular objective like that of equation~\eqref{eq:em_obj}. 
 
-In summary, given an initial $\eta_0$, $\phi_0$, and data $X$,
-for $t = 1, ..., T$, the wake-sleep algorithm alternates between two objectives: 
-\begin{align}
-    \text{{\bf Sleep: }} & 
-    \eta_{t} = \argmin_\eta \; \Expect_{\Prob_{\phi_{t - 1}}(\tilde X)}\Big[\KL\big ( \Prob_{\phi_{t - 1}}(N, \ell, f | \tilde X)\| q_{\eta}(N, \ell, f |\tilde X)\big)\Big]
-    \label{eq:sleep_kl}\\
-    \text{{\bf Wake: }} & \phi_{t} =  \argmin_{\phi} \; \mathrm{KL}\Big[\,q_{\eta_t}(N, \ell, f | X)\, \| \,\Prob_\phi(N, \ell, f | X )\,\Big]. 
-    \label{eq:wake_kl}
-\end{align}
-In the sleep phase, we are simulating data from $\Prob_\phi$ (i.e. ``dreaming") in 
-order to construct an approximate posterior. In the wake phase, we reveal the observed data $X$ and optimize model parameters $\phi$ so that our data-generating process aligns as closely as possible with the true data. 
+% Equation~\eqref{eq:wake_elbo} is equivalent to maximizing the ELBO in equation~\eqref{eq:elbo} with respect to model parameters $\phi$. 
+% Since maximizing the ELBO is equivalent to 
+% minimizing the $\KL$, we can also express the wake-phase objective as 
+% \begin{align}
+%     \phi_{t} = \argmin_{\phi} \; \mathrm{KL}\Big[\,q_\eta(N, \ell, f | X)\, \| \,\Prob_\phi(N, \ell, f | X )\,\Big]. 
+% \end{align}
+
+% In summary, given an initial $\eta_0$, $\phi_0$, and data $X$,
+% for $t = 1, ..., T$, the wake-sleep algorithm alternates between two objectives: 
+% \begin{align}
+%     \text{{\bf Sleep: }} & 
+%     \eta_{t} = \argmin_\eta \; \Expect_{\Prob_{\phi_{t - 1}}(\tilde X)}\Big[\KL\big ( \Prob_{\phi_{t - 1}}(N, \ell, f | \tilde X)\| q_{\eta}(N, \ell, f |\tilde X)\big)\Big]
+%     \label{eq:sleep_kl}\\
+%     \text{{\bf Wake: }} & \phi_{t} =  \argmin_{\phi} \; \mathrm{KL}\Big[\,q_{\eta_t}(N, \ell, f | X)\, \| \,\Prob_\phi(N, \ell, f | X )\,\Big]. 
+%     \label{eq:wake_kl}
+% \end{align}
+% In the sleep phase, we are simulating data from $\Prob_\phi$ (i.e. ``dreaming") in 
+% order to construct an approximate posterior. In the wake phase, we reveal the observed data $X$ and optimize model parameters $\phi$ so that our data-generating process aligns as closely as possible with the true data. 
 
 \subsubsection{Decomposing the sleep objective}
 \label{sec:sleep_details}
-In this section, we decompose the sleep-phase objective in equation~\ref{eq:sleep_obj} to examine its properties. First, we show 
-that the objective does not depend on the intractable term $\Prob(X)$. 
+In this section, we decompose the sleep-phase objective in equation~\eqref{eq:sleep_obj} to examine its properties. We take $\phi$ as fixed in this section, and drop the explicit dependence of $\Prob$ on $\phi$.
+
+First, we show that the objective does not depend on the intractable term $\Prob(X)$. 
 We write
 \begin{align}
  \argmin_{\eta} \; & \mathbb{E}_{\tilde X \sim P(\tilde X)}\Big[ \mathrm{KL}(P(N, \ell, f | \tilde X) \| q_\eta(N, \ell, f | \tilde X)\Big] \\
@@ -71,8 +81,7 @@ We write
 &=\argmin_{\eta} \; \mathbb E_{P(\tilde X, N, \ell, f)}\Big[- \log q_\eta(N, \ell, f | \tilde X) \Big]\label{eq:sleep_loss_simple}
 \end{align}
 Crucially, the integrating distribution is $P$, which does not depend on the optimization parameter $\eta$.
-In the classical variational inference objective, equation~\eqref{eq:kl_objective},
-the integrating distribution is $q_\eta$, resulting in the need for reparameterization or other adjustments to compute stochastic gradients. 
+In the E-step of variational EM (equation~\eqref{eq:e_step}), the integrating distribution is $q_\eta$, resulting in the need for reparameterization or other adjustments to compute stochastic gradients. 
 Here, unbiased stochastic gradients can be obtained simply as 
 \begin{align}
     g = -\nabla_\eta \log q_\eta(N, \ell, f | \tilde X) \quad \text{ for } (N, \ell, f, \tilde X)\sim P
@@ -80,35 +89,38 @@ Here, unbiased stochastic gradients can be obtained simply as
 
 In other words, we simulate {\itshape complete} data $(N, \ell, f, \tilde X)$ from our generative model and optimize $q_{\eta}(N, \ell, f | \tilde X)$ so that it maps images $\tilde X$ to a probability distribution with mass on $(N, \ell, f)$.
 
-Recall that $-\log q_\eta(N, \ell, f | X)$ factorizes over image patches, and 
-for a given image patch, the latent variables $N$, $\ell$, $f$ also factorize (for the moment dropping dependence on the patch index $k$). Having sampled $N,\ell,f,\tilde X$ from $P$, the loss in equation~\eqref{eq:sleep_loss_simple} becomes
+We examine the loss $-\log q_\eta(N, \ell, f | \tilde X)$ more closely. Recall that $q_\eta$ factorizes over image patches. Having sampled latent variables and the $(N,\ell,f)$ and the $H\times W$ image $\tilde X$ from $P$, we convert the latent variables to their patch parameterization $(N^k, \ell^k, f^k)_{k = 1}^K$. 
+
+For a given image patch, the latent variables $N^k$, $\ell^k$, $f^k$ also factorize in $q$, so 
 \begin{align}
-    - \log q_\eta(N, \ell, f | \tilde X) = 
-        - \log q_\eta(N | \tilde X) 
-        - \log q_\eta(\ell | \tilde X) 
-        - \log q_\eta(f | \tilde X) 
+    - \log q_\eta(N^k, \ell^k, f^k | \tilde X) = 
+        - \log q_\eta(N^k | \tilde X) 
+        - \log q_\eta(\ell^k | \tilde X) 
+        - \log q_\eta(f^k | \tilde X). 
         \label{eq:sleep_loss_decomp}
 \end{align}
-We examine each term separately. The number of stars $N$ is categorical with parameter $\omega$. The loss function for the number of stars becomes
+We examine each term separately. On patch $k$, the number of stars $N^k$ is categorical with parameter $\omega^k$. The loss function for the number of stars becomes
 \begin{align}
-    - \log q_\eta(N | \tilde X) = -\sum_{n = 0}^{N_{max}} 1\{N = n\} \log \omega_n, 
+    - \log q_\eta(N^k | \tilde X) = -\sum_{n = 0}^{N_{max}} 1\{N^k = n\} \log \omega^k_n, 
 \end{align}
 the usual cross-entropy loss for a multi-class classification problem. 
 
-For the last two terms, recall that locations are logit-normal and fluxes are log-normal. 
-For a given index $(i, N)$ let $y_{i,N}$ generically denote either the 
+For the last two terms, recall that location coordinates are logit-normal and fluxes are log-normal. For a given index $(i, N)$ let $y^k_{i,N}$ generically denote either the 
 logit-location or log-flux for that star, 
-and let $\mu$ and $\sigma^2$ generically denote its variational parameters. 
-Then the losses in the last two terms of equation~\ref{eq:sleep_loss_decomp}
+and let $\mu^k_{i,N}$ and $\sigma^{k}_{i,N}$ generically denote its variational parameters,
+the mean and standard deviation. Then the losses in the last two terms of equation~\ref{eq:sleep_loss_decomp}
 of the form 
 \begin{align}
-    -\log q_\eta(y_{i,N} | \tilde X) = 
-        \frac{1}{2\sigma^2}(y_{i,N} - \mu)^2 + \frac{1}{2}\log(2\pi\sigma^2)
+    -\log q_\eta(y^k_{i,N} | \tilde X) = 
+        \frac{1}{2(\sigma^{k}_{i,N})^2}(y^k_{i,N} - \mu^k_{i,N})^2 + \frac{1}{2}\log(2\pi) + \log\sigma^{k}_{i,N}
 \end{align}
-We also give an interpretation: $y_{i,N}$ is the true, simulated parameter value (either logit-location or log-flux); $\mu$ is the predicted value of the neural network. $\sigma^2$ is also outputted by the neural network, representing uncertainty -- the second term encourages small uncertainties, but this is 
-balanced by the scaling of the error $(y_{i,N} - \mu)^2$ in the first term. 
+We also give an interpretation: $y_{i,N}$ is the true, simulated latent variable (either logit-location or log-flux); $\mu^k_{i,N}$ is the predicted value for that latent variable of the neural network. $\sigma^{k}_{i,N}$ is also outputted by the neural network, representing uncertainty -- the second term encourages small uncertainties, but this is 
+balanced by the scaling of the error $(y^k_{i,N} - \mu^k_{i,N})^2$ in the first term. 
 
 In summary, the sleep-phase results in a supervised learning problem on complete data simulated from our generative model. 
+
+\subsubsection{Reverse versus forward KL}
+TODO
 
 % \begin{itemize}
 %     \item Number of stars $N$ is {\color{red}{\bf categorical}} with parameter $\omega$. 
