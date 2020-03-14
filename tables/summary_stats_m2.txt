@@ -1,4 +1,4 @@
-\begin{table}[h]
+\begin{table}
 \centering
 \caption{Summary statistics on M2}
 \label{tab:summary_stats}
@@ -7,7 +7,7 @@
      Method &   TPR &   PPV &  F1 score &  \#stars \\
 \midrule
     DAOPHOT &  0.21 &  0.66 &      0.31 &     351 \\
-  Portillos &  0.51 &  0.36 &      0.42 &    1764 \\
+       PCAT &  0.51 &  0.36 &      0.42 &    1764 \\
  Sleep-only &  0.52 &  0.45 &      0.48 &    1348 \\
  Wake-sleep &  0.49 &  0.62 &      0.55 &     906 \\
      Hubble &  1.00 &  1.00 &      1.00 &    1118 \\

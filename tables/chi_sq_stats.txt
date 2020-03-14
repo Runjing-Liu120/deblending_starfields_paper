@@ -1,20 +1,13 @@
 \begin{table}
 \centering
 \label{tab:chi-square-stats1}
-\caption{
-Chi-squared statistics for SDSS, wake-sleep, and Hubble estimated model parameters.
-The chi-squared statistic is defined as
-$\sum_{bij}\frac{([\text{obs.image}]_{bij} - [\text{recon.image}]_{bij})^2}{[\text{recon.image}]_{bij}}$.
-In the middle column, ``model parameters" refer to both background and PSF.
-In the right column, we fix the background to the Hubble estimate, and examine
-chi-squared statistics as the PSF varies.}
 \begin{tabular}{lrr}
 \toprule
-     Method &  Chi sq. & \multicolumn{1}{p{5cm}}{\raggedleft Chi sq. \\ (with Hubble back.)} \\
+     Method &  Chi sq. & Chi sq.(Hubble background) \\
 \midrule
-       SDSS & 1.88e+06 &                   4.17e+05 \\
- Wake-sleep & 4.69e+05 &                   3.85e+05 \\
-     Hubble & 3.48e+05 &                   3.48e+05 \\
+       SDSS & 1.01e+06 &                   2.78e+05 \\
+ Wake-sleep & 3.04e+05 &                   2.62e+05 \\
+     Hubble & 2.43e+05 &                   2.43e+05 \\
 \bottomrule
 \end{tabular}
 \end{table}
