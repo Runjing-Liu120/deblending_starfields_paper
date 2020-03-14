@@ -120,7 +120,18 @@ balanced by the scaling of the error $(y^k_{i,N} - \mu^k_{i,N})^2$ in the first 
 In summary, the sleep-phase results in a supervised learning problem on complete data simulated from our generative model. 
 
 \subsubsection{Reverse versus forward KL}
-TODO
+\label{sec:kl_q_p}
+TODO: something about forward KL overestimates uncertainties, see figure~\ref{fig:kl_q_p_schematic}. 
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width = 0.5\textwidth]{figures/kl_q_p_schematic.png}
+    \caption{A toy example where the true distribution is a bivariate Gaussian on 
+    $\theta = (\theta_1, \theta_2)$ with positively correlated components. 
+    $q$ is a mean-field variational approximation. Left, the optimal $q$ found 
+    optimizing $\KL(q\|p)$; right, the optimal $q$ found optimizing $\KL(p\|q)$. }
+    \label{fig:kl_q_p_schematic}
+\end{figure}
 
 % \begin{itemize}
 %     \item Number of stars $N$ is {\color{red}{\bf categorical}} with parameter $\omega$. 

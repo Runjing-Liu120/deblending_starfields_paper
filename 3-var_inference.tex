@@ -98,7 +98,7 @@ we place a normal distribution on the logit of the location scaled by $1 / s$.
 The parameters of the variational distribution (equations~\eqref{eq:var_distr_n}-\eqref{eq:var_distr_f}) are the output of a neural network. The input to the neural network is the $s \times s$ tile, padded with surrounding pixels. 
 For the problem of cataloging crowded starfields, we take $s = 2$ and pad the tile with three pixels. The architecture is shown schematically in figure~\ref{fig:starnet_arch}. 
 
-\begin{figure}[h]
+\begin{figure}[!h]
     \centering
     \includegraphics[width=0.4\textwidth]{figures/starnet_archetecture2.png}
     \vspace{-0.5cm}
