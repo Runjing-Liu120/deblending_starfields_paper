@@ -3,11 +3,11 @@
 \label{tab:chi-square-stats1}
 \begin{tabular}{lrr}
 \toprule
-     Method &  Chi sq. & Chi sq.(Hubble background) \\
+     Method & Neg. loglik & Neg. loglik (Hubble background) \\
 \midrule
-       SDSS & 1.01e+06 &                   2.78e+05 \\
- Wake-sleep & 3.04e+05 &                   2.62e+05 \\
-     Hubble & 2.43e+05 &                   2.43e+05 \\
+       SDSS &    1.01e+06 &                        2.78e+05 \\
+ Wake-sleep &    3.04e+05 &                        2.62e+05 \\
+     Hubble &    2.43e+05 &                        2.43e+05 \\
 \bottomrule
 \end{tabular}
 \end{table}
