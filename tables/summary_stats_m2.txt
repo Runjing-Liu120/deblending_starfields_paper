@@ -1,4 +1,4 @@
-\begin{table}
+\begin{table}[h]
 \centering
 \caption{Summary statistics on M2}
 \label{tab:summary_stats}

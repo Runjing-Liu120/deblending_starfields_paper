@@ -6,11 +6,10 @@ $100 \times 100$ images. Note however, our variational posterior can be evaluate
 We trained the initial sleep phase with the PSF and background set to SDSS estimates. We trained for 200 epochs with 200 images per epoch. We used 
 the Adam optimization routine~\cite{kingma2014adam} set at its default parameters. On a single GPU (TODO: give some specs?), this initial sleep phase took approximately 10 minutes. 
 
-We ran two further wake-sleep cycles with each cycle taking approximately a minute. 
+We ran two further wake-sleep cycles with each cycle taking approximately a minute. The subsequent sleep phases were shorter (10 epochs with 200 image each), and the wake phase employed SGD, with the gradient estimator from equation~\eqref{eq:mstep_grad}. 
 
 After training, evaluating the approximate posterior on a $100 \times 100$ 
-image took $\approx 0.2$ seconds. By comparison, PCAT, which runs MCMC, 
-reported a runtime of 30 minutes. 
+image took $\approx 0.2$ seconds. By comparison, the reported runtime of PCAT, which uses MCMC, is 30 minutes on a $100 \times 100$ subimage of M2~\cite{Feder_2019}. 
 
 We emphasize that our speed at inference time is what enables our method to 
 scale up to large astronomical surveys. An SDSS image is $1489 \times 2048$ 
@@ -35,33 +34,30 @@ contains over 8000 runs, MCMC will clearly be unfeasible.
 
 
 \subsection{Inference on M2}
-To test our performance, we applied our method to the SDSS image of M2 found in run 2583, camcol 2, and field 136.
-This globular cluster was also imaged by the ACS Globular Cluster Survey~\cite{Sarajedini_2007}
+To test our performance, we applied our method to the SDSS image of the M2 found in run 2583, camcol 2, and field 136.
+M2 was also imaged by the ACS Globular Cluster Survey~\cite{Sarajedini_2007}
 using the Hubble Space telescope (HST),
-which has $\approx20$ times the angular resolution and $\approx30$ times the exposure of the Sloan telescope.
-Inference was done solely using the SDSS image, 
-and the HST catalog reported in \cite{Sarajedini_2007} was used only to 
-validate our results.
+which has $\approx20$ times the angular resolution and $\approx30$ times the exposure of the Sloan telescope. The reported catalog using the Hubble images was used to 
+validate our results. 
 
 We focused on a specific $100 \times 100$ subimage of M2 that \cite{Portillo_2017, Feder_2019} cataloged using PCAT.
 This subimage is located $\approx2$ arcseconds away from the heavily saturated core of the cluster;
 even in this subimage, the HST catalog contains over 1000 stars brighter than the 22nd magnitude in its F606W band.
 
 We compared our method with PCAT. We also compared with the catalog reported in~\cite{An_2008_m2}, which applied DAOPHOT to the same SDSS image of M2. 
-For our method and PCAT, we used the $r$ and $i$ bands (TODO: check how does DAOPHOT handle bands). For both methods, the inclusion of more bands did not significantly improve the quality of the estimated catalog.
+For our method and PCAT, we used the $r$ and $i$ bands (TODO: check how does DAOPHOT handle bands). The inclusion of more bands did not significantly improve the quality of the estimated catalog for either our method or PCAT. 
 
-Both DAOPHOT and the Hubble survey report a ``traditional" catalog, that is, a list of stellar locations and their respective fluxes. In the context of probabilistic cataloging (our method and PCAT), the posterior 
-defines a distribution over catalogs -- each draw from our posterior returns a list (potentially of varying length) of stellar locations and fluxes. 
+Both DAOPHOT and the Hubble survey reported a ``traditional" catalog, that is, a list of stellar locations and their respective fluxes. In the context of probabilistic cataloging (our method and PCAT), the posterior 
+defines a distribution over catalogs -- each draw from our posterior returns a list (of potentially varying length) of stellar locations and fluxes. 
 
 Given an estimated catalog, two metrics we examined were the true positive rate (TPR) and the positive predicted value (PPV). Using the HST catalog as ground truth, TPR is the proportion of stars in the HST catalog that had a match in the estimated catalog;
 PPV is the proportion of stars in the estimated catalog that had a match in the HST catalog. Like \cite{Portillo_2017, Feder_2019}, we defined a match to be when the estimated location and the HST location were within 0.75 pixels
 (TODO: results actually right now are for 0.5 pixels),
 and the estimated r-band flux and the HST F606W band flux were within half a magnitude.
 
-For all methods, we filtered the Hubble catalog to stars with brightness at most 22.5~mag in the $r$-band, 
-corresponding to the detection limit in SDSS images  
-(TODO: we should make this precise. Portillos says something like this, too). In our method and PCAT, this amounts to setting $f_{min}$ in flux prior (equation~\eqref{eq:flux_prior})
-to the 22.5th magnitude; all dimmer stars are absorbed into the sky intensity. 
+We filtered the Hubble catalog to stars with brightness at most 22.5~mag in the $r$-band, corresponding to the detection limit in SDSS images  
+(TODO: we should make this precise. Portillos says something like this, too). In our method and PCAT, this amounted to setting $f_{min}$ in the flux prior (equation~\eqref{eq:flux_prior})
+to the 22.5th magnitude; all dimmer stars were absorbed into the sky intensity. 
 
 Table~\ref{tab:summary_stats} prints the summary statistics. For PCAT, we 
 computed the summary statistics for each catalog sampled from their posterior and display the average over the catalog ensemble. For our method, sleep-only and wake-sleep, we display the 
@@ -70,8 +66,8 @@ summary statistics computed at the catalog returned by our MAP estimate (our MAP
 We initialized our background and the PSF parameters at the SDSS estimates.``Sleep-only" refers 
 to optimizing equation~\eqref{eq:sleep_obj} using the SDSS estimates of the model parameters. We compared against running two further cycles of wake-sleep. Further cycles of wake-sleep did not appear to improve the quality of the catalog. 
 
-We found that the DAOPHOT catalog grossly underestimates the number of stars in this submimage.
-Our MAP catalog found using wake-sleep predicted nearly three times as many stars, while only suffering a decrease in PPV of 4\%. 
+We found that the DAOPHOT catalog underestimates the number of stars in this submimage.
+Our wake-sleep MAP catalog predicted nearly three times as many stars as DAOPHOT, while only suffering a decrease in PPV of 4\%. 
 Conversely, PCAT predicted roughly 50\% more stars than our MAP catalog, without significant gains in the TPR. 
 We combined TPR and PPV into one statistic using the F1 score,
 defined as the geometric average between TPR and PPV, and found that our wake-sleep method outperforms both PCAT and DAOPHOT.
@@ -96,9 +92,7 @@ our MAP catalog against the Hubble catalog. We also display the DAOPHOT catalog 
 
 \begin{figure}[h]
     \centering
-    \vspace{-3cm}
-    \includegraphics[width=0.8\textwidth]{figures/example_subimages.png}
-    \vspace{-3cm}
+    \includegraphics[width=0.6\textwidth]{figures/example_subimages.png}
     \caption{Estimated catalogs on four 10$\times$10 subimages from
     M2. Blue dots are Hubble stars brighter than the 22nd magnitude.
     Starnet, Portillos, and DAOPHOT estimated stars are in
@@ -114,9 +108,7 @@ were generally larger. This is expected from the discussion of section~\ref{sec:
 
 \begin{figure}[h]
     \centering
-    \vspace{-3cm}
-    \includegraphics[width=0.8\textwidth]{figures/example_subimages_samples.png}
-    \vspace{-3cm}
+    \includegraphics[width=0.6\textwidth]{figures/example_subimages_samples.png}
     \caption{Four 10$\times$10 subimages from
     M2. Blue dots are Hubble stars brighter than the 22nd magnitude.
     We print display the posterior samples from our variational
@@ -162,6 +154,7 @@ likelihood (using the likelihood defined in section~\ref{sec:gen_model}). We use
 
 
 \subsection{Estimation of model parameters}
+\label{sec:results_model_params}
 In this section, we examine our estimated model parameters. As shown in the previous section, wake-sleep improved the catalog over sleep-only. In table~\ref{tab:chi-square-stats1}, we
 print the negative log-likelihood $- \log \Prob_\phi(X | N_{H}, \ell_{H}, f_{H})$ for various model parameters $\phi$, where $N_{H}, \ell_{H}, f_{H}$ are the ground truth
 values from the Hubble catalog (though the $i$-band flux needs to be estimated, as above). 
@@ -186,7 +179,7 @@ As evidenced in figure~\ref{fig:psf_profiles}, our wake-sleep PSF did not change
 \end{figure}
 
 
-% \multicolumn{1}{p{5cm}}{\raggedleft Chi sq. \\ (with Hubble back.)}
+% \multicolumn{1}{p{5cm}}{\raggedleft Neg. loglik \\ (with Hubble back.)}
 % \caption{
 % Chi-squared statistics for SDSS, wake-sleep, and Hubble estimated model parameters.
 % The chi-squared statistic is defined as
