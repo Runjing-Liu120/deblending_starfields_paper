@@ -9,7 +9,7 @@ where $(\beta_0^{b}, \beta_1^{b}, \beta_2^{b})$ are model parameters to be estim
 vary by band $b$. 
 
 
-We model the PSF as a weighted average between a Gaussian ``core" and power-law ``wings" as described in~\cite{Xin2018psf}. For a given band, the PSF is modeled as 
+We model the PSF as a weighted average between a Gaussian ``core" and a power-law ``wing" as described in~\cite{Xin2018psf}. For a given band, the PSF is modeled as 
 \begin{align}
     \mathcal{P}(x, y) = \frac{\exp(\frac{-r^2}{2\sigma_1^2}) + 
                             b \exp(\frac{-r^2}{2\sigma_2^2}) + 
@@ -18,7 +18,7 @@ We model the PSF as a weighted average between a Gaussian ``core" and power-law 
 where $r^2 = x^2 + y^2$. Though not explicit here, we allow the model parameters 
 $(\sigma_1^2, \sigma_2^2, \sigma_P^2, \beta, p_0)$ to vary by band as well. 
 
-We concatenate all model parameters into a real-valued vector $\phi$. Our likelihood, and therefore posterior, now depends on $\phi$. We denote this dependence with a subscript, $\Prob_\phi$. 
+We concatenate all model parameters into a real-valued vector $\phi$. Our likelihood, and therefore posterior, now depend on $\phi$. We denote this dependence with a subscript, $\Prob_\phi$. 
 
 We can simultaneously find an approximate posterior and 
 estimate model parameters by jointly optimizing 
@@ -44,8 +44,7 @@ Recall that minimizing the KL divergence is equivalent to maximizing the ELBO (e
     \text{{\bf M-step: }} \phi_{t} &= \argmax_{\phi} \; \Expect_{q_{\eta}(N, \ell, f | X)}\Big[\log \Prob_\phi(X, N, \ell, f) - \log q_\eta(N, \ell, f)\Big] \\
     &= \argmax_{\phi} \; \Expect_{q_{\eta}(N, \ell, f | X)}\Big[\log \Prob_\phi(X, N, \ell, f)\Big]    \label{eq:m_step}
 \end{align} 
-To estimate model parameters, the goal is to optimize $\log \Prob_\phi(X)$; however, 
-since the marginal log-likelihood is intractable, we optimize a lower bound as a surrogate for the marginal log-likelihood. 
+To estimate model parameters, the goal is to optimize the marginal log-likelihood $\log \Prob_\phi(X)$; however, since $\log \Prob_\phi(X)$ is intractable, we optimize a lower bound as a surrogate for $\log \Prob_\phi(X)$. 
 
 % \subsection{Estimation of the catalogue}
 % In previous work \cite{Brewer_2013, Portillo_2017, Feder_2019}, the posterior on

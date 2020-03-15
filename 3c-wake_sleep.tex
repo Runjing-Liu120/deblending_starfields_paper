@@ -28,7 +28,7 @@ data likelihood $\Prob_\phi(X)$, the $\KL$ with arguments reversed does.
 As will be detailed in section~\ref{sec:sleep_details}, the outer expectation over the data makes this optimization objective tractable with various desirable properties. 
 
 The expectation over the data also gives different meaning to the sleep objective. The E-step objective seeks $\eta$ to minimize the $\KL$ between $P_\phi(N, \ell, f | X)$ and $q_\eta(N, \ell, f | X)$ {\itshape for fixed, observed data $X$}, 
-in this case the $H\times W$ image. In contrast, the sleep objective seeks to minimize the $\KL$ {\itshape averaged over all possible data. } In other words, are target is no longer an approximate posterior for observed data, but rather an approximate posterior that is ``good on average" over possible data .
+in this case the $H\times W$ image. In contrast, the sleep objective seeks to minimize the $\KL$ {\itshape averaged over all possible data. } In other words, the target is no longer an approximate posterior for observed data, but rather an approximate posterior that is ``good on average" over possible data .
 
 Moreover, ``possible data" is defined under our generative model from section~\ref{sec:gen_model}. In order for $q_\eta(N, \ell, f | X)$ to be a good approximation to
 the true posterior when $X$ is observed data, then it is imperative that our generative model $\Prob_\phi(X)$ well-approximates the true underlying data-generating mechanism. 
@@ -42,12 +42,12 @@ which is equivalent to the M-step in variational EM (equation~\ref{eq:m_step}).
 
 Note that stochastic gradients are easy to compute in the wake phase (M-step). Because the integrating distribution does not depend on the optimization parameter $\phi$ in the wake phase, unbiased stochastic gradients are computed simply as 
 \begin{align}
-    \nabla_\phi \log\Prob_\phi(N, \ell, f) \quad \text{ for } (N, \ell, f)\sim q_\eta
+    \nabla_\phi \log\Prob_\phi(X, N, \ell, f) \quad \text{ for } (N, \ell, f)\sim q_\eta
     \label{eq:mstep_grad}
 \end{align}
 While the E-step is not conducive to simple gradient estimators, we will see in section~\ref{sec:sleep_details} that our sleep-phase objective
-results in a gradient estimator similar to the estimator shown in equation~\eqref{eq:mstep_grad}. However,
-we note that a consequence of replacing the E-step with the sleep phase is that wake-sleep no longer targets a singular objective like that of equation~\eqref{eq:em_obj}. 
+results in a similarly straightforward gradient estimator as in equation~\eqref{eq:mstep_grad}. However,
+we note that a consequence of replacing the E-step with the sleep phase is that the wake-sleep algorithm no longer targets a singular objective like that of equation~\eqref{eq:em_obj}. 
 
 % Equation~\eqref{eq:wake_elbo} is equivalent to maximizing the ELBO in equation~\eqref{eq:elbo} with respect to model parameters $\phi$. 
 % Since maximizing the ELBO is equivalent to 
@@ -87,7 +87,8 @@ Here, unbiased stochastic gradients can be obtained simply as
     g = -\nabla_\eta \log q_\eta(N, \ell, f | \tilde X) \quad \text{ for } (N, \ell, f, \tilde X)\sim P
 \end{align}
 
-In other words, we simulate {\itshape complete} data $(N, \ell, f, \tilde X)$ from our generative model and optimize $q_{\eta}(N, \ell, f | \tilde X)$ so that it maps images $\tilde X$ to a probability distribution with mass on $(N, \ell, f)$.
+In other words, we simulate {\itshape complete} data $(N, \ell, f, \tilde X)$ from our generative model and evaluate the loss $-\log q_\eta(N, \ell, f | \tilde X)$. 
+This loss encourages $q_{\eta}(N, \ell, f | \tilde X)$ to map images $\tilde X$ to a probability distribution with large mass on $(N, \ell, f)$.
 
 We examine the loss $-\log q_\eta(N, \ell, f | \tilde X)$ more closely. Recall that $q_\eta$ factorizes over image patches. Having sampled latent variables and the $(N,\ell,f)$ and the $H\times W$ image $\tilde X$ from $P$, we convert the latent variables to their patch parameterization $(N^k, \ell^k, f^k)_{k = 1}^K$. 
 
@@ -108,11 +109,12 @@ the usual cross-entropy loss for a multi-class classification problem.
 For the last two terms, recall that location coordinates are logit-normal and fluxes are log-normal. For a given index $(i, N)$ let $y^k_{i,N}$ generically denote either the 
 logit-location or log-flux for that star, 
 and let $\mu^k_{i,N}$ and $\sigma^{k}_{i,N}$ generically denote its variational parameters,
-the mean and standard deviation. Then the losses in the last two terms of equation~\ref{eq:sleep_loss_decomp}
-of the form 
+the mean and standard deviation of a Gaussian. Then the losses in the last two terms of equation~\ref{eq:sleep_loss_decomp} are of the form 
 \begin{align}
     -\log q_\eta(y^k_{i,N} | \tilde X) = 
-        \frac{1}{2(\sigma^{k}_{i,N})^2}(y^k_{i,N} - \mu^k_{i,N})^2 + \frac{1}{2}\log(2\pi) + \log\sigma^{k}_{i,N}
+        \frac{1}{2(\sigma^{k}_{i,N})^2}(y^k_{i,N} - \mu^k_{i,N})^2
+         + \log\sigma^{k}_{i,N}
+         + \frac{1}{2}\log(2\pi)
 \end{align}
 We also give an interpretation: $y_{i,N}$ is the true, simulated latent variable (either logit-location or log-flux); $\mu^k_{i,N}$ is the predicted value for that latent variable of the neural network. $\sigma^{k}_{i,N}$ is also outputted by the neural network, representing uncertainty -- the second term encourages small uncertainties, but this is 
 balanced by the scaling of the error $(y^k_{i,N} - \mu^k_{i,N})^2$ in the first term. 
