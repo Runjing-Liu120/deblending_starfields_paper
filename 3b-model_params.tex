@@ -18,7 +18,12 @@ We model the PSF as a weighted average between a Gaussian ``core" and a power-la
 where $r^2 = x^2 + y^2$. Though not explicit here, we allow the model parameters 
 $(\sigma_1^2, \sigma_2^2, \sigma_P^2, \beta, p_0)$ to vary by band as well. 
 
-We concatenate all model parameters into a real-valued vector $\phi$. Our likelihood, and therefore posterior, now depend on $\phi$. We denote this dependence with a subscript, $\Prob_\phi$. 
+We concatenate all model parameters into a real-valued vector $\phi$.
+\jeff{You've been saying ``we'' a lot. Not that ``we'' needs to be avoided entirely. Or that you need start using the passive voice. But some of the time, there's a more concise way to say it by excluding us, the authors, from the sentence. Above, you might say something like ``let $\phi$ refer to all the model parameters collectively.''}
+\jeff{It's probably better to explicitly list the model parameters though when you're defining $\phi$.}
+\jeff{It's pretty unusual to use $\phi$ for model parameters, rather than $\theta$. Unless there's a reason, better to use $\theta$. It will be much easier on the reader, leaving them with more attention to devote to understanding the substantive ideas in the paper.
+}
+Our likelihood, and therefore posterior, now depend on $\phi$. We denote this dependence with a subscript, $\Prob_\phi$. 
 
 We can simultaneously find an approximate posterior and 
 estimate model parameters by jointly optimizing 

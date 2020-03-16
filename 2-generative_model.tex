@@ -3,14 +3,17 @@ on the plane. Explicitly, we first draw the number of stars $N$
 \begin{align}
 	N &\sim \text{Poisson}(\mu HW)
 \end{align}
-and independently, for every $N = 1, 2, ... $, we draw locations and fluxes
+and independently, for every $N = 1, 2, ... $, we draw locations 
 \begin{align}
-  \ell_{N, i} &\sim \text{Uniform}([0, H] \times [0, W]) \quad \forall i = 1, ..., N \\
-  f_{N, i}^{0} & \sim \text{Pareto}(f_{min}, \alpha) \quad \forall i = 1, ..., N
+  \ell_{N, i} &\sim \text{Uniform}([0, H] \times [0, W]) \quad \forall i = 1, ..., N, 
+ \end{align}
+ and fluxes
+ \begin{align}
+  f_{N, i}^{0} & \sim \text{Pareto}(f_{min}, \alpha) \quad \forall i = 1, ..., N. 
   \label{eq:flux_prior}
 \end{align}
-Note that we have a triangular array of latent variables; there is a set of
-locations and fluxes for each $N$.
+These latent variables form a triangular array; that is, 
+there is a set of location and fluxes for each $N$. 
 
 For images with $B$ bands, we also draw $B - 1$ colors,
 \begin{align}
@@ -19,6 +22,9 @@ For images with $B$ bands, we also draw $B - 1$ colors,
 The relation between flux and color is as follows: 
 given flux in the first band $f^0$ and color $c^b$, 
 the flux in the $b$th band $f^b$ is $f^0 \times 10^{c^b / 2.5}$.
+\jeff{Which band is the first? Do you want to designate one band the ``reference band'' ? That's what we did in the Celeste journal article.
+Alternative, you could make $f$ the total flux across all bands, but that may be more cumbersome.
+}
 
 After having sampled $N$,
 we index into the $N$th row of the triangular array of latent variables
@@ -32,7 +38,9 @@ where $I^{b}_{hw}$ is the background intensity, which we allow to vary by pixel 
 and $\mathcal{P}^b$ is the point spread function (PSF) for band $b$. The PSF
 is a function $\mathcal{P}^b : [0, H] \times [0, W] \mapsto \Reals^+$,
 describing how a stellar point source appears
-on our image. We shall see in the sequel that these model
+on our image. We shall see in the sequel
+\jeff{Are you making a movie? :-)}
+that these model
 parameters $I^{b}_{hw}$ and $\mathcal{P}^b$ can be estimated jointly with
 the latent variables.
 
@@ -46,3 +54,4 @@ Thus, the observed pixel intensities are drawn
 \end{align}
 For simplicity, we use $\ell$, $f$ without subscripts  
 denote the entire triangular array of latent variables. 
+\jeff{Better to introduce this notation where you first mention triangular arrays, instead of here.}

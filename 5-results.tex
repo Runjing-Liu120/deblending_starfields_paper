@@ -4,7 +4,9 @@ In the sleep phase, we trained the variational approximation on
 $100 \times 100$ images. Note however, our variational posterior can be evaluated on images of arbitrary size, by tiling the image into $s \times s$ tiles. On the crowded starfield described below, we used $s = 2$. 
 
 We trained the initial sleep phase with the PSF and background set to SDSS estimates. We trained for 200 epochs with 200 images per epoch. We used 
-the Adam optimization routine~\cite{kingma2014adam} set at its default parameters. On a single GPU (TODO: give some specs?), this initial sleep phase took approximately 10 minutes. 
+the Adam optimization routine~\cite{kingma2014adam} set at its default parameters. On a single GPU (TODO: give some specs?),
+\jeff{Just the model is enough. Nvidia GeForce RTX 2080 Ti, if we're taking about deeplearning-01.}
+this initial sleep phase took approximately 10 minutes. 
 
 We ran two further wake-sleep cycles with each cycle taking approximately a minute. The subsequent sleep phases were shorter (10 epochs with 200 image each), and the wake phase employed SGD, with the gradient estimator from equation~\eqref{eq:mstep_grad}. 
 
@@ -18,6 +20,8 @@ $\approx 30\text{min} \times 14 \times 20 = 8400$min, or almost six days to run.
 Maybe this isn't quite fair? I suspect MCMC will scale
 with the number of stars, not the size of an image. I think we can make 
 this more precise.}
+\jeff{You could we ``we project'' or ``we expect'' rather ``would require'', to account for the uncertainty. It's probably not that far off though.}
+
 In contrast, if we assume the PSF and background are relatively homogeneous 
 across the full SDSS image (which PCAT also assumes), we can 
 train our variational approximation on a small $100 \times 100$ subimage
@@ -159,10 +163,10 @@ In this section, we examine our estimated model parameters. As shown in the prev
 print the negative log-likelihood $- \log \Prob_\phi(X | N_{H}, \ell_{H}, f_{H})$ for various model parameters $\phi$, where $N_{H}, \ell_{H}, f_{H}$ are the ground truth
 values from the Hubble catalog (though the $i$-band flux needs to be estimated, as above). 
 
-We compared the log-likelihood under the default SDSS estimates of the background and the PSF with the estimates found using wake-sleep, and found that wake-sleep improved the log-likelihood. We also compared against the ``Hubble estimate" of the background and PSF, obtained by minimizing 
+We compared the log-likelihood under the default SDSS estimates with the estimates found using wake-sleep. We see that the wake-sleep estimates improved the log-likelihood. We also compared against the ``Hubble estimate" of the background and PSF, obtained by minimizing 
 $- \log \Prob_\phi(X | N_{H}, \ell_{H}, f_{H})$ for $\phi$ directly. 
 
-This table suggests that the largest source of model misfit is the background. A significant decrease occurred by switching from the SDSS background to the Hubble-estimated background. 
+This table suggests that the largest source of model misfit is the background. A significant decrease in negative log-likelihood occurred by switching from the SDSS background to the Hubble-estimated background. 
 But even using the Hubble-estimated background, switching from the SDSS PSF to our wake-sleep PSF still improved the log-likelihood. 
 
 \input{tables/chi_sq_stats.txt}
@@ -192,8 +196,8 @@ As evidenced in figure~\ref{fig:psf_profiles}, our wake-sleep PSF did not change
 As discussed in section~\ref{sec:runtime}, our approach has the potential 
 to scale up to large astronomical surveys. We chose the image of M2 to 
 test our method because ``ground truth" could be obtained from Hubble images 
-to validate our results. However, most regions of the sky are much less 
-crowded than M2. 
+to validate our results. Most regions of the sky are much less 
+crowded than M2.
 
 We applied our method to SDSS run 94, camcol 1, and field  12, 
 a region of the sky with star density more typical of the SDSS survey. 
@@ -201,11 +205,15 @@ After 10 minutes of training, we produced a catalog on the full $1489\times 2048
 
 We chose this SDSS image because it is contained in Stripe 82, a region of the sky repeated imaged by SDSS. Averaging images from different runs boosts the signal to noise ratio and this {\itshape co-added} image can be analyzed to obtain a ground truth. 
 
-Because this region of the sky contains galaxies, we trained only the sleep-phase (otherwise the model will try to explain both stars and galaxies in the wake-phase). 
-A future paper will extend our generative model to include galaxies. In 
-figure~\ref{fig:sparse_field}, we plot a $500\times 500$ subimage with 
+However, this region of the sky also contains galaxies, which are 
+not well-modelled by a PSF. A future paper will extend our generative model to include galaxies. For our setup, we use our approximate posterior 
+trained using sleep-only (otherwise the model will try to use the PSF to explain both stars and galaxies in the wake-phase). 
+
+Since this region of the sky is more sparse, we tile the image into $50\times 50$ tiles; $N_{max}$ on the tiles is three. 
+
+In figure~\ref{fig:sparse_field}, we plot a $500\times 500$ subimage with 
 our MAP catalog overlayed with the ground truth. We also report the 
-TPR, comparing the stars in the co-added image with our estimated stars. (We have extraneous defections that are due to galaxies and thus 
+TPR, comparing the stars in the co-added catalog with our estimated stars. (We have extraneous defections that are due to galaxies and thus 
 do not report the PPV). Of the stars in the co-added catalog with brightness at least $22.5$mag, we achieved a TPR of 90\%. 
 
 
@@ -219,6 +227,8 @@ do not report the PPV). Of the stars in the co-added catalog with brightness at 
         \includegraphics[width=\textwidth]{figures/sparse_field_tpr.png}
         \label{fig:sparse_field_tpr}
     \end{subfigure}
-    \caption{sparse field}
+    \caption{(Left) a $500\times 500$ sparse field, with true stars in 
+    blue, and true galaxies in green. Estimated stars are shown in red x's. 
+    (Right) the true positive rate as a function of true magnitude. }
     \label{fig:sparse_field}
 \end{figure}

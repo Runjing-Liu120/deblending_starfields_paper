@@ -3,14 +3,17 @@ $\Prob(X | N, \ell, f)$, and specified the prior, $\Prob(N, \ell, f)$.
 For moment, we treat the model parameters, the background and PSF, as known and fixed
 (we can use the SDSS estimates, for example). In section~\ref{sec:model_params}, we extend to unknown 
 model parameters and estimate them as part of our inference procedure. 
+\jeff{``Section'' is typically capitalized. Same for ``Figure''.}
 
 We seek the posterior distribution 
 $\Prob(N, \ell, f | X)$. In most nontrivial probabilistic models, including ours, the exact posterior distribution is intractable.
 
 Markov chain Monte Carlo (MCMC) is a common approach for approximating
-posterior distributions by constructing a stochastic process on the parameter space whose stationary distribution is the true posterior. 
+posterior distributions by constructing a stochastic process on the parameter space whose stationary distribution is the true posterior.
+\jeff{Better to drop the word ``true'' here. There's the posterior distribution, and there are approximations to the posterior distribution.}
 However, its computational cost is prohibitively expensive for
 large-scale astronomical surveys. Instead, we propose to construct an approximate posterior using variational inference, resulting in a procedure that is several orders of magnitude faster than MCMC.
+\jeff{Probably better to move the comparison to MCMC to the introduction. Here we should just describe what we did with VI.}
 
 Variational inference~\cite{Blei_2017_vi_review, Jordan_intro_vi, Wainwrite_graph_models_vi}
 posits a family of distributions $\mathcal{Q}$ and seeks
@@ -43,7 +46,9 @@ are the neural network weights.
 In the ensuing subsections, we detail the construction of our variational distribution. 
 
 \subsubsection{The factorization}
-To make the objective in equation~\eqref{eq:kl_objective} tractable in most 
+To make the objective in equation~\eqref{eq:kl_objective} 
+\jeff{``Equation'' is usually capitalized. However, if you use eqref rather than ref (which doesn't add parentheses), it seems to be more common to omit the word ``Equation'' entirely.}
+tractable in most 
 applications, the family $\mathcal{Q}$ is restricted to probability distributions 
 that limit conditional dependencies between latent variables. In the most extreme case, mean-field variational inference, 
 the distribution over latent variables is assumed to fully factorize in the approximate posterior. 
@@ -54,6 +59,7 @@ Independently for each tile,
 we infer the number, locations, and fluxes of stars falling in that tile.
 Let $k = 1, ..., K$ index the tiles. Then
 denote the number of stars on tile $k$ by $N^k$;
+\jeff{Maybe better to use parentheses around the superscripts so they don't look like exponents?}
 the locations by $\ell^k = (\ell_{N, i}^k)_{i \leq N}$; 
 the fluxes $f^k = (f_{N, i}^k)_{i \leq N}$. Recall that locations on the 
 full image $\ell_{N, i}$ are parameterized to be in $[0, H] \times [0, W]$; 
@@ -71,7 +77,11 @@ of our tiling is shown in figure~\ref{fig:ex_tiles}.
 
 Note that there is a bijection between latent variables on each tile and latent variables on the full image (locations on the full image map to locations on image tiles and vice-versa). Thus, a variational distribution for latent variables on tiles induces a variational distribution for latent variables on the full image. 
 
-In summary, we construct a distribution for latent variables on each tile that factorize over tiles: 
+In summary, 
+\jeff{Better to say it once clearly than to have a summary afterwards.
+Can you integrate the text below into the text before it?
+}
+we construct a distribution for latent variables on each tile that factorize over tiles: 
 \begin{align}
     q((N^k, \ell^k, f^k)_{k = 1}^K|X) = \prod_{k = 1}^K q_\eta(N^k, \ell^k, f^k | X). 
 \end{align}
@@ -96,7 +106,9 @@ we place a normal distribution on the logit of the location scaled by $1 / s$.
 
 \subsubsection{Neural network architecture}
 The parameters of the variational distribution (equations~\eqref{eq:var_distr_n}-\eqref{eq:var_distr_f}) are the output of a neural network. The input to the neural network is the $s \times s$ tile, padded with surrounding pixels. 
-For the problem of cataloging crowded starfields, we took $s = 2$ and padded the tile with three pixels. The architecture is shown schematically in figure~\ref{fig:starnet_arch}. 
+For the problem of cataloging crowded starfields,
+\jeff{Is there another problem we address too?}
+we took $s = 2$ and padded the tile with three pixels. The architecture is shown schematically in figure~\ref{fig:starnet_arch}. 
 
 \begin{figure}[!h]
     \centering
@@ -116,5 +128,5 @@ and $N_{max}$ must be larger.
 On the $2\times 2$ tile, we set $N_{max} = 3$. 
 Moreover, the tiling amortizes the inference across image tiles: the same neural network is reused for each tile. 
 
-We note however, that while the variational distribution factorizes over $2 \times 2$ tiles, we are not breaking the inference problem on the full image into embarrassingly parallel subproblems. We always evaluate the likelihood (when example, when computing the ELBO, equation~\eqref{eq:elbo}) on the full image. 
+We note however, that while the variational distribution factorizes over $2 \times 2$ tiles, we are not breaking the inference problem on the full image into embarrassingly parallel subproblems. We always evaluate the likelihood (when example, when computing the ELBO, equation~\eqref{eq:elbo}) on the full image.
 Light from a star within a 2 x 2 tile spills over into neighboring tiles, so the likelihood does not decouple into image tiles. 
