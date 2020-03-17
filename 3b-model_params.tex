@@ -5,7 +5,7 @@ we take the background at pixel $(i, j)$ to be an affine function in $i$ and $j$
 \begin{align}
     I_{ij}^{b} = \beta_0^{b} + \beta_1^{b} \times i + \beta_2^{b} \times j
 \end{align}
-where $(\beta_0^{b}, \beta_1^{b}, \beta_2^{b})$ are model parameters to be estimated, and 
+where $\beta^ := (\beta_0^{b}, \beta_1^{b}, \beta_2^{b})$ are model parameters to be estimated, and 
 vary by band $b$. 
 
 
@@ -13,12 +13,16 @@ We model the PSF as a weighted average between a Gaussian ``core" and a power-la
 \begin{align}
     \mathcal{P}(x, y) = \frac{\exp(\frac{-r^2}{2\sigma_1^2}) + 
                             b \exp(\frac{-r^2}{2\sigma_2^2}) + 
-                            p_0(1 + \frac{r^2}{\beta\sigma^2_P})^{-\beta/2} }{1 + b + p_0},
+                            p_0(1 + \frac{r^2}{\gamma\sigma^2_P})^{-\beta/2} }{1 + b + p_0},
 \end{align}
-where $r^2 = x^2 + y^2$. Though not explicit here, we allow the model parameters 
-$(\sigma_1^2, \sigma_2^2, \sigma_P^2, \beta, p_0)$ to vary by band as well. 
+where $r^2 = x^2 + y^2$. Though not explicit here, we allow the PSF parameters
+$\pi := (\sigma_1, \sigma_2, \sigma_P, \gamma, p_0)$ to vary by band as well. 
 
-We concatenate all model parameters into a real-valued vector $\phi$. Our likelihood, and therefore posterior, now depend on $\phi$. We denote this dependence with a subscript, $\Prob_\phi$. 
+Let $\phi = (\beta^b, \pi^b)_{b = 1}^B$
+be the concatenation of all model parameters into a real-valued vector. 
+\jeff{It's pretty unusual to use $\phi$ for model parameters, rather than $\theta$. Unless there's a reason, better to use $\theta$. It will be much easier on the reader, leaving them with more attention to devote to understanding the substantive ideas in the paper.
+}
+Our likelihood, and therefore posterior, now depend on $\phi$. We denote this dependence with a subscript, $\Prob_\phi$. 
 
 We can simultaneously find an approximate posterior and 
 estimate model parameters by jointly optimizing 

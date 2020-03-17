@@ -1,38 +1,45 @@
 To generate a $H \times W$ pixel image, we first draw stars from a marked Poisson process
 on the plane. Explicitly, we first draw the number of stars $N$
 \begin{align}
-	N &\sim \text{Poisson}(\mu HW)
+	N &\sim \text{Poisson}(\mu HW),
 \end{align}
-and independently, for every $N = 1, 2, ... $, we draw locations and fluxes
+and independently, for every $N = 1, 2, ... $, we draw locations 
 \begin{align}
-  \ell_{N, i} &\sim \text{Uniform}([0, H] \times [0, W]) \quad \forall i = 1, ..., N \\
-  f_{N, i}^{0} & \sim \text{Pareto}(f_{min}, \alpha) \quad \forall i = 1, ..., N
+  \ell_{N, i} &\sim \text{Uniform}([0, H] \times [0, W]) \quad \forall i = 1, ..., N, 
+ \end{align}
+ and reference band fluxes,
+ \begin{align}
+  f_{N, i}^{1} & \sim \text{Pareto}(f_{min}, \alpha) \quad \forall i = 1, ..., N. 
   \label{eq:flux_prior}
 \end{align}
-Note that we have a triangular array of latent variables; there is a set of
-locations and fluxes for each $N$.
-
 For images with $B$ bands, we also draw $B - 1$ colors,
 \begin{align}
-  c_{N, i}^{b}  & \sim \mathcal{N}(\mu_c, \sigma^2_c) \quad \forall b = 1, ..., B - 1; i = 1, ..., N.
+  c_{N, i}^{b}  & \sim \mathcal{N}(\mu_c, \sigma^2_c) \quad \forall b = 2, ..., B; i = 1, ..., N.
 \end{align}
 The relation between flux and color is as follows: 
-given flux in the first band $f^0$ and color $c^b$, 
-the flux in the $b$th band $f^b$ is $f^0 \times 10^{c^b / 2.5}$.
+given flux in the reference band $f^1$ and color $c^b$, 
+the flux in the $b$th band $f^b$ is $f^1 \times 10^{c^b / 2.5}$. 
+In the SDSS data, we took the $r$-band to be the reference band. 
 
-After having sampled $N$,
-we index into the $N$th row of the triangular array of latent variables
-and use this set of locations, fluxes, and colors to produce an image.
+These latent variables form a triangular array; that is, 
+there is a set of locations and fluxes for each $N$. For simplicity, let
+$\ell$ and $f$ without subscripts to denote entire triangular 
+arrays. 
+
+After sampling $N$,
+the locations and fluxes in the $N$th row of the triangular array 
+produces an image.
 The expected number of photoelectrons to arrive at pixel $(h,w)$ in band $b$ is given by
 \begin{align}
-  \lambda^b_{hw} = I^{b}_{hw} + \sum_{i = 1}^N f_{N, i}^b \mathcal{P}^b\big(h - \ell_{N, i}[1], w - \ell_{N,i}[2]\big)
+  \lambda^b_{hw} = I^{b}_{hw} + \sum_{i = 1}^N f_{N, i}^b \mathcal{P}^b\big(h - \ell_{N, i}[1], w - \ell_{N,i}[2]\big),
   \label{eq:expected_intensity}
 \end{align}
 where $I^{b}_{hw}$ is the background intensity, which we allow to vary by pixel and band,
 and $\mathcal{P}^b$ is the point spread function (PSF) for band $b$. The PSF
 is a function $\mathcal{P}^b : [0, H] \times [0, W] \mapsto \Reals^+$,
 describing how a stellar point source appears
-on our image. We shall see in the sequel that these model
+on our image. In Section~\ref{sec:model_params}, we will see 
+that these model
 parameters $I^{b}_{hw}$ and $\mathcal{P}^b$ can be estimated jointly with
 the latent variables.
 
@@ -44,5 +51,10 @@ Thus, the observed pixel intensities are drawn
 \begin{align}
   X_{hw}^b | f, \ell, N \overset{ind}{\sim} \mathcal{N}(\lambda^b_{hw}, \lambda^b_{hw}).
 \end{align}
-For simplicity, we use $\ell$, $f$ without subscripts  
-denote the entire triangular array of latent variables. 
+Explicitly, the log-likelihood is computed as 
+\begin{align}
+    \log P(X | N, \ell, f) &= \sum_{b = 1}^{B} \sum_{h = 1}^H \sum_{w = 1}^W 
+        \Big\{\frac{1}{2\lambda^b_{hw}}(X_{hw}^b  - \lambda^b_{hw})^2 - 
+               \frac{1}{2}\log(2\pi\lambda^b_{hw})\Big\}
+    \label{eq:loglik}.
+\end{align}
