@@ -22,19 +22,19 @@
 % \subsection{Cataloging of stellar fields}
 % TODO
 
-The data releases of SDSS come with the image, a catalog, and estimates of background and PSF. These estimates were obtained using the cataloger PHOTO~\cite{lupton2001sdss}. However, PHOTO was not designed for crowded starfields and timed out when attempting to catalog M2. 
+In addition to the telescope images, the data releases of SDSS also contain 
+a corresponding catalog and estimates of background and PSF. These estimates were obtained using the cataloger PHOTO~\cite{lupton2001sdss}. However, PHOTO was not designed for crowded starfields and timed out when attempting to catalog M2. 
 
-DAOPHOT~\cite{stetson2987daophot} is an algorithmic routine designed for crowded starfields. To detect stars, the observed image is convolved with a Gaussian kernel. The convolved image is scanned for peaks above a given threshold, which are then labeled as stars. \cite{An_2008_m2} applied DAOPHOT to catalog M2; in section~\ref{sec:results}, we compare our method 
-against the DAOPHOT catalog. 
+DAOPHOT~\cite{stetson2987daophot} is an algorithmic routine designed for crowded starfields. To detect stars, the observed image is convolved with a Gaussian kernel. The convolved image is scanned for peaks above a given threshold, which are then labeled as stars. In Section~\ref{sec:results}, we compare our method with the catalog reported in \cite{An_2008_m2}, where DAOPHOT was used to catalog M2. 
 
-\cite{Brewer_2013, Portillo_2017, Feder_2019} also employed probabilistic modeling, though inference was done using MCMC. \cite{Portillo_2017, Feder_2019} called their procedure PCAT (probabilistic cataloging). \cite{Feder_2019} is the extension 
+\cite{Brewer_2013, Portillo_2017, Feder_2019} also employed probabilistic modeling, though inference was done using MCMC. \cite{Portillo_2017, Feder_2019} called their procedure PCAT (Probabilistic CATaloging). \cite{Feder_2019} is the extension 
 of \cite{Portillo_2017} to multiband images. Our generative model is identical to PCAT, except PCAT used an exponential prior on the number of stars instead of Poisson. 
 
 In \cite{Brewer_2013}, a broken power law prior was used for the flux. 
-Further hyper-priors were placed on the parameters of the broken power-law, and the parameters of the broken power law were treated as latent variables. In our case, this would be analogous to placing a hyper-prior on $\alpha$ in equation~\eqref{eq:flux_prior}. Alternatively, though not explored in this work, we can treat $\alpha$ as a model parameter to optimize in the wake phase. The same principle applies to the Poisson prior parameter, $\mu$. 
+Further hyper-priors were placed on the parameters of the broken power-law, and the parameters of the broken power law were treated as latent variables. In our case, this would be analogous to placing a hyper-prior on $\alpha$ in \eqref{eq:flux_prior}. Alternatively, though not explored in this work, we can treat $\alpha$ as a model parameter to optimize in the wake phase. The same principle applies to the Poisson prior parameter, $\mu$. 
 
-Finally, PCAT used the SDSS estimates for the PSF and background.
-As will be shown in section~\ref{sec:results_model_params}, the SDSS estimates for the PSF and background can be improved for a better model fit (recall that PHOTO timed out 
-on the image of M2). $\cite{Brewer_2013}$ treated PSF parameters as latent variables in their generative model and placed priors on them. In contrast, our we treated PSF parameters as model parameters to be estimated in the wake phase. 
+Finally, PCAT used the SDSS estimates for the PSF and background obtained by PHOTO.
+As will be shown in Section~\ref{sec:results_model_params}, the SDSS estimates for the PSF and background can be improved for a better model fit (recall that PHOTO timed out 
+on the image of M2). $\cite{Brewer_2013}$ treated PSF parameters as latent variables in their generative model and placed priors on them. In contrast, we treated PSF parameters as model parameters to be estimated in the wake phase. 
 
 % in the most recent work \cite{Feder_2019}, a runtime of 30min was reported to catalog a $100 \times 100$ subimage of M2. In the sequel, we compare the catalog produced from their MCMC procedure against the catalog produced by our variational posterior. We show that our method is several orders of magnitude faster at inference time. 

@@ -25,8 +25,7 @@ reparameterization or REINFORCE.
 We comment on two key differences between the sleep objective and the E-step (equation~\eqref{eq:e_step}). First note the difference in ordering of arguments to the $\KL$. 
 While optimizing $\KL(q\|p)$ in equation~\eqref{eq:e_step} does not depend on the intractable 
 data likelihood $\Prob_\phi(X)$, the $\KL$ with arguments reversed does. 
-As will be detailed in section~\ref{sec:sleep_details}, the outer expectation over the data makes this optimization objective tractable with various desirable properties. 
-\jeff{Good to be more specific about the desirable properties}
+As will be detailed in section~\ref{sec:sleep_details}, the outer expectation over the data makes this optimization objective tractable without dependence on $\log P(X)$. 
 
 The expectation over the data also gives different meaning to the sleep objective. The E-step objective seeks $\eta$ to minimize the $\KL$ between $P_\phi(N, \ell, f | X)$ and $q_\eta(N, \ell, f | X)$ {\itshape for fixed, observed data $X$},
 in this case the $H\times W$ image. In contrast, the sleep objective seeks to minimize the $\KL$ {\itshape averaged over all possible data. } In other words, the target is no longer an approximate posterior for observed data, but rather an approximate posterior that is ``good on average" over possible data .

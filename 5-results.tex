@@ -1,86 +1,109 @@
 \subsection{Runtime} 
 \label{sec:runtime}
 In the sleep phase, we trained the variational approximation on 
-$100 \times 100$ images. Note however, our variational posterior can be evaluated on images of arbitrary size, by tiling the image into $s \times s$ tiles. On the crowded starfield described below, we used $s = 2$. 
+$100 \times 100$ images. However, our variational posterior can be evaluated on images of arbitrary size, by tiling the image into $s \times s$ tiles. On the crowded starfield described below, we used $s = 2$. 
 
 We trained the initial sleep phase with the PSF and background set to SDSS estimates. We trained for 200 epochs with 200 images per epoch. We used 
-the Adam optimization routine~\cite{kingma2014adam} set at its default parameters. On a single GPU (TODO: give some specs?),
-\jeff{Just the model is enough. Nvidia GeForce RTX 2080 Ti, if we're taking about deeplearning-01.}
+the Adam optimization routine~\cite{kingma2014adam} set at its default parameters. On a single Nvidia GeForce RTX 2080 Ti GPU 
 this initial sleep phase took approximately 10 minutes. 
 
-We ran two further wake-sleep cycles with each cycle taking approximately a minute. The subsequent sleep phases were shorter (10 epochs with 200 image each), and the wake phase employed SGD, with the gradient estimator from equation~\eqref{eq:mstep_grad}. 
+We ran two further wake-sleep cycles with each cycle taking approximately a minute. The subsequent sleep phases were shorter (10 epochs with 200 images each), and the wake phase employed SGD, with the gradient estimator in \eqref{eq:mstep_grad}. 
 
 After training, evaluating the approximate posterior on a $100 \times 100$ 
 image took $\approx 0.2$ seconds. By comparison, the reported runtime of PCAT, which uses MCMC, is 30 minutes on a $100 \times 100$ subimage of M2~\cite{Feder_2019}. 
 
 We emphasize that our speed at inference time is what enables our method to 
-scale up to large astronomical surveys. An SDSS image is $1489 \times 2048$ 
-pixels. Thus, PCAT would require 
-$\approx 30\text{min} \times 14 \times 20 = 8400$min, or almost six days to run.\footnote{TODO: 
-Maybe this isn't quite fair? I suspect MCMC will scale
-with the number of stars, not the size of an image. I think we can make 
-this more precise.}
-\jeff{You could we ``we project'' or ``we expect'' rather ``would require'', to account for the uncertainty. It's probably not that far off though.}
+scale up to large astronomical surveys. A single SDSS image is $1489 \times 2048$ pixels. Projecting the reported runtime of PCAT to the full image, 
+we would expect a runtime of 
+$\approx 30\text{min} \times 14 \times 20 = 8400$min, or almost six days. 
 
-In contrast, if we assume the PSF and background are relatively homogeneous 
+In contrast, if we assume the PSF and background are homogeneous 
 across the full SDSS image (which PCAT also assumes), we can 
-train our variational approximation on a small $100 \times 100$ subimage
+train our variational approximation using wake-sleep 
+on a small $100 \times 100$ subimage
 (while getting estimates of the PSF and background along the way),
 a one time computational cost of twelve minutes. 
 Producing a catalog on the full $1489 \times 2048$ image will require 
 $\approx 0.2\text{sec} \times 14 \times 20 = 56$ seconds. In practice, 
 this will be even faster as we would batch the image tiles to run in parallel on a GPU. 
 
-Finally, we note that an SDSS image, each of size $1489 \times 2048$, is indexed by a run, camera column (camcol), and field. A run refers to one continuous scan of the telescope, usually corresponding to one night of data collection. A run is broken down 
-into fields; some runs have over 800 fields. Each field contains 
-six camera columns. Thus, for a large-scale sky survey like SDSS which 
-contains over 8000 runs, MCMC will clearly be unfeasible. 
+Moreover, an SDSS image is indexed by a run, camera column (camcol), and field.
+A run is one continuous scan of the telescope, usually corresponding to one night of data collection. 
+A run is broken down into fields; some runs have over 800 fields. 
+Each field contains six camera columns. 
+Thus, for a large-scale sky survey like SDSS which 
+contains over 8000 runs, MCMC will be unfeasible. 
 
 
 \subsection{Inference on M2}
-To test our performance, we applied our method to the SDSS image of the M2 found in run 2583, camcol 2, and field 136.
-M2 was also imaged by the ACS Globular Cluster Survey~\cite{Sarajedini_2007}
+To test our performance, we applied our method to the SDSS image of M2 found in run 2583, camcol 2, and field 136.
+M2 was also imaged in the ACS Globular Cluster Survey~\cite{Sarajedini_2007}
 using the Hubble Space telescope (HST),
-which has $\approx20$ times the angular resolution and $\approx30$ times the exposure of the Sloan telescope. The reported catalog using the Hubble images was used to 
-validate our results. 
+which has $\approx20$ times the angular resolution and $\approx30$ times the exposure of the Sloan telescope. The reported catalog from this Hubble survey was used to 
+validate our results.
 
 We focused on a specific $100 \times 100$ subimage of M2 that \cite{Portillo_2017, Feder_2019} cataloged using PCAT.
 This subimage is located $\approx2$ arcseconds away from the heavily saturated core of the cluster;
-even in this subimage, the HST catalog contains over 1000 stars brighter than the 22nd magnitude in its F606W band.
+even in this subimage, the HST catalog contained over 1000 stars brighter than the 22nd magnitude in its F606W band.
 
-We compared our method with PCAT. We also compared with the catalog reported in~\cite{An_2008_m2}, which applied DAOPHOT to the same SDSS image of M2. 
-For our method and PCAT, we used the $r$ and $i$ bands (TODO: check how does DAOPHOT handle bands). The inclusion of more bands did not significantly improve the quality of the estimated catalog for either our method or PCAT. 
+We compared our method with PCAT and DAOPHOT. The DAOPHOT catalog of M2 was reported in 
+\cite{An_2008_m2}. While DAOPHOT returned photometry for all five SDSS bands, 
+we chose to model only the $r$ and $i$ bands for our method and PCAT. We found 
+that for our method and PCAT, the inclusion of more bands did not improve
+the true positive rate and positive predictive value (described below) of our detections. 
 
 Both DAOPHOT and the Hubble survey reported a ``traditional" catalog, that is, a list of stellar locations and their respective fluxes. In the context of probabilistic cataloging (our method and PCAT), the posterior 
-defines a distribution over catalogs -- each draw from our posterior returns a list (of potentially varying length) of stellar locations and fluxes. 
+defines a distribution over catalogs -- each draw from the posterior returns a catalog 
+(of potentially varying length) of stellar locations and fluxes. 
 
-Given an estimated catalog, two metrics we examined were the true positive rate (TPR) and the positive predicted value (PPV). Using the HST catalog as ground truth, TPR is the proportion of stars in the HST catalog that had a match in the estimated catalog;
-PPV is the proportion of stars in the estimated catalog that had a match in the HST catalog. Like \cite{Portillo_2017, Feder_2019}, we defined a match to be when the estimated location and the HST location were within 0.75 pixels
+Given an estimated catalog, two metrics we examined were the true positive rate (TPR) and the positive predicted value (PPV). Using the HST catalog as ground truth, the TPR is the proportion of stars in the HST catalog that had a match in the estimated catalog;
+the PPV is the proportion of stars in the estimated catalog that had a match in the HST catalog. Like \cite{Portillo_2017, Feder_2019}, we defined a match to be when the estimated location and the HST location were within 0.75 pixels
 (TODO: results actually right now are for 0.5 pixels),
-and the estimated r-band flux and the HST F606W band flux were within half a magnitude.
+and the estimated $r$-band flux and the HST F606W band flux were within half a
+magnitude. The slack in the magnitude allows for some discrepancy between the 
+SDSS $r$-band and the the Hubble F606W band. The Hubble F606W band absorption range is broader than the SDSS $r$-band, though they centered at roughly the same wavelength. 
 
-We filtered the Hubble catalog to stars with brightness at most 22.5~mag in the $r$-band, corresponding to the detection limit in SDSS images  
-(TODO: we should make this precise. Portillos says something like this, too). In our method and PCAT, this amounted to setting $f_{min}$ in the flux prior (equation~\eqref{eq:flux_prior})
+We filtered the Hubble catalog to stars brighter than 22.5~mag in the F606W band, corresponding to the detection limit in SDSS images  
+(TODO: we should make this precise. Portillos says something like this, too). In our method and PCAT, this amounted to setting $f_{min}$ in the flux prior (equation~\ref{eq:flux_prior})
 to the 22.5th magnitude; all dimmer stars were absorbed into the sky intensity. 
 
-Table~\ref{tab:summary_stats} prints the summary statistics. For PCAT, we 
-computed the summary statistics for each catalog sampled from their posterior and display the average over the catalog ensemble. For our method, sleep-only and wake-sleep, we display the 
-summary statistics computed at the catalog returned by our MAP estimate (our MAP catalog). 
+Table~\ref{tab:summary_stats} prints the summary statistics. For our method, we  computed the TPR and PPV at the maximum a posteriori (MAP) catalog under
+the variational distribution. 
+We compared the variational distribution obtained using only the sleep-phase (optimizing~\eqref{eq:sleep_obj} at the SDSS estimates of the model parameters)
+and the variational distribution obtained after two further cycles of wake-sleep. The additional two cycles of wake-sleep improved the PPV 
+over sleep-only by 17\%; the TPR decreases slightly by 2\%. 
+We found that the quality of the catalog did not seem to further improve after the second iteration of wake-sleep. 
 
-We initialized our background and the PSF parameters at the SDSS estimates.``Sleep-only" refers 
-to optimizing equation~\eqref{eq:sleep_obj} using the SDSS estimates of the model parameters. We compared against running two further cycles of wake-sleep. Further cycles of wake-sleep did not appear to improve the quality of the catalog. 
+For PCAT, we computed the summary statistics for each catalog sampled from their posterior and display the average over 300 posterior samples. 
+Our wake-sleep PPV was much better than PCAT. 
+Moreover, PCAT predicted roughly 50\% more stars than 
+wake-sleep, without significant gains in the TPR. 
 
-We found that the DAOPHOT catalog underestimates the number of stars in this submimage.
-Our wake-sleep MAP catalog predicted nearly three times as many stars as DAOPHOT, while only suffering a decrease in PPV of 4\%. 
-Conversely, PCAT predicted roughly 50\% more stars than our MAP catalog, without significant gains in the TPR. 
+% , and ran 
+% a first sleep phase (optimizing equation~\ref{eq:sleep_obj}). We compare the 
+% catalog obtained under the MAP estimate under the variational distribution trained using only this sleep phase against the 
+% variational distribution obtained after two further cycles of wake-sleep. 
+% We define the ``wake-sleep" catalog 
+
+% Our  MAP  estimate  under  the  variational  distribution  trained  using  wake-sleep
+% (which we will call our “wake-sleep catalog”) had similar TPR to the 
+
+
+% (which we will call our ``wake-sleep catalog")
+
+
+Conversely, we found that the DAOPHOT catalog underestimates the number of stars in this submimage, and it has the lowest TPR of all the methods. Moreover, while wake-sleep predicted nearly three times as many stars as DAOPHOT, 
+wake-sleep only suffered a decrease in PPV of 4\%. 
+
 We combined TPR and PPV into one statistic using the F1 score,
-defined as the geometric average between TPR and PPV, and found that our wake-sleep method outperforms both PCAT and DAOPHOT.
+defined as the geometric average between TPR and PPV, and found that both 
+sleep-only and wake-sleep outperform PCAT and DAOPHOT.
 
 \input{tables/summary_stats_m2.txt}
 
-In figure~\ref{fig:summary_stats}, we plot the TPR and PPV as a function of magnitude.
-Our method and PCAT showed similar TPR across all magnitudes, and were
-uniformly better than DAOPHOT. Wake-sleep had a PPV that is higher than PCAT for all magnitudes, though DAOPHOT had a better PPV at the smaller magnitudes.
+In figure~\ref{fig:summary_stats}, we plot the TPR and PPV binned by magnitude.
+Wake-sleep and PCAT showed similar TPR across all magnitudes, and both were
+uniformly better than DAOPHOT. Wake-sleep had a PPV that is higher than PCAT for all magnitudes. Of all methods, DAOPHOT had the best PPV at smaller magnitudes.
 
 \begin{figure}[h]
     \centering
@@ -92,14 +115,14 @@ uniformly better than DAOPHOT. Wake-sleep had a PPV that is higher than PCAT for
 \end{figure}
 
 In figure~\ref{fig:example_subimages}, we display four $10\times10$ subimages, and plot
-our MAP catalog against the Hubble catalog. We also display the DAOPHOT catalog and one catalog sample from PCAT.
+our wake-sleep catalog against the Hubble catalog. We also display the DAOPHOT catalog and one catalog sample from PCAT.
 
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.6\textwidth]{figures/example_subimages.png}
     \caption{Estimated catalogs on four 10$\times$10 subimages from
     M2. Blue dots are Hubble stars brighter than the 22nd magnitude.
-    Starnet, Portillos, and DAOPHOT estimated stars are in
+    Starnet, PCAT, and DAOPHOT estimated stars are in
     red, cyan, and orange x's, respectively. }
     \label{fig:example_subimages}
 \end{figure}
@@ -116,7 +139,7 @@ were generally larger. This is expected from the discussion of section~\ref{sec:
     \caption{Four 10$\times$10 subimages from
     M2. Blue dots are Hubble stars brighter than the 22nd magnitude.
     We print display the posterior samples from our variational
-    posterior (left) and from the MCMC chain of Portillos (right). }
+    posterior (left) and from the MCMC chain of PCAT (right). }
     \label{fig:example_subimages_sampled}
 \end{figure}
 

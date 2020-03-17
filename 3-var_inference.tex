@@ -1,36 +1,36 @@
 We have thus far described the likelihood,
 $\Prob(X | N, \ell, f)$, and specified the prior, $\Prob(N, \ell, f)$. 
 For moment, we treat the model parameters, the background and PSF, as known and fixed
-(we can use the SDSS estimates, for example). In section~\ref{sec:model_params}, we extend to unknown 
+(we can use the SDSS estimates, for example). In Section~\ref{sec:model_params}, we extend to unknown 
 model parameters and estimate them as part of our inference procedure. 
-\jeff{``Section'' is typically capitalized. Same for ``Figure''.}
 
 We seek the posterior distribution 
 $\Prob(N, \ell, f | X)$. In most nontrivial probabilistic models, including ours, the exact posterior distribution is intractable.
 
 Markov chain Monte Carlo (MCMC) is a common approach for approximating
-posterior distributions by constructing a stochastic process on the parameter space whose stationary distribution is the true posterior.
+posterior distributions by constructing a stochastic process on the parameter space whose stationary distribution is the exact posterior.
 \jeff{Better to drop the word ``true'' here. There's the posterior distribution, and there are approximations to the posterior distribution.}
+\bryan{I changed it to ``exact'' posterior; is that better?}
 However, its computational cost is prohibitively expensive for
 large-scale astronomical surveys. Instead, we propose to construct an approximate posterior using variational inference, resulting in a procedure that is several orders of magnitude faster than MCMC.
 \jeff{Probably better to move the comparison to MCMC to the introduction. Here we should just describe what we did with VI.}
 
 Variational inference~\cite{Blei_2017_vi_review, Jordan_intro_vi, Wainwrite_graph_models_vi}
 posits a family of distributions $\mathcal{Q}$ and seeks
-the distribution $q^*\in \mathcal{Q}$ that is closest to the true posterior
+the distribution $q^*\in \mathcal{Q}$ that is closest to the exact posterior
 in $\KL$ divergence. Suppose the family of distributions $\mathcal{Q}$ is parameterized by a real-valued vector $\eta$. The objective is 
 \begin{align}
    \eta^* &= \argmin_{\eta} \Big\{ \mathrm{KL}\Big[\,q_\eta(N, \ell, f | X)\, \| \,\Prob(N, \ell, f | X )\,\Big]\Big\} 
    \label{eq:kl_objective}
 \end{align}
 
-We note that minimizing the $\KL$ divergence is equivalent to maximizing the ELBO (evidence lower bound), defined as 
+Minimizing the $\KL$ divergence is equivalent to maximizing the ELBO (evidence lower bound), defined as 
 \begin{align}
     \mathcal{L} = 
     \Expect_{q_\eta(N, \ell, f | X)}\Big[\log\Prob(X, N, \ell, f) - \log q_\eta(N, \ell, f | X)\Big],
     \label{eq:elbo}
 \end{align}
-which does not depend on the marginal data distribution $\Prob(X)$, which is intractable. 
+which does not depend on the intractable marginal distribution $\Prob(X)$
 
 \subsection{The variational distribution}
 We now describe our family of distributions $\mathcal{Q}$. 
@@ -46,26 +46,22 @@ are the neural network weights.
 In the ensuing subsections, we detail the construction of our variational distribution. 
 
 \subsubsection{The factorization}
-To make the objective in equation~\eqref{eq:kl_objective} 
-\jeff{``Equation'' is usually capitalized. However, if you use eqref rather than ref (which doesn't add parentheses), it seems to be more common to omit the word ``Equation'' entirely.}
-tractable in most 
+To make the objective in \eqref{eq:kl_objective} tractable in most 
 applications, the family $\mathcal{Q}$ is restricted to probability distributions 
 that limit conditional dependencies between latent variables. In the most extreme case, mean-field variational inference, 
 the distribution over latent variables is assumed to fully factorize in the approximate posterior. 
 
 Our factorization takes a spatial structure: we first decompose the full 
-$H \times W$ image into disjoint $s \times s$ tiles. 
-Independently for each tile,
-we infer the number, locations, and fluxes of stars falling in that tile.
+$H \times W$ image into disjoint $s \times s$ tiles. See Figure~\ref{fig:ex_tiles} for a schematic. 
+Independently for each tile, we infer the number, locations, and fluxes of stars falling in that tile.
 Let $k = 1, ..., K$ index the tiles. Then
-denote the number of stars on tile $k$ by $N^k$;
-\jeff{Maybe better to use parentheses around the superscripts so they don't look like exponents?}
-the locations by $\ell^k = (\ell_{N, i}^k)_{i \leq N}$; 
-the fluxes $f^k = (f_{N, i}^k)_{i \leq N}$. Recall that locations on the 
-full image $\ell_{N, i}$ are parameterized to be in $[0, H] \times [0, W]$; 
-locations on the tiles $\ell^k_{N, i}$ parameterized to be in
-$[0, s] \times [0, s]$. A schematic 
-of our tiling is shown in figure~\ref{fig:ex_tiles}. 
+denote the number of stars on tile $k$ by $N^{(k)}$;
+the locations by $\ell^{(k)} = (\ell_{N, i}^k)_{i \leq N}$; 
+the fluxes $f^{(k)} = (f_{N, i}^k)_{i \leq N}$. Our variational 
+distribution factorizes over image tiles, so
+\begin{align}
+    q\big((N^{(k)}, \ell^{(k)}, f^{(k)})_{k = 1}^K|X\big) = \prod_{k = 1}^K q_\eta\big(N^{(k)}, \ell^{(k)}, f^{(k)} | X\big). 
+\end{align}
 
 \begin{figure}[h]
     \centering
@@ -75,52 +71,53 @@ of our tiling is shown in figure~\ref{fig:ex_tiles}.
     \label{fig:ex_tiles}
 \end{figure}
 
-Note that there is a bijection between latent variables on each tile and latent variables on the full image (locations on the full image map to locations on image tiles and vice-versa). Thus, a variational distribution for latent variables on tiles induces a variational distribution for latent variables on the full image. 
-
-In summary, 
-\jeff{Better to say it once clearly than to have a summary afterwards.
-Can you integrate the text below into the text before it?
-}
-we construct a distribution for latent variables on each tile that factorize over tiles: 
+There is a bijection between latent variables on each tile and latent variables on the full image (locations on the full image map to locations on image tiles and vice-versa). Thus, a variational distribution for latent variables on tiles induces a variational distribution for latent variables on the full image. Let $f$ be the mapping from latent variables on tiles to latent variables on the full image. Then the variational distribution for the latent variables on the full image is described by 
 \begin{align}
-    q((N^k, \ell^k, f^k)_{k = 1}^K|X) = \prod_{k = 1}^K q_\eta(N^k, \ell^k, f^k | X). 
-\end{align}
-If $f$ is the mapping from latent variables on tiles to latent variables on the full image, then the variational distribution for the latent variables on the full image is given by 
-\begin{align}
-    (N, \ell, f) &\stackrel{d}{=} f((N^k, \ell^k, f^k)_{k = 1}^K), \notag \\  
-        &\text{where } (N^k, \ell^k, f^k)_{k = 1}^K \sim \prod_{k = 1}^K q_\eta(N^k, \ell^k, f^k | X). 
+    (N, \ell, f) &\stackrel{d}{=} f((N^{(k)}, \ell^{(k)}, f^{(k)})_{k = 1}^K), \notag \\  
+        &\text{where } (N^{(k)}, \ell^{(k)}, f^{(k)})_{k = 1}^K \sim \prod_{k = 1}^K q_\eta(N^{(k)}, \ell^{(k)}, f^{(k)} | X). 
 \end{align}
 
 \subsubsection{Distributions on image tiles}
-We describe the distribution on each tile, $q_\eta(N^k, \ell^k, f^k | X)$. 
+We describe the distribution on each tile, $q_\eta(N^{(k)}, \ell^{(k)}, f^{(k)} | X)$. 
 Dropping the tile index $k$ in this subsection,
 \begin{align}
     N &\sim \text{Categorical}(\omega; 0, ..., N_{max}) \label{eq:var_distr_n}\\
 	\ell_{N, i} / s &\sim \text{LogitNormal}(\mu_{\ell_{N, i}}, \text{diag}(\nu_{\ell_{N, i}}) )\label{eq:var_distr_loc}\\
 	f^b_{N, i} &\sim \text{LogNormal}(\mu_{f^b_{N, i}}, \sigma^2_{f^b_{N, i}}) \label{eq:var_distr_f}
 \end{align}
-for $i = 1, ..., N$; $N = 1, ..., N_{max}$. The latent variables also fully factorize within each tile. Note that in the true posterior, $N$ has support on the nonnegative integers; in practice, we truncate at an $N_{max}$ large. 
+for $i = 1, ..., N$; $N = 1, ..., N_{max}$. The latent variables also fully factorize within each tile. Note that in the exact posterior, $N$ has support on the nonnegative integers; in practice, we truncate at an $N_{max}$ large. 
 
 These distributions were taken for convenience: fluxes are positive and right skewed, so we place a normal distribution on log-fluxes; locations are between zero and $s$, so 
 we place a normal distribution on the logit of the location scaled by $1 / s$. 
 
 \subsubsection{Neural network architecture}
-The parameters of the variational distribution (equations~\eqref{eq:var_distr_n}-\eqref{eq:var_distr_f}) are the output of a neural network. The input to the neural network is the $s \times s$ tile, padded with surrounding pixels. 
-For the problem of cataloging crowded starfields,
+On each tile, the parameters of the variational distribution, \eqref{eq:var_distr_n}-\eqref{eq:var_distr_f}, are the output of a neural network. The input to the neural network is the $s \times s$ tile, padded with surrounding pixels. 
+For cataloging the crowded starfield M2,
+we took $s = 2$ and padded the tile with three pixels. 
+For our test on a sparse field, we took $s = 50$ with no padding. 
+The architecture is shown schematically in figure~\ref{fig:starnet_arch}. 
 \jeff{Is there another problem we address too?}
-we took $s = 2$ and padded the tile with three pixels. The architecture is shown schematically in figure~\ref{fig:starnet_arch}. 
+\bryan{We do look at a sparse field later, where we take a larger $s$. 
+I've changed the text no comment on this. }
 
 \begin{figure}[!h]
     \centering
     \includegraphics[width=0.4\textwidth]{figures/starnet_archetecture2.png}
     \vspace{-0.5cm}
-    \caption{The neural network returning parameters for the variational distribution on each 2 x 2 image tile.}
+    \caption{For cataloging M2, the neural network returning parameters for the variational distribution on each 2 x 2 image tile.
+    On a sparse field, the neural network architecture is the same, 
+    except the input is a $50 \times 50$ image tile. }
     \label{fig:starnet_arch}
 \end{figure}
 
 Consider the output dimension of the neural network. The categorical parameter $\omega$ lies on the 
 simplex and has dimension $N_{max} + 1$; for each $i = 1, ..., N$ and $N = 1, ..., N_{max}$, the location has a mean and variance on each coordinate; the flux has a mean and variance for each band. Thus, for star indexed by $(i, N)$, 
 there are $2 \times (B + 2)$ parameters for its variational distribution. In total, the neural network has output dimension $(N_{max} + 1) + (B + 2) \times (N_{max}^2 + N_{max})$. 
+
+Recall that locations on the 
+full image $\ell_{N, i}$ are parameterized to be in $[0, H] \times [0, W]$. 
+On the tiles, locations $\ell^{(k)}_{N, i}$ are parameterized to be in
+$[0, s] \times [0, s]$. 
 
 Thus, decomposing the inference problem from full images into $2 \times 2$ tiles controls the output dimension of the neural network. 
 On a crowded starfield with $H = W = 100$, $N$ is on the order of $10^3$, 
