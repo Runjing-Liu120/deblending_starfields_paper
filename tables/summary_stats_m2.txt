@@ -1,6 +1,6 @@
-\begin{table}[h]
+\begin{table}
 \centering
-\caption{Summary statistics on M2}
+\caption{Summary statistics on M2. ``Hubble" refers to the catalog which we use as ground-truth}
 \label{tab:summary_stats}
 \begin{tabular}{lrrrr}
 \toprule
