@@ -1,19 +1,26 @@
 \subsection{Runtime} 
 \label{sec:runtime}
 In the sleep phase, we trained the variational approximation on 
-$100 \times 100$ images. However, our variational posterior can be evaluated on images of arbitrary size, by tiling the image into $s \times s$ tiles. On the crowded starfield described below, we used $s = 2$. 
+$100 \times 100$ images. 
+\jeff{An encoder network can be trained, but not a variational approximation.
+A variational approximation can be ``selected''. Or the variational parameters can be fit/trained.
+}
+However, our variational posterior can be evaluated on images of arbitrary size,
+\jeff{Our variational approximation to the posterior is \textit{defined} for images of arbitrary size. It's not ``evaluated''.}
+by tiling the image into $s \times s$ tiles. On the crowded starfield described below, we used $s = 2$. 
 
-We trained the initial sleep phase with the PSF and background set to SDSS estimates. We trained for 200 epochs with 200 images per epoch. We used 
+We trained the initial sleep phase 
+\jeff{What does it mean to ``train'' a sleep phase?}
+with the PSF and background set to SDSS estimates. We trained for 200 epochs with 200 images per epoch. We used 
 the Adam optimization routine~\cite{kingma2014adam} set at its default parameters. On a single Nvidia GeForce RTX 2080 Ti GPU 
 this initial sleep phase took approximately 10 minutes. 
 
-We ran two further wake-sleep cycles with each cycle taking approximately a minute. The subsequent sleep phases were shorter (10 epochs with 200 images each), and the wake phase employed SGD, with the gradient estimator in \eqref{eq:mstep_grad}. 
+We ran two further wake-sleep cycles. Each cycle took approximately a minute. The subsequent sleep phases were shorter (10 epochs with 200 images each), and the wake phase employed SGD, with the gradient estimator in \eqref{eq:mstep_grad}. 
 
 After training, evaluating the approximate posterior on a $100 \times 100$ 
 image took $\approx 0.2$ seconds. By comparison, the reported runtime of PCAT, which uses MCMC, is 30 minutes on a $100 \times 100$ subimage of M2~\cite{Feder_2019}. 
 
-We emphasize that our speed at inference time is what enables our method to 
-scale up to large astronomical surveys. A single SDSS image is $1489 \times 2048$ pixels. Projecting the reported runtime of PCAT to the full image, 
+The speed of our procedure at inference time (which excludes training time) enables our method to scale up to large astronomical surveys. A single SDSS image is $1489 \times 2048$ pixels. Projecting the reported runtime of PCAT to the full image, 
 we would expect a runtime of 
 $\approx 30\text{min} \times 14 \times 20 = 8400$min, or almost six days. 
 
@@ -32,11 +39,11 @@ A run is one continuous scan of the telescope, usually corresponding to one nigh
 A run is broken down into fields; some runs have over 800 fields. 
 Each field contains six camera columns. 
 Thus, for a large-scale sky survey like SDSS which 
-contains over 8000 runs, MCMC will be unfeasible. 
+contains over 8000 runs, MCMC will be infeasible. 
 
 
-\subsection{Inference on M2}
-To test our performance, we applied our method to the SDSS image of M2 found in run 2583, camcol 2, and field 136.
+\subsection{Inference on the M2 globular cluster}
+To test our performance, we applied our method to the SDSS image of the M2 globular cluster found in run 2583, camcol 2, and field 136.
 M2 was also imaged in the ACS Globular Cluster Survey~\cite{Sarajedini_2007}
 using the Hubble Space telescope (HST),
 which has $\approx20$ times the angular resolution and $\approx30$ times the exposure of the Sloan telescope. The reported catalog from this Hubble survey was used to 
@@ -96,14 +103,13 @@ Conversely, we found that the DAOPHOT catalog underestimates the number of stars
 wake-sleep only suffered a decrease in PPV of 4\%. 
 
 We combined TPR and PPV into one statistic using the F1 score,
-defined as the geometric average between TPR and PPV, and found that both 
-sleep-only and wake-sleep outperform PCAT and DAOPHOT.
+defined as the geometric average between TPR and PPV, and found that both sleep-only and wake-sleep outperform PCAT and DAOPHOT.
 
 \input{tables/summary_stats_m2.txt}
 
-In figure~\ref{fig:summary_stats}, we plot the TPR and PPV binned by magnitude.
+In Figure~\ref{fig:summary_stats}, we plot the TPR and PPV binned by magnitude.
 Wake-sleep and PCAT showed similar TPR across all magnitudes, and both were
-uniformly better than DAOPHOT. Wake-sleep had a PPV that is higher than PCAT for all magnitudes. Of all methods, DAOPHOT had the best PPV at smaller magnitudes.
+uniformly better than DAOPHOT. Wake-sleep had a PPV higher than PCAT for all magnitudes. 
 
 \begin{figure}[h]
     \centering
@@ -114,52 +120,52 @@ uniformly better than DAOPHOT. Wake-sleep had a PPV that is higher than PCAT for
     \label{fig:summary_stats}
 \end{figure}
 
-In figure~\ref{fig:example_subimages}, we display four $10\times10$ subimages, and plot
-our wake-sleep catalog against the Hubble catalog. We also display the DAOPHOT catalog and one catalog sample from PCAT.
+In Figure~\ref{fig:example_subimages}, we display four $10\times10$ subimages, and overlay our wake-sleep MAP catalog against the Hubble catalog. We also display the DAOPHOT catalog and one catalog sample from PCAT.
 
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.6\textwidth]{figures/example_subimages.png}
     \caption{Estimated catalogs on four 10$\times$10 subimages from
     M2. Blue dots are Hubble stars brighter than the 22nd magnitude.
-    Starnet, PCAT, and DAOPHOT estimated stars are in
+    Wake-sleep, PCAT, and DAOPHOT estimated stars are in
     red, cyan, and orange x's, respectively. }
     \label{fig:example_subimages}
 \end{figure}
 
 
-In figure~\ref{fig:example_subimages_sampled}, we display the sampled catalogs from both our 
-wake-sleep trained approximate posterior as well as from PCAT. Assuming the MCMC
-of PCAT converged to the true posterior, we see that our uncertainty estimates
-were generally larger. This is expected from the discussion of section~\ref{sec:kl_q_p}. 
+In Figure~\ref{fig:example_subimages_sampled}, we display sampled catalogs from both our wake-sleep approximate posterior as well as from PCAT. Our variational approximate posterior appeared to show larger uncertainties
+than PCAT. This is in agreement from the discussion of section~\ref{sec:kl_q_p}. 
 
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.6\textwidth]{figures/example_subimages_samples.png}
     \caption{Four 10$\times$10 subimages from
     M2. Blue dots are Hubble stars brighter than the 22nd magnitude.
-    We print display the posterior samples from our variational
+    We print display the posterior samples from our wake-sleep variational
     posterior (left) and from the MCMC chain of PCAT (right). }
     \label{fig:example_subimages_sampled}
 \end{figure}
 
-In figure~\ref{fig:z-score_calibration} we examine the calibration of our uncertainties. We evaluated our approximate posterior obtained from wake-sleep training, conditioning on the true number of stars in the Hubble catalog. Thus, each star in our estimated 
-catalog was matched with exactly one Hubble star (we found the permutation of the Hubble stars that had the largest log-likelihood under our variational distribution $q_\eta$). For each star, we computed the z-score $(y - \hat y) / \hat \sigma$, where $y$ is the true log-flux or 
-logit-location; $\hat y$ is the mean of the Gaussian variational distribution, and $\hat\sigma$  its standard deviation. If the uncertainties were perfectly calibrated, the distribution of the 
-z-scores would be a standard Gaussian. We found the empirical variance of the z-scores
-to be approximately one (TODO: report values). There was a slight upward downward bias in our estimated fluxes, suggesting some degree of model mis-specification. 
+Figure~\ref{fig:z-score_calibration} examines the calibration of our uncertainties. We evaluated our wake-sleep approximate posterior 
+conditional on the true number of stars in the Hubble catalog. 
+Thus, each star in our estimated catalog was matched with exactly one Hubble star (we found the permutation of the Hubble stars that had the largest log-likelihood under our variational distribution $q_\eta$). For each star, we computed the z-score $(y - \hat y) / \hat \sigma$, where $y$ is the true log-flux or 
+logit-location; $\hat y$ is the mean of the Gaussian variational distribution, and $\hat\sigma$ the standard deviation.
+If the uncertainties were perfectly calibrated, the distribution of the z-scores would be a standard Gaussian. 
+We see from Figure~\ref{fig:z-score_calibration} that 
+the tails of our empirical z-score distribution are slightly larger than standard Gaussian, suggesting that our error is somewhat under-estimated. 
 
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.99\textwidth]{figures/z-score_calibration.png}
-    \caption{The calibration of uncertainties in our variational posterior. Conditional on the true number of stars, we computed the z-score of the true logit-location or log-flux evaluated at our
-    variational posterior. }
+    \caption{The calibration of uncertainties in our variational posterior. Conditional on the true number of stars, we computed the z-score of the true logit-location or log-flux evaluated at our variational posterior. 
+    The empirical mean and variance for the logit-location z-scores are 0.27 and 1.91, respectively; The empirical mean and variance for the log-flux z-scores are 0.17 and 1.53, respectively. 
+}
     \label{fig:z-score_calibration}
 \end{figure}
 
-We plot the distribution of estimated r-band fluxes in figure~\ref{fig:luminosity_fun_m2}. We compared 
-against the distribution of F606W-band fluxes in the HST catalog. While the Hubble F606W-band has a broader absorption range than the SDSS r-band, they are centered at roughly the same wavelength. For PCAT, we display the flux distribution from single catalog sample; for our variational 
-posterior, we use our MAP catalog. We see that DAOPHOT returned fluxes only up to $\approx21$ mag; 
+We plot the distribution of estimated $r$-band fluxes in Figure~\ref{fig:luminosity_fun_m2}. We compared 
+against the distribution of F606W-band fluxes in the HST catalog. While the Hubble F606W-band has a broader absorption range than the SDSS $r$-band, they are centered at roughly the same wavelength. For PCAT, we displayed the flux distribution from single catalog sample; for our wake-sleep variational 
+posterior, we used our MAP catalog. We see that DAOPHOT returned fluxes only up to $\approx21$ mag; 
 conversely, PCAT greatly over-estimated the number of dim stars with magnitude less than 21 mag. Our flux distribution came closest to the distribution of the HST catalog. 
 
 \begin{figure}[h]
@@ -169,8 +175,8 @@ conversely, PCAT greatly over-estimated the number of dim stars with magnitude l
     \label{fig:luminosity_fun_m2}
 \end{figure}
 
-Finally, we print the estimated color-magnitude diagrams in figure~\ref{fig:cmd_m2}. While the Hubble F606W-band corresponds roughly to the SDSS $r$-band, there is no such correspondence for the SDSS $i$-band. Thus, using the Hubble locations, we estimated the ``true" i-band fluxes using maximum 
-likelihood (using the likelihood defined in section~\ref{sec:gen_model}). We used this estimated $i$-band flux and the Hubble F606W-band flux to define the ``true" color. We again compared with the catalog returned by DAOPHOT, PCAT, and wake-sleep. We see that DAOPHOT did not capture the full spectrum of colors; of all three methods, PCAT seemed to best capture the color spectrum. All three methods however, were able to capture the arm thing (TODO there is a name for this ... main sequence turnoff?) that branches off at low magnitudes. 
+Finally, Figure~\ref{fig:cmd_m2} displays the estimated color-magnitude diagrams. While the Hubble F606W-band corresponds roughly to the SDSS $r$-band, there is no such correspondence for the SDSS $i$-band. Thus, using the Hubble locations, we estimated the ``true" $i$-band fluxes using maximum likelihood; that is, we maximized \eqref{eq:loglik}
+for $f$, with $N$ and $\ell$ set to the true number of stars and locations. We used this estimated $i$-band flux and the Hubble F606W-band flux to define the ``true" color. We again compared with the catalog returned by DAOPHOT, PCAT, and wake-sleep. We see that DAOPHOT did not capture the full spectrum of colors; of all three methods, PCAT seemed to best capture the color spectrum. All three methods however, were able to capture the arm thing (TODO there is a name for this ... main sequence turnoff?) that branches off at low magnitudes. 
 
 \begin{figure}[h]
     \centering
@@ -182,19 +188,22 @@ likelihood (using the likelihood defined in section~\ref{sec:gen_model}). We use
 
 \subsection{Estimation of model parameters}
 \label{sec:results_model_params}
-In this section, we examine our estimated model parameters. As shown in the previous section, wake-sleep improved the catalog over sleep-only. In table~\ref{tab:chi-square-stats1}, we
+In this section, we examine our estimated parameters 
+for the sky intensity and the PSF. As shown in the previous section, wake-sleep improved the catalog over sleep-only. In Table~\ref{tab:chi-square-stats1}, we
 print the negative log-likelihood $- \log \Prob_\phi(X | N_{H}, \ell_{H}, f_{H})$ for various model parameters $\phi$, where $N_{H}, \ell_{H}, f_{H}$ are the ground truth
 values from the Hubble catalog (though the $i$-band flux needs to be estimated, as above). 
 
-We compared the log-likelihood under the default SDSS estimates with the estimates found using wake-sleep. We see that the wake-sleep estimates improved the log-likelihood. We also compared against the ``Hubble estimate" of the background and PSF, obtained by minimizing 
+We compared the log-likelihood under the default SDSS estimates with the estimates found using wake-sleep. Wake-sleep estimates improved the log-likelihood. We also compared against the ``Hubble estimate" of the background and PSF, obtained by minimizing 
 $- \log \Prob_\phi(X | N_{H}, \ell_{H}, f_{H})$ for $\phi$ directly. 
 
 This table suggests that the largest source of model misfit is the background. A significant decrease in negative log-likelihood occurred by switching from the SDSS background to the Hubble-estimated background. 
 But even using the Hubble-estimated background, switching from the SDSS PSF to our wake-sleep PSF still improved the log-likelihood. 
 
 \input{tables/chi_sq_stats.txt}
+% \caption{
+% Negative log-likelihood for SDSS, wake-sleep, and Hubble estimated model parameters. In the right column, we fix the background to the Hubble estimate, and examine negative log-likelihood as the PSF varies.}
 
-As evidenced in figure~\ref{fig:psf_profiles}, our wake-sleep PSF did not change the SDSS PSF significantly. The greatest change was in the r-band PSF, where the SDSS PSF was most different from the Hubble-estimated PSF. 
+As evidenced in Figure~\ref{fig:psf_profiles}, our wake-sleep PSF did not change the SDSS PSF significantly. The greatest change was in the $r$-band PSF, where the SDSS PSF was most different from the Hubble-estimated PSF. 
 
 \begin{figure}[h]
     \centering
@@ -216,17 +225,18 @@ As evidenced in figure~\ref{fig:psf_profiles}, our wake-sleep PSF did not change
 % chi-squared statistics as the PSF varies.}
 
 \subsection{Sparse field test}
-As discussed in section~\ref{sec:runtime}, our approach has the potential 
-to scale up to large astronomical surveys. We chose the image of M2 to 
-test our method because ``ground truth" could be obtained from Hubble images 
-to validate our results. Most regions of the sky are much less 
+As discussed in Section~\ref{sec:runtime}, our approach has the potential 
+to scale up to large astronomical surveys. We chose the image of M2 to test our method because ``ground truth" could be obtained from Hubble images to validate our results. Moreover, 
+the PSF model is fairly realistic on M2: all sources are 
+stars, and there are no galaxies in this region. 
+However, most regions of the sky are much less 
 crowded than M2.
 
-We applied our method to SDSS run 94, camcol 1, and field  12, 
-a region of the sky with star density more typical of the SDSS survey. 
-After 10 minutes of training, we produced a catalog on the full $1489\times 2048$ image in $\approx2$ seconds. 
 
-We chose this SDSS image because it is contained in Stripe 82, a region of the sky repeated imaged by SDSS. Averaging images from different runs boosts the signal to noise ratio and this {\itshape co-added} image can be analyzed to obtain a ground truth. 
+We chose SDSS run 94, camcol 1, and field  12 to examine our method on a sparse field more typical of SDSS 
+images. After ten minutes of sleep training, we produced a catalog on the full $1489\times 2048$ image in $\approx2$ seconds (versus approximately six days of runtime for MCMC). 
+
+This image is contained in Stripe 82, a region of the sky repeatedly imaged by SDSS. Averaging images from different runs boosts the signal to noise ratio and this {\itshape co-added} image can be analyzed to obtain a ground truth. 
 
 However, this region of the sky also contains galaxies, which are 
 not well-modelled by a PSF. A future paper will extend our generative model to include galaxies. For our setup, we use our approximate posterior 
@@ -234,7 +244,7 @@ trained using sleep-only (otherwise the model will try to use the PSF to explain
 
 Since this region of the sky is more sparse, we tile the image into $50\times 50$ tiles; $N_{max}$ on the tiles is three. 
 
-In figure~\ref{fig:sparse_field}, we plot a $500\times 500$ subimage with 
+In Figure~\ref{fig:sparse_field}, we plot a $500\times 500$ subimage with 
 our MAP catalog overlayed with the ground truth. We also report the 
 TPR, comparing the stars in the co-added catalog with our estimated stars. (We have extraneous defections that are due to galaxies and thus 
 do not report the PPV). Of the stars in the co-added catalog with brightness at least $22.5$mag, we achieved a TPR of 90\%. 

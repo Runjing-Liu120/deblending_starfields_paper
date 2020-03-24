@@ -19,18 +19,18 @@ E-step objective with
     \argmin_{\eta} \Expect_{\tilde X \sim \Prob(\tilde X)}\Big[\KL(\Prob_\phi(N, \ell, f | \tilde X) \| q_\eta(N, \ell, f | \tilde X)\Big]
     \label{eq:sleep_obj}
 \end{align}
-called the {\itshape sleep phase}. We will see in section~\ref{sec:sleep_details} that a simple gradient estimator can be derived for the sleep phase objective, without 
+called the {\itshape sleep phase}. We will see in Section~\ref{sec:sleep_details} that a simple gradient estimator can be derived for the sleep phase objective, without 
 reparameterization or REINFORCE. 
 
 We comment on two key differences between the sleep objective and the E-step (equation~\eqref{eq:e_step}). First note the difference in ordering of arguments to the $\KL$. 
 While optimizing $\KL(q\|p)$ in equation~\eqref{eq:e_step} does not depend on the intractable 
 data likelihood $\Prob_\phi(X)$, the $\KL$ with arguments reversed does. 
-As will be detailed in section~\ref{sec:sleep_details}, the outer expectation over the data makes this optimization objective tractable without dependence on $\log P(X)$. 
+As will be detailed in Section~\ref{sec:sleep_details}, the outer expectation over the data makes this optimization objective tractable without dependence on $\log P(X)$. 
 
 The expectation over the data also gives different meaning to the sleep objective. The E-step objective seeks $\eta$ to minimize the $\KL$ between $P_\phi(N, \ell, f | X)$ and $q_\eta(N, \ell, f | X)$ {\itshape for fixed, observed data $X$},
 in this case the $H\times W$ image. In contrast, the sleep objective seeks to minimize the $\KL$ {\itshape averaged over all possible data. } In other words, the target is no longer an approximate posterior for observed data, but rather an approximate posterior that is ``good on average" over possible data .
 
-Moreover, ``possible data" is defined under our generative model from section~\ref{sec:gen_model}. In order for $q_\eta(N, \ell, f | X)$ to be a good approximation to
+Moreover, ``possible data" is defined under our generative model from Section~\ref{sec:gen_model}. In order for $q_\eta(N, \ell, f | X)$ to be a good approximation to
 the true posterior when $X$ is observed data, then it is imperative that our generative model $\Prob_\phi(X)$ well-approximates the true underlying data-generating mechanism. 
 
 Therefore, a {\itshape wake phase} is employed to tune the model parameters. The wake-phase objective is
@@ -40,12 +40,12 @@ Therefore, a {\itshape wake phase} is employed to tune the model parameters. The
 \end{align}
 which is equivalent to the M-step in variational EM (equation~\ref{eq:m_step}). 
 
-Note that stochastic gradients are easy to compute in the wake phase (M-step). Because the integrating distribution does not depend on the optimization parameter $\phi$ in the wake phase, unbiased stochastic gradients are computed simply as 
+Stochastic gradients are easy to compute in the wake phase (M-step). Because the integrating distribution does not depend on the optimization parameter $\phi$ in the wake phase, unbiased stochastic gradients are computed simply as 
 \begin{align}
     \nabla_\phi \log\Prob_\phi(X, N, \ell, f) \quad \text{ for } (N, \ell, f)\sim q_\eta
     \label{eq:mstep_grad}
 \end{align}
-While the E-step is not conducive to simple gradient estimators, we will see in section~\ref{sec:sleep_details} that our sleep-phase objective
+While the E-step is not conducive to simple gradient estimators, we will see in Section~\ref{sec:sleep_details} that our sleep-phase objective
 results in a similarly straightforward gradient estimator as in equation~\eqref{eq:mstep_grad}. However,
 we note that a consequence of replacing the E-step with the sleep phase is that the wake-sleep algorithm no longer targets a singular objective like that of equation~\eqref{eq:em_obj}. 
 
@@ -65,12 +65,12 @@ we note that a consequence of replacing the E-step with the sleep phase is that 
 %     \text{{\bf Wake: }} & \phi_{t} =  \argmin_{\phi} \; \mathrm{KL}\Big[\,q_{\eta_t}(N, \ell, f | X)\, \| \,\Prob_\phi(N, \ell, f | X )\,\Big]. 
 %     \label{eq:wake_kl}
 % \end{align}
-% In the sleep phase, we are simulating data from $\Prob_\phi$ (i.e. ``dreaming") in 
 % order to construct an approximate posterior. In the wake phase, we reveal the observed data $X$ and optimize model parameters $\phi$ so that our data-generating process aligns as closely as possible with the true data. 
 
 \subsubsection{Decomposing the sleep objective}
 \label{sec:sleep_details}
-In this section, we decompose the sleep-phase objective in equation~\eqref{eq:sleep_obj} to examine its properties. We take $\phi$ as fixed in this section, and drop the explicit dependence of $\Prob$ on $\phi$.
+In this section, we decompose the sleep-phase objective in equation~\eqref{eq:sleep_obj} to examine its properties. 
+We take $\phi$ as fixed in this section, and drop the explicit dependence of $\Prob$ on $\phi$.
 
 First, we show that the objective does not depend on the intractable term $\Prob(X)$. 
 We write
@@ -123,7 +123,7 @@ In summary, the sleep-phase results in a supervised learning problem on complete
 
 \subsubsection{Reverse versus forward KL}
 \label{sec:kl_q_p}
-TODO: something about forward KL overestimates uncertainties, see figure~\ref{fig:kl_q_p_schematic}. 
+TODO: something about forward KL overestimates uncertainties, see Figure~\ref{fig:kl_q_p_schematic}. 
 
 \begin{figure}[!h]
     \centering

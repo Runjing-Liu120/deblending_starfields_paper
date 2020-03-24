@@ -1,57 +1,62 @@
-To generate a $H \times W$ pixel image, we first draw stars from a marked Poisson process
-on the plane. Explicitly, we first draw the number of stars $N$
+To generate a $H \times W$ pixel image, we first draw the number of stars it contains:
 \begin{align}
 	N &\sim \text{Poisson}(\mu HW),
 \end{align}
-and independently, for every $N = 1, 2, ... $, we draw locations 
+\jeff{Consider making $N$ lowercase, so that all our random variables are lowercase. It might look weird at first, but it's really helpful to distinguish with notation what is random and what isn't.}
+\jeff{Better to talk about the marked point process later (or earlier, in the introduction). Just describe the model as simply as possible here.}
+Then, for each $N = 1, 2, ... $, we draw locations 
 \begin{align}
   \ell_{N, i} &\sim \text{Uniform}([0, H] \times [0, W]) \quad \forall i = 1, ..., N, 
  \end{align}
- and reference band fluxes,
+ and reference band fluxes
  \begin{align}
   f_{N, i}^{1} & \sim \text{Pareto}(f_{min}, \alpha) \quad \forall i = 1, ..., N. 
   \label{eq:flux_prior}
 \end{align}
-For images with $B$ bands, we also draw $B - 1$ colors,
+Images have $B$ bands and therefore $B - 1$ colors. The color distribution is
 \begin{align}
   c_{N, i}^{b}  & \sim \mathcal{N}(\mu_c, \sigma^2_c) \quad \forall b = 2, ..., B; i = 1, ..., N.
 \end{align}
 The relation between flux and color is as follows: 
-given flux in the reference band $f^1$ and color $c^b$, 
-the flux in the $b$th band $f^b$ is $f^1 \times 10^{c^b / 2.5}$. 
-In the SDSS data, we took the $r$-band to be the reference band. 
+given flux in the reference band $f^1$ and color $c^b$,
+\jeff{Is the reference band always 1? I usually think of the r band as having index 3. What does Portillo do?}
+the flux in the $b$th band $f^b$ is $f^1 \times 10^{c^b / 2.5}$.
+\jeff{$f^b$ looks like a value raised to an exponent. $f^{(b)}$ instead?}
+In the SDSS data, we took the $r$-band to be the reference band.
 
-These latent variables form a triangular array; that is, 
-there is a set of locations and fluxes for each $N$. For simplicity, let
-$\ell$ and $f$ without subscripts to denote entire triangular 
-arrays. 
+Each value of $N$ corresponds to a disjoint set of $N$ locations and fluxes.
+Let $\ell$ and $f$ (without subscripts) each denote the triangular array of latent variables.
 
-After sampling $N$,
-the locations and fluxes in the $N$th row of the triangular array 
-produces an image.
-The expected number of photoelectrons to arrive at pixel $(h,w)$ in band $b$ is given by
+Given $N$, $\ell$, and $f$, the expected number of photoelectrons measured at pixel $(h,w)$ in band $b$ is
 \begin{align}
   \lambda^b_{hw} = I^{b}_{hw} + \sum_{i = 1}^N f_{N, i}^b \mathcal{P}^b\big(h - \ell_{N, i}[1], w - \ell_{N,i}[2]\big),
   \label{eq:expected_intensity}
 \end{align}
 where $I^{b}_{hw}$ is the background intensity, which we allow to vary by pixel and band,
-and $\mathcal{P}^b$ is the point spread function (PSF) for band $b$. The PSF
-is a function $\mathcal{P}^b : [0, H] \times [0, W] \mapsto \Reals^+$,
+and where $\mathcal{P}^b$ is the point spread function (PSF) for band $b$. The PSF
+is a function
+\begin{align}
+\mathcal{P}^b : [0, H] \times [0, W] \mapsto \Reals^+,
+\end{align}
+\jeff{Is this the same $H$ as appears earlier?}
 describing how a stellar point source appears
 on our image. In Section~\ref{sec:model_params}, we will see 
-that these model
-parameters $I^{b}_{hw}$ and $\mathcal{P}^b$ can be estimated jointly with
+that the model
+parameters $I^{b}_{hw}$ and $\mathcal{P}^b$
+\jeff{The PSF is a function, not model parameters. What are the parameters the PSF depends on? Those are part of the generative model.}
+can be estimated jointly with
 the latent variables.
 
 Making an appeal to the law of rare events, we model the
 observed number of photoelectrons at pixel $(h,w)$ and band $b$ as Poisson
 with mean $\lambda^b_{hw}$. Since $\lambda^b_{hw}$ is large,
 we take the Gaussian approximation to the Poisson.
-Thus, the observed pixel intensities are drawn
+Thus, the observed pixel intensities are
 \begin{align}
   X_{hw}^b | f, \ell, N \overset{ind}{\sim} \mathcal{N}(\lambda^b_{hw}, \lambda^b_{hw}).
 \end{align}
-Explicitly, the log-likelihood is computed as 
+\jeff{Better to use lowercase $x$ rather than $X$ if you're not going to use uppercase for all the random variables}
+Explicitly, the log-likelihood is
 \begin{align}
     \log P(X | N, \ell, f) &= \sum_{b = 1}^{B} \sum_{h = 1}^H \sum_{w = 1}^W 
         \Big\{\frac{1}{2\lambda^b_{hw}}(X_{hw}^b  - \lambda^b_{hw})^2 - 

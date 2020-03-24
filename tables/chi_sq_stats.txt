@@ -1,7 +1,7 @@
 \begin{table}[h]
 \centering
 \caption{
-Negative log-likelihood for SDSS, wake-sleep, and Hubble estimated model parameters.In the middle column, ``model parameters" refer to both background and PSF. In the right column, we fix the background to the Hubble estimate, and examine negative log-likelihood as the PSF varies.}
+Negative log-likelihood for SDSS, wake-sleep, and Hubble estimated model parameters. In the right column, we fix the background to the Hubble estimate, and examine negative log-likelihood as the PSF varies.}
 \label{tab:chi-square-stats1}
 \begin{tabular}{lrr}
 \toprule

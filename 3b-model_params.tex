@@ -1,4 +1,4 @@
-The generative model from section~\ref{sec:gen_model} requires
+The generative model from Section~\ref{sec:gen_model} requires
 the specification of a PSF and a sky background. 
 For the subimage of M2 we examine, 
 we take the background at pixel $(i, j)$ to be an affine function in $i$ and $j$, so 
@@ -17,10 +17,11 @@ We model the PSF as a weighted average between a Gaussian ``core" and a power-la
 \end{align}
 where $r^2 = x^2 + y^2$. Though not explicit here, we allow the PSF parameters
 $\pi := (\sigma_1, \sigma_2, \sigma_P, \gamma, p_0)$ to vary by band as well. 
+\jeff{Seems like this should be in Section 2. It's part of the specification of the generative model.}
 
 Let $\phi = (\beta^b, \pi^b)_{b = 1}^B$
 be the concatenation of all model parameters into a real-valued vector. 
-\jeff{It's pretty unusual to use $\phi$ for model parameters, rather than $\theta$. Unless there's a reason, better to use $\theta$. It will be much easier on the reader, leaving them with more attention to devote to understanding the substantive ideas in the paper.
+\jeff{It's pretty unusual to use $\phi$ for model parameters, rather than $\theta$. Unless there's a reason, better to use $\theta$. It will be easier on the reader, leaving them with more attention to devote to understanding the substantive ideas in the paper.
 }
 Our likelihood, and therefore posterior, now depend on $\phi$. We denote this dependence with a subscript, $\Prob_\phi$. 
 
@@ -40,7 +41,7 @@ Variational EM~\cite{Jordan_intro_vi, neal2000varem, Beal2002varem} optimizes th
 \end{align}
 for iterations $t = 1, ..., T$. 
 
-The E-step objective is exactly same as the KL objective in variational inference, equation~\ref{eq:kl_objective}, for fixed model parameters $\phi$. 
+The E-step objective is exactly same as the KL objective in variational inference, equation~\eqref{eq:kl_objective}, for fixed model parameters $\phi$. 
 In other words, for fixed model parameters $\phi$, we are seeking the variational distribution closest the the true posterior under $\phi$. 
 
 Recall that minimizing the KL divergence is equivalent to maximizing the ELBO (equation~\eqref{eq:elbo}). We can thus rewrite the M-step as 
@@ -59,7 +60,7 @@ To estimate model parameters, the goal is to optimize the marginal log-likelihoo
 % While MCMC allows for the careful quantification of uncertainties, its computational cost
 % is prohibitively large for large scale astronomical surveys. One possible alternative
 % is to characterize the posterior using the maximum a posteriori estimate. Using the
-% generative model from section~\ref{sec:gen_model}, the joint loglikelihood is
+% generative model from Section~\ref{sec:gen_model}, the joint loglikelihood is
 % \begin{align}
 %   \log \mathcal{L}(N, \ell, f,& c) \stackrel{c}{=} \overbrace{\sum_{b = 1}^B \sum_{w = 1}^W \sum_{h = 1}^H
 %         \Big\{-\frac{1}{2}\log{\lambda_{hw}^b} - \frac{(x_{hw}^b - \lambda_{hw}^b)^2}{2\lambda_{hw}^b}\Big\}}^
