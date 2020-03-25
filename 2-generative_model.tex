@@ -1,51 +1,67 @@
-To generate a $H \times W$ pixel image, we first draw the number of stars it contains:
+\subsection{Latent variable spaces and priors}
+Our goal is to infer a {\itshape catalog} of 
+point sources, defined as the collection
+\begin{align}
+    \theta := \{N, (\ell_i, f_i)
+\end{align}
+
+
+To generate an $H \times W$ pixel image, we first draw the number of stars it contains:
 \begin{align}
 	N &\sim \text{Poisson}(\mu HW),
 \end{align}
 \jeff{Consider making $N$ lowercase, so that all our random variables are lowercase. It might look weird at first, but it's really helpful to distinguish with notation what is random and what isn't.}
-\jeff{Better to talk about the marked point process later (or earlier, in the introduction). Just describe the model as simply as possible here.}
+% \jeff{Better to talk about the marked point process later (or earlier, in the introduction). Just describe the model as simply as possible here.}
 Then, for each $N = 1, 2, ... $, we draw locations 
 \begin{align}
-  \ell_{N, i} &\sim \text{Uniform}([0, H] \times [0, W]) \quad \forall i = 1, ..., N, 
+  \ell_{N, i} &\sim \text{Uniform}([0, H] \times [0, W]) \quad \forall i = 1, ..., N. 
  \end{align}
- and reference band fluxes
- \begin{align}
-  f_{N, i}^{1} & \sim \text{Pareto}(f_{min}, \alpha) \quad \forall i = 1, ..., N. 
-  \label{eq:flux_prior}
+We draw fluxes in the reference band (band 1) from a power law distribution:
+\begin{align}
+    f_{N, i}^{1} & \sim \text{Pareto}(f_{min}, \alpha) \quad \forall i = 1, ..., N. 
+\label{eq:flux_prior}
 \end{align}
 Images have $B$ bands and therefore $B - 1$ colors. The color distribution is
 \begin{align}
   c_{N, i}^{b}  & \sim \mathcal{N}(\mu_c, \sigma^2_c) \quad \forall b = 2, ..., B; i = 1, ..., N.
 \end{align}
 The relation between flux and color is as follows: 
-given flux in the reference band $f^1$ and color $c^b$,
+given flux in the reference band $f^1_{N, i}$ and color $c^b_{N, i}$,
 \jeff{Is the reference band always 1? I usually think of the r band as having index 3. What does Portillo do?}
-the flux in the $b$th band $f^b$ is $f^1 \times 10^{c^b / 2.5}$.
+\bryan{I didn't actually mean the index of the band in the telescope -- just wanted an enumerate of bands $1, ..., B$}
+the flux in the $b$th band $f^b_{N, i}$ is $f^1_{N, i} \times 10^{c^b_{N, i} / 2.5}$.
 \jeff{$f^b$ looks like a value raised to an exponent. $f^{(b)}$ instead?}
 In the SDSS data, we took the $r$-band to be the reference band.
 
-Each value of $N$ corresponds to a disjoint set of $N$ locations and fluxes.
+In our formulation, each value of $N$ corresponds to a disjoint set of $N$ locations and fluxes.
 Let $\ell$ and $f$ (without subscripts) each denote the triangular array of latent variables.
 
-Given $N$, $\ell$, and $f$, the expected number of photoelectrons measured at pixel $(h,w)$ in band $b$ is
+Having drawn $N$, we index into the $N$th row of triangular array, and use this set of locations and fluxes to construct 
+the image. The expected number of photoelectrons measured at pixel $(h,w)$ in band $b$ is
 \begin{align}
   \lambda^b_{hw} = I^{b}_{hw} + \sum_{i = 1}^N f_{N, i}^b \mathcal{P}^b\big(h - \ell_{N, i}[1], w - \ell_{N,i}[2]\big),
   \label{eq:expected_intensity}
 \end{align}
-where $I^{b}_{hw}$ is the background intensity, which we allow to vary by pixel and band,
-and where $\mathcal{P}^b$ is the point spread function (PSF) for band $b$. The PSF
-is a function
+where $I^{b}_{hw}$ is the background intensity, which we allow to vary by pixel and band. $\mathcal{P}^b$ is the point spread function (PSF) for band $b$. The PSF
+is a function 
 \begin{align}
-\mathcal{P}^b : [0, H] \times [0, W] \mapsto \Reals^+,
+\mathcal{P}^b : \Reals \times \Reals \mapsto \Reals^+,
 \end{align}
-\jeff{Is this the same $H$ as appears earlier?}
 describing how a stellar point source appears
-on our image. In Section~\ref{sec:model_params}, we will see 
-that the model
-parameters $I^{b}_{hw}$ and $\mathcal{P}^b$
-\jeff{The PSF is a function, not model parameters. What are the parameters the PSF depends on? Those are part of the generative model.}
-can be estimated jointly with
-the latent variables.
+on our image. In this paper, we model the PSF as a weighted average between a Gaussian ``core" and a power-law ``wing" as described in~\cite{Xin2018psf}. For each band, the PSF is 
+\begin{align}
+    \mathcal{P}(u,w) = \frac{\exp(\frac{-r^2}{2\sigma_1^2}) + 
+                            b \exp(\frac{-r^2}{2\sigma_2^2}) + 
+                            p_0(1 + \frac{r^2}{\gamma\sigma^2_P})^{-\beta/2} }{1 + b + p_0},
+\end{align}
+where $r^2 = u^2 + w^2$. The PSF parameters are allowed to vary by band. Define 
+$\pi := (\sigma_{1,b}, \sigma_{2,b}, \sigma_{P,b}, \gamma_b, p_{0,b})_{b=1}^B$ as the collection of PSF parameters across all bands. 
+
+The background intensity is modeled as a simple affine function: 
+\begin{align}
+    I_{ij}^{b} = \beta_0^{b} + \beta_1^{b} \times i + \beta_2^{b} \times j,
+\end{align}
+and the background parameters are also allowed to vary by band. 
 
 Making an appeal to the law of rare events, we model the
 observed number of photoelectrons at pixel $(h,w)$ and band $b$ as Poisson
@@ -53,13 +69,28 @@ with mean $\lambda^b_{hw}$. Since $\lambda^b_{hw}$ is large,
 we take the Gaussian approximation to the Poisson.
 Thus, the observed pixel intensities are
 \begin{align}
-  X_{hw}^b | f, \ell, N \overset{ind}{\sim} \mathcal{N}(\lambda^b_{hw}, \lambda^b_{hw}).
+  x_{hw}^b | f, \ell, N \overset{ind}{\sim} \mathcal{N}(\lambda^b_{hw}, \lambda^b_{hw}).
 \end{align}
-\jeff{Better to use lowercase $x$ rather than $X$ if you're not going to use uppercase for all the random variables}
+% \jeff{Better to use lowercase $x$ rather than $X$ if you're not going to use uppercase for all the random variables}
 Explicitly, the log-likelihood is
 \begin{align}
-    \log P(X | N, \ell, f) &= \sum_{b = 1}^{B} \sum_{h = 1}^H \sum_{w = 1}^W 
-        \Big\{\frac{1}{2\lambda^b_{hw}}(X_{hw}^b  - \lambda^b_{hw})^2 - 
+    \log p(x | N, \ell, f) &= \sum_{b = 1}^{B} \sum_{h = 1}^H \sum_{w = 1}^W 
+        \Big\{\frac{1}{2\lambda^b_{hw}}(x_{hw}^b  - \lambda^b_{hw})^2 - 
                \frac{1}{2}\log(2\pi\lambda^b_{hw})\Big\}
     \label{eq:loglik}.
 \end{align}
+
+In summary, we have described the likelihood,
+$p(x | N, \ell, f)$, and specified the prior, $p(N, \ell, f)$. Our goal 
+in the next section is to compute an approximation to the posterior distribution, $p(N, \ell, f | x)$. 
+
+Our model described above are are similar to those 
+presented in~\cite{Portillo_2017, Feder_2019}. We also use similar prior parameters. We set $\alpha = 2$; we set 
+$f_{min}$ to correspond with the SDSS 
+lower detection limit ($\approx$ 22 magnitude); we use a standard Gaussian for color priors. 
+
+One difference is that \cite{Portillo_2017, Feder_2019} use an exponential prior on $N$. We use a Poisson prior and set $\mu = 0.15$, slightly denser than the $0.1$ stars per pixel 
+brighter than 22mag found in the Hubble image of M2. 
+
+The model parameters $\pi$ for the PSF and 
+$\beta$ for the background can be set to the SDSS estimates. In Section~\ref{sec:model_params}, propose a method to estimate these model parameters as part of our inference procedure, and we show that we can improve upon the SDSS estimates in the crowded starfield. 

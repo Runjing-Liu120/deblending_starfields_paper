@@ -1,10 +1,3 @@
-We have thus far described the likelihood,
-$\Prob(X | N, \ell, f)$, and specified the prior, $\Prob(N, \ell, f)$. 
-For moment, we treat the model parameters, the background and PSF, as known and fixed
-(we can use the SDSS estimates, for example). In Section~\ref{sec:model_params}, we extend to unknown 
-model parameters and estimate them as part of our inference procedure. 
-\jeff{I suggest deleting the paragraph above. It doesn't seem to have anything to do with VI, which is the title of this section.}
-
 We seek the posterior distribution 
 $\Prob(N, \ell, f | X)$. In most nontrivial probabilistic models, including ours, the exact posterior distribution is intractable.
 
@@ -22,18 +15,17 @@ posits a family of distributions $\mathcal{Q}$ and seeks
 the distribution $q^*\in \mathcal{Q}$ that is closest to the exact posterior
 in $\KL$ divergence. Suppose the family of distributions $\mathcal{Q}$ is parameterized by a real-valued vector $\eta$. The objective is 
 \begin{align}
-   \eta^* &= \argmin_{\eta} \Big\{ \mathrm{KL}\Big[\,q_\eta(N, \ell, f | X)\, \| \,\Prob(N, \ell, f | X )\,\Big]\Big\} 
+   \eta^* &= \argmin_{\eta} \Big\{ \mathrm{KL}\Big[\,q_\eta(N, \ell, f | X)\, \| \,p(N, \ell, f | X )\,\Big]\Big\} 
    \label{eq:kl_objective}
 \end{align}
 
 Minimizing the $\KL$ divergence is equivalent to maximizing the ELBO (evidence lower bound), defined as 
 \begin{align}
     \mathcal{L} = 
-    \Expect_{q_\eta(N, \ell, f | X)}\Big[\log\Prob(X, N, \ell, f) - \log q_\eta(N, \ell, f | X)\Big].
+    \Expect_{q_\eta(N, \ell, f | X)}\Big[\log p(X, N, \ell, f) - \log q_\eta(N, \ell, f | X)\Big].
     \label{eq:elbo}
 \end{align}
-The ELBO does not depend on the intractable marginal distribution $\Prob(X)$.
-\jeff{Better to use lowercase $p_\theta$ here for symmetry with $q_\eta$.}
+The ELBO does not depend on the intractable marginal distribution $p(X)$.
 
 \subsection{The variational distribution}
 % We now describe our family of distributions $\mathcal{Q}$. 
@@ -54,11 +46,27 @@ applications, the family $\mathcal{Q}$ is restricted to probability distribution
 that limit conditional dependencies between latent variables. In the most extreme case, mean-field variational inference, 
 the distribution over latent variables is assumed to fully factorize in the approximate posterior. 
 
-Our factorization takes a spatial structure: we first decompose the full 
-$H \times W$ image into disjoint $s \times s$ tiles. See Figure~\ref{fig:ex_tiles} for a schematic. 
-\jeff{Also, we should define what tiles are.}
-\jeff{The dimension of the tiles maybe better in uppercase: the other ``structural constants'' are uppercase (e.g., $H$, $W$).}
-Independently, for each tile, we infer the number, locations, and fluxes of stars falling in that tile.
+Our factorization takes a spatial structure: we decompose the full $H \times W$ image into disjoint $S \times S$ tiles. Explicitly, each tile $\tilde x_{rs}$ is comprised of pixels 
+\begin{align}
+    \tilde x_{rt} = \{x_{hw} : S(r+1) \geq h > Sr \text{ and } S(t+1) \geq w > St\}.
+\end{align}
+for $r = 1, ..., \frac{H}{S}$ and $t = 1, ..., \frac{W}{S}$ (we assume that $H$ and $W$ are multiples of $S$). See Figure~\ref{fig:ex_tiles} for a schematic. 
+% \jeff{Also, we should define what tiles are.}
+% \jeff{The dimension of the tiles maybe better in uppercase: the other ``structural constants'' are uppercase (e.g., $H$, $W$).}
+There is a function that maps 
+
+Let $N_{rt}$ be the number of stars in tile $r, t$. 
+On each tile, we also construct a triangular array of 
+locations and fluxes:
+\begin{align}
+    \tilde\ell^{(r,t)} &= (\tilde\ell_{N, i}^{(r,t)} : i = 1, ..., N; N = 1, 2, ...) \\
+    \tilde f^{(r,t)} &= (\tilde f_{N, i}^{b, (r,t)} : 
+    b = 1, ..., B; i = 1, ..., N; N = 1, 2, ...)
+\end{align}
+There is a mapping from latent variables on each tile to latent variables on the full image 
+
+
+
 Let $k = 1, ..., K$ index the tiles. Then
 denote the number of stars on tile $k$ by $N^{(k)}$;
 the locations by $\ell^{(k)} = (\ell_{N, i}^k)_{i \leq N}$; 
@@ -73,10 +81,9 @@ distribution factorizes over image tiles, so
     \centering
     \includegraphics[width = 0.5\textwidth]{figures/example_tiled.png}
     \vspace{-1cm}
-    \caption{Tiling a 10 x 10 image into 2 x 2 patches.}
+    \caption{Tiling a 10 x 10 image into 2 x 2 tiles.}
     \label{fig:ex_tiles}
 \end{figure}
-\jeff{In the figure caption: Patches? Or tiles? Pick one term and use it consistently. I think tiles is a bit more clear.}
 \jeff{Would you want to introduce a term like ``padded tiles'' somewhere to refer to the tile plus some of the nearby pixels around it? Tiles are disjoint from each other but padded tiles overlap some with each other.}
 
 There is a bijection between latent variables on each tile and latent variables on the full image (locations on the full image map to locations on image tiles and vice-versa). 
