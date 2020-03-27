@@ -1,0 +1,89 @@
+Astronomical surveys play a critical role in developing scientific knowledge of the universe.
+The raw data in the form of telescope images
+are often condensed into catalogs of light sources. 
+Light sources are identified as stars, galaxies, or other objects; physical parameters such as flux, color, and morphology are recorded. Catalogs are used for downstream analysis in a myriad of applications. For example, the Argonaut map used the flux and colors of stars to map the 3D distribution of interstellar dust~\cite{Green_2019_argonaut}. Spatial distributions of galaxies were used to 
+validate theoretical models of dark matter and dark energy~\cite{Eisenstein_2005_darkmatter}. 
+
+Our work targets applications where all sources are well-modeled as points without spatial extent. Estimation of colors and fluxes is the primary goal; morphology is not considered. 
+Point sources are good models for surveys where the primary objects studied are stars, such as DECam~\cite{Schlafly_2018_DECam}, which imaged the center of our own Milky Way. Point source models are also used for surveys like WISE~\cite{Wright_2010_WISESurvey} whose telescope's resolution and the density of light sources did not allow for differentiation between stars and galaxies. 
+
+In this paper, we test our method on the crowded starfield M2 imaged by the Sloan Digital Sky Survey (SDSS). 
+Understanding these starfields are of scientific interest per se. The distribution 
+of colors and fluxes in crowded starfields 
+can be used to estimate the age 
+of the starfield, which in turn lower bounds the 
+age of the universe~\cite{Isochrome_fitting}. 
+
+For all the aforementioned applications, a key challenge
+in catalog construction is the {\itshape blending} of light sources: in crowded fields, sources are no longer well-separated, and peak intensities may correspond to multiple sources. An algorithm producing a catalog should be able to reliably {\itshape deblend} the peak intensity, that is, distinguish whether the peak corresponds to one light source or 
+multiple. When the two cases are nearly unidentifiable from the data, the algorithm should 
+report calibrated uncertainties. As telescopes peer deeper into space, most images from future surveys will be in the crowded field regime. 
+For example, \cite{Bosch_2017_LSST} estimates that in the Large Synoptic Survey Telescope (LSST), 68\% of the light sources will be blended. Therefore, developing a method to produce reliable catalogs even in cases of significant source blending will be paramount for advancing astronomical research. 
+
+\subsection{From algorithmic pipelines to probabilistic cataloging}
+
+Traditionally, most cataloging has been done using purely algorithmic pipelines, involving scanning the image for the brightest peaks, estimating fluxes, and subtracting out the estimated light source, and repeating. Most of these pipelines are not designed for crowded starfields; PHOTO~\cite{lupton2001sdss}, 
+the default SDSS cataloging pipeline, timed out on 
+the crowded starfield M2. 
+Not only do these pipelines fail in the crowded field 
+regime, but they do not produce statistically rigorous uncertainty estimates. TODO: this last statement is probably a generalization ... can I make this more precise?
+
+\cite{Brewer_2013, Portillo_2017, Feder_2019}
+propose {\itshape probabilistic} cataloging. A statistical model was developed, and instead of deriving a single catalog, they produced a Bayesian posterior distribution on the space of all possible catalogs. 
+Each sample from the posterior is a catalog; that is, each sample returns a list, potentially of varying length, consisting of stellar locations, fluxes, and colors. Uncertainties are fully quantified: for example, in an image with an ambiguously blended bright peak, some catalogs drawn from the posterior would contain multiple dim sources while others would contain one bright source. The relative weight the posterior distribution places on the one explanation over another represents the statistical confidence. 
+
+In \cite{Brewer_2013, Portillo_2017, Feder_2019},
+the posterior was computed using
+Markov chain Monte Carlo (MCMC). 
+However, the computational cost of MCMC is prohibitively large for
+large-scale astronomical surveys. \cite{Feder_2019} reported a runtime of 30 minutes for a $100\times 100$ pixel subimage of the globular cluster M2, roughly a $0.3\times0.3$ arcsecond patch of the sky.
+For comparison, in one night SDSS scans a region of size on the order of $10 \times 1000$ arcminutes. Extrapolating the 30 min runtime of \cite{Feder_2019}, 
+it would take about two months to process one night's data collection using MCMC. 
+
+\subsection{Variational inference and neural networks}
+As an alternative to MCMC, we propose to construct an approximate posterior using variational inference~\cite{Blei_2017_vi_review,Jordan_intro_vi, Wainwrite_graph_models_vi}.
+Variational inference (VI) proposes a family of distributions and uses numerical optimization to find the distribution 
+in the proposed family that is closest 
+to the approximate posterior in KL divergence. 
+With a sufficiently constrained family of distributions, the VI optimization problem is often orders of magnitude faster than sampling. 
+
+One immediate challenge of applying variational inference to probabilistic cataloging is the transdimensionality 
+of the latent variable space. The posterior 
+is defined over the space of all catalogs, and the the number of sources in a catalog is unknown and random in a Bayesian framework.
+Previous work on probabilistic cataloging employed Reversible Jump MCMC~\cite{Green95reversiblejump} to sample transdimensional catalogs. In Reverse Jump MCMC, auxiliary variables are added to encode the ``birth" of new sources 
+or the ``death" of existing sources in the Markov chain. Our challenge in VI is to construct a family of distributions on this transdimensional space. Section~\ref{sec:var_distr} discusses our construction: we define the variational distribution on catalogs of all possible size; that is, we define a distribution on a triangular array of latent locations and fluxes and map this to a distribution 
+on catalog space.
+
+The second challenge is to build a VI procedure 
+that can scale to the petabytes of data 
+modern astronomical surveys are poised to collected.
+We are not the first to propose a VI procedure
+that scales to entire surveys. 
+\cite{regier2019_celeste} also employed 
+VI, and with the help of a 650,000 core supercomputer, they constructed a catalog of the entire Sloan Digital Sky Survey. In their application of 
+VI, numerical optimization had to be re-run for every new collection of images. 
+In contrast, we employ {\itshape amortized} variational inference, where a neural network is trained to map input images to a variational distribution. After a one time cost to train the neural network, inference 
+on a new image requires a single forward pass through the neural network. Moreover, neural networks can evaluate batches of images in parallel 
+on a GPU. This amortization is critical for scaling up to large astronomical surveys. 
+
+One primary 
+
+% Neural networks have seen tremendous success in supervised learning problems on image datasets. Neural networks have taken hold in astronomy as well, and they have been applied to image data from telescope surveys. For example, \cite{Lanusse_2017_cmudeeplens, huang2019finding} used neural networks to 
+% detect Einstein rings; \cite{Hezaveh_2017_nn_lensing_nature} used
+% neural networks to infer morphological characteristics of the Einstein rings; 
+% in the context of deblending, 
+% \cite{Reiman_2019_gans_deblend} used 
+% GANS to separate two overlapping galaxies. 
+
+% Several factors contribute to the success of neural networks. Firstly, neural networks are computationally efficient; multiple images can be easily evaluated in parallel on a GPU.
+% Secondly, a well-trained neural network is able to generalize beyond the data on which is was trained. This combined with computational efficiency is extremely beneficial for sky surveys: after training a neural network on a subset of the survey, the remaining images in the survey can be evaluated quickly in batches using only forward-passes through the network. 
+
+% In this paper, we combine the flexibility of neural networks with a formal statistical model. This enables the neural network output to be interpreted in a statistically principled way: the output of our neural network will be a distribution that approximates the Bayesian posterior.
+
+% Secondly, we train the neural network using {\itshape wake-sleep} training. This allows our neural network to be trained using unlimited simulated data. Using simulated data to train neural networks is common practice is astronomy (see for example~\cite{Lanusse_2017_cmudeeplens, huang2019finding}). However, we also make the connection with a formal statistical model 
+% and introduce the simulated data in a principled way. TODO: yikes ... this paragraph is terrible and needs work. 
+
+% In Section~\ref{sec:gen_model} we introduce 
+% the generative model. Section~\ref{sec:var_inference} details the variational distribution and discuss training of the neural network. Section~\ref{sec:related_work} makes connections with previous cataloging software. In Section~\ref{sec:results}, we compare 
+% our variational inference procedure with MCMC as well as more traditional cataloging software pipelines. Section 6 concludes. 
+
