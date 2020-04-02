@@ -1,8 +1,7 @@
 A central quantity in Bayesian statistics is the posterior distribution. 
-\jeff{It's more like certain functionals of the posterior distribution we're after; e.g., the mean and some measures of uncertainty. 
-
-Perhaps we just want to say here that ``A central quantity in Bayesian statistics is the posterior distribution'', rather that saying what we ``seek''.  My concern is that astronomy reviewers will say that the posterior isn't what matters for scientific inference....it's population-level quantities or something like that. We need to address that concern in the introduction and the discussion section, but it'd be better to avoid having this discussion in the VI section.
-}
+%\jeff{It's more like certain functionals of the posterior distribution we're after; e.g., the mean and some measures of uncertainty. 
+%Perhaps we just want to say here that ``A central quantity in Bayesian statistics is the posterior distribution'', rather that saying what we ``seek''.  My concern is that astronomy reviewers will say that the posterior isn't what matters for scientific inference....it's population-level quantities or something like that. We need to address that concern in the introduction and the discussion section, but it'd be better to avoid having this discussion in the VI section.
+%}
 However, in most nontrivial probabilistic models, including ours, the posterior distribution is intractable.
 % \jeff{Can you say ``computing the posterior distribution exactly is intractable'' here instead?
 % An ``exact posterior distribution'' isn't really a thing. Only ``posterior distribution'' is defined.
@@ -30,7 +29,8 @@ require computing the posterior distribution $p(\theta | x)$.
 \label{sec:var_distr}
 % We now describe our family of distributions $\mathcal{Q}$. 
 Traditionally in variational inference, the posterior approximation 
-$q_\eta$ depends on data $x$ only through the optimization objective. In this case, $q_\eta(\theta | x)$ equals $q_\eta(\theta)$. For a new observation $\tilde x$, the objective~\eqref{eq:kl_objective} must be re-optimized at $\tilde x$ to find an 
+$q_\eta$ depends on data $x$ implicitly, 
+in that $\eta^*$ is chosen according to~\eqref{eq:kl_objective}. In this case, $q_\eta(\theta | x)$ equals $q_\eta(\theta)$. For a new observation $\tilde x$, the objective~\eqref{eq:kl_objective} must be re-optimized including $\tilde x$ to find an 
 approximation to the posterior $p(\theta | \tilde x)$. 
 
 In {\itshape amortized} variational inference
@@ -49,11 +49,12 @@ In the ensuing subsections, we detail the construction of our variational distri
 % \jeff{You probably want to cite Kingma and Welling 2014 somewhere around here}
 
 \subsubsection{The factorization}
+\label{sec:factorization}
 To make the objective in \eqref{eq:kl_objective} tractable in most 
 applications, the family $\mathcal{Q}$ is restricted to probability distributions 
-that limit conditional dependencies between latent variables. In the most extreme case, mean-field variational inference, the variational distribution factorizes across all latent variables. 
+that limit conditional dependencies between latent variables. In the most extreme case, called mean-field variational inference, the variational distribution factorizes across all latent variables. 
 
-Our factorization has a spatial structure: we decompose the full $H \times W$ image into disjoint $R \times R$ tiles. Each tile $\tilde x_{st}$ is composed of pixels:
+Our factorization has a spatial structure. We decompose the full $H \times W$ image into disjoint $R \times R$ tiles. Each tile $\tilde x_{st}$ is composed of pixels:
 \begin{align}
     \tilde x_{st} = \{x_{hw} : R(s+1) \geq h > Rs \text{ and } R(t+1) \geq w > Rt\}.
     \label{eq:tiles}
@@ -61,7 +62,7 @@ Our factorization has a spatial structure: we decompose the full $H \times W$ im
 The tiles cover the image, so $s$ and $t$ range over $s = 1, ..., S$ and $t = 1, ..., T$, respectively, where $S = \frac{H}{R}$ and $T = \frac{W}{R}$ (we assume that $H$ and $W$ are multiples of $R$). See Figure~\ref{fig:ex_tiles} for a schematic.
 % \jeff{Also, we should define what tiles are.}
 % \jeff{The dimension of the tiles maybe better in uppercase: the other ``structural constants'' are uppercase (e.g., $H$, $W$).}
-\begin{figure}[!h]
+\begin{figure}[!ht]
     \centering
     \includegraphics[width = 0.5\textwidth]{figures/example_tiled.png}
     \vspace{-1cm}
@@ -71,30 +72,36 @@ The tiles cover the image, so $s$ and $t$ range over $s = 1, ..., S$ and $t = 1,
 % \jeff{Would you want to introduce a term like ``padded tiles'' somewhere to refer to the tile plus some of the nearby pixels around it? Tiles are disjoint from each other but padded tiles overlap some with each other.}
 
 Let $\tilde N^{(s, t)}$ be the number of stars in tile $s, t$. 
-On each tile, we construct a {\itshape triangular array} of locations and fluxes:
+For the locations and fluxes, we construct a {\itshape triangular array}  of latent variables on each tile:
 \begin{align}
     \tilde\ell^{(s, t)} &= (\tilde\ell_{N, i}^{(s, t)} : i = 1, ..., N; N = 1, 2, ...) \\
     \tilde f^{(s, t)} &= (\tilde f_{N, i}^{(s, t)} : i = 1, ..., N; N = 1, 2, ...)
 \end{align}
 While locations on the full image are parameterized to be
-$\ell_i \in [0, H]\times[0, W]$, locations on tiles are parameterized to be $\tilde\ell_{N, i}^{(s, t)} \in [0, R]\times[0, R]$.
+$\ell_i \in [0, H]\times[0, W]$, locations on tiles are parameterized to be $\tilde\ell_{N, i}^{(s, t)} \in [0, R]\times[0, R]$. The fluxes $\tilde f_{N, i}^{(s, t)}$ are positive. 
 
-There is a mapping from tile latent variables to the catalog on the full image of the form~\eqref{eq:cat_formulation}. 
-The number of stars
-in the full image catalog is given by 
+We call $(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)})_{s=1,t=1}^{S,T}$ the {\itshape tile latent variables}; 
+succinctly, denote tile latent variables as $\tilde\theta$. 
+We will define a distribution on $\tilde \theta$. 
+We also construct a mapping from $\tilde \theta$ to 
+the catalog $\theta = \{N, (\ell_i, f_{i,1}, ..., f_{i,B})_{i = 1}^N\}$. Thus, a distribution 
+on the tile latent variables $\tilde \theta$ induces 
+a distribution on our latent variable of interest, the catalog $\theta$. 
+
+We detail the mapping $\tilde\theta\mapsto\theta$. 
+The number of stars in the catalog is 
 \begin{align}
-    N = \sum_{s=1}^{S}\sum_{t=1}^T \tilde N^{(s, t)}
+    N = \sum_{s=1}^{S}\sum_{t=1}^T \tilde N^{(s, t)}. 
 \end{align}
 For every tile $(s,t)$ we index into the $\tilde N^{(s,t)}$-th
 row of the triangular array of locations and fluxes. 
-The band $b$ fluxes in the full catalog 
-is the collection
+The fluxes in the catalog are
 \begin{align}
-    \Big\{\tilde f_{\tilde N^{(s, t)}, i}^{(s, t)} : i = 1, ..., \tilde N^{(s, t)}, s = 1, ..., S, t = 1, ..., T \Big\}
+    \{f_i\}_{i=1}^N = \Big\{\tilde f_{\tilde N^{(s, t)}, i}^{(s, t)} : i = 1, ..., \tilde N^{(s, t)}, s = 1, ..., S, t = 1, ..., T \Big\}
 \end{align}
-The corresponding locations in the full catalog are 
+The corresponding locations in the catalog are 
 \begin{align}
-    \Big\{\tilde \ell_{N^{(s, t)}, i}^{(s, t)} + 
+    \{\ell_i\}_{i = 1}^N = \Big\{\tilde \ell_{N^{(s, t)}, i}^{(s, t)} + 
     \begin{pmatrix}
     Rs \\ Rt
     \end{pmatrix} 
@@ -102,84 +109,101 @@ The corresponding locations in the full catalog are
 \end{align}
 where we took the stellar location within the tile and shifted it by the location of the tile $(Rs, Rt)$. 
 
-We have defined a mapping from tile latent variables to the full image catalog, 
+We have defined a mapping from tile latent variables to the catalog of interest, 
 \begin{align}
  \big(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)}\big)_{s=1, t = 1}^{S, T}
-\mapsto \theta.    
+\mapsto     
+\{N, (\ell_i, f_{i,1}, ..., f_{i,B})_{i = 1}^N\}
 \label{eq:patch_to_full_map}
 \end{align}
-Therefore, a distribution on the tile latent variables induces a distribution on the full image catalog. 
+Therefore, a distribution on the tile latent variables induces a distribution on catalogs. 
 
-Our variational distribution factorizes over image tiles:
+Our distribution on $\tilde\theta$ factorizes over image tiles:
 \begin{align}
-    q_\eta\big( \big(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)}\big)_{s=1, t = 1}^{S, T}|x\big) 
+    \tilde q_\eta\big( \big(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)}\big)_{s=1, t = 1}^{S, T}|x\big) 
     &=
-    \prod_{s = 1}^S \prod_{t=1}^T q_\eta\big(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)} | x\big)
+    \prod_{s = 1}^S \prod_{t=1}^T
+    \tilde q_\eta\big(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)} | x\big)
     \label{eq:factorize_patches}
 \end{align}
 Within each tile $(s,t)$, the distribution also fully factorizes: 
 \begin{align}
-    q_\eta\big(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)} | x\big)
+    \tilde q_\eta\big(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)} | x\big)
     &= 
-    q_\eta\big(\tilde N^{(s, t)} | x\big)
+    \tilde q_\eta\big(\tilde N^{(s, t)} | x\big)
     \prod_{N = 1}^\infty \prod_{i = 1}^N 
-    q_\eta\big(\tilde \ell_{N,i}^{(s, t)} | x\big)
-    q_\eta\big(\tilde f_{N,i}^{(s, t)} | x\big)
+    \tilde q_\eta\big(\tilde \ell_{N,i}^{(s, t)} | x\big)
+    \tilde q_\eta\big(\tilde f_{N,i}^{(s, t)} | x\big)
     \label{eq:factorize_within_patch}
 \end{align}
 
+If $\tau$ is the mapping in~\eqref{eq:patch_to_full_map}, then the variational distribution on catalogs $\theta$ is
+\begin{align}
+    q_\eta(\theta | x) := \tilde q_\eta(\tau^{-1}(\theta) | x)
+    \label{eq:pull_back_of_q}
+\end{align}
+where $\tau^{-1}(\theta)$ is the pre-image of $\theta$.
+
 \noindent{\bf Evaluating the variational distribution}
 
-\noindent We can use the mapping~\eqref{eq:patch_to_full_map}
-from tile latent variables to the full image 
-to sample from our variational distribution.
-If~\eqref{eq:patch_to_full_map} 
-$\tau$ is the mapping in~\eqref{eq:patch_to_full_map}, then 
-we can express the variational distribution
-on the full image catalog as 
-\begin{align}
-    \theta &\stackrel{d}{=} \tau\Big( \big(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)}\big)_{s=1, t = 1}^{S,T}\Big), \notag \\  
-        &\text{where } 
-        \big(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)}\big)_{s=1, t = 1}^{S,T}
-        \sim 
-        q_\eta\big( \cdot |x\big).
-\end{align}
+% \noindent We can use the mapping~\eqref{eq:patch_to_full_map}
+% to sample catalogs from our variational distribution.
+% If $\tau$ is the mapping in~\eqref{eq:patch_to_full_map}, then 
+% we can express the variational distribution
+% on the full image catalog $\theta$ as 
+% \begin{align}
+%     \theta &\stackrel{d}{=} \tau\Big( \big(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)}\big)_{s=1, t = 1}^{S,T}\Big), \notag \\  
+%         &\text{where } 
+%         \big(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)}\big)_{s=1, t = 1}^{S,T}
+%         \sim 
+%         q_\eta\big( \cdot |x\big).
+% \end{align}
 
-Now suppose we are given a catalog 
-$\theta = \{N, (\ell_i, f_{i,1}, ..., f_{i,B})_{i = 1}^N\}$. To evaluate
-the KL objective~\eqref{eq:kl_objective}, 
-we need to compute probability of $\theta$ under $q_\eta$. Let $\tau^{-1}(\theta)$ be
-the pre-image of $\theta$, so our 
-goal is to compute $q(\tau^{-1}(\theta) | x)$. 
+\noindent To evaluate
+the ELBO in~\eqref{eq:elbo}, 
+we need to compute the probability of 
+$q_\eta(\theta | x)$
+for any given catalog $\theta = \{N, (\ell_i, f_{i,1}, ..., f_{i,B})_{i = 1}^N\}$. By~\eqref{eq:pull_back_of_q}, 
+we need to evaluate $\tilde q(\tau^{-1}(\theta) | x)$. 
 
-We remark that $\tau^{-1}(\theta)$ is a {\itshape set} of tile latent variables: the mapping from tile latent variables to full image catalogs $\theta$ is not injective. We detail this below. 
+We remark that $\tau^{-1}(\theta)$ is a {\itshape set} of tile latent variables because the mapping from tile latent variables to catalogs $\theta$ is not injective. We detail this below. 
 
-Locations on the full image catalog $\ell_i, i = 1, ..., N$ determine the number of stars on tile $(s,t)$. $\tilde N^{(s,t)}$ is simply the count of the locations that fall within that tile:
+Locations on the catalog $\{\ell_i\}_{i=1}^N$
+determine the number of stars on tile $(s,t)$. 
+The number of stars $\tilde N^{(s,t)}$ is simply the count of the locations that fall within that tile:
 \begin{align}
 \tilde N^{(s,t)} = \sum_{i=1}^N 
 \mathbb{I}\Big\{\ell_i\in [Rs, R(s+1)] \times [Rt, R(t+1)]\Big\},
 \end{align}
-where $\mathbb{I}\{\cdot\}$ is the indicator function; equal to one if true and zero if false.
+where $\mathbb{I}\{\cdot\}$ is the indicator function, equal to one if true and zero if false.
 
-Now we consider $\ell^{(s, t)}$ and $\tilde f^{(s, t)}$, the triangular array of locations and fluxes on tile $(s,t)$. 
+Now we consider $\tilde\ell^{(s, t)}$ and $\tilde f^{(s, t)}$, the triangular array of locations and fluxes on tile $(s,t)$. 
 For each $(s,t)$, the $\tilde N^{(s,t)}$-th row 
 of the triangular array of fluxes and locations are 
-determined by the locations and fluxes of stars that landed in tile $(s,t)$. The other rows 
-of the triangular array are not determined by 
-the full image catalog $\theta$, and are free to take any value in their domain. Therefore, the mapping $\tau$ is not injective. 
+determined by the locations and fluxes of stars that landed in tile $(s,t)$. However, the other rows 
+of the triangular arrays are not determined by 
+the catalog $\theta$, and are free to take any value in their domain. Therefore, the mapping $\tau$ is not injective. 
 
 To evaluate the probability of $\tau^{-1}(\theta)$ under $q$, we must marginalize over the rows of the triangular arrays $\ell^{(s, t)}$ and $\tilde f^{(s, t)}$ that are not determined by $\theta$. However, 
 because $q$ fully factorizes, the terms 
-in~\ref{eq:factorize_within_patch} where $N \not= \tilde N^{(s,t)}$ are simply dropped out of the product. Therefore, we compute 
+in~\eqref{eq:factorize_within_patch} where $N \not= \tilde N^{(s,t)}$ simply drop out of the product
+after marginalization.
+Applying this observation and combining~\eqref{eq:factorize_within_patch} and ~\eqref{eq:factorize_patches}, we obtain that
 \begin{align}
-    q(\tau^{-1}(\theta) | x) = \prod_{s=1}^S\prod_{t=1}^T
+    \tilde q(\tau^{-1}(\theta) | x) = \prod_{s=1}^S\prod_{t=1}^T
     \Big\{
-    q_\eta(\tilde N^{(s,t)} | x) 
+    \tilde q_\eta(\tilde N^{(s,t)} | x) 
     \prod_{i = 1}^{\tilde N^{(s,t)}}
-    q_\eta\big(\tilde \ell_{\tilde N^{(s,t)},i}^{(s, t)} | x\big)
-    q_\eta\big(\tilde f_{\tilde N^{(s,t)},i}^{(s, t)} | x\big)
+    \tilde q_\eta\big(\tilde \ell_{\tilde N^{(s,t)},i}^{(s, t)} | x\big)
+    \tilde q_\eta\big(\tilde f_{\tilde N^{(s,t)},i}^{(s, t)} | x\big)
     \Big\}
 \end{align}
+In other words, given a catalog $\theta$,
+we convert $\theta$ to tile random variables;
+to compute $q(\theta | x)$, it suffices to evaluate $\tilde q$ only at the rows of triangular 
+arrays determined by the number 
+of stars falling in each tile. 
+
 
 % There is a bijection between latent variables on each tile and latent variables on the full image (locations on the full image map to locations on image tiles and vice-versa). 
 % \jeff{It's not clear what it means for a latent variable to be ``on a tile''. Why a bijection? They're the same latent variables, right?}
@@ -204,36 +228,52 @@ in~\ref{eq:factorize_within_patch} where $N \not= \tilde N^{(s,t)}$ are simply d
 % \jeff{Is there somewhere you say that in the variational distribution, $N = \sum_{k=1}^K N^{(k)}$ ? That might be a good way to put it.}
 
 \subsubsection{Distributions on image tiles}
-We describe the distribution on each tile, $q_\eta\big(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)} | x\big)$. 
-
-The distribution on each tile depends on the the pixel values of the tile itself~\ref{eq:tiles}
-and surrounding pixels. For cataloging 
-the crowded stafield M2, we took $R = 2$ and padded the each tile with three pixels. Define the {\itshape padded tiles} as 
+We describe the distribution on each tile,
+$\tilde q_\eta\big(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)} | x\big)$. Dropping the index 
+$(s,t)$ in this subsection, 
 \begin{align}
-    \hat x^{(s,t)} = 
-    \{x_{hw} : & R(s+1) + P \geq h > Rs - P \text{ and } \notag \\
-    & R(t+1) + P\geq w > Rt - P\}.
-\end{align}
-
-A neural network maps the padded tiles to the 
-parameters describing the neural network. 
-
-Dropping the tile index $(s, t)$ in this subsection,
-\begin{align}
-    \tilde N &\sim \text{Categorical}(\omega; 0, ..., N_{max}) \label{eq:var_distr_n}\\
+    \tilde N &\sim \text{Categorical}(
+    \omega; 0, ..., N_{max}) \label{eq:var_distr_n}\\
 	\tilde \ell_{N, i} / S &\sim \text{LogitNormal}(\mu_{\ell_{N, i}}, \text{diag}(\nu_{\ell_{N, i}}) )\label{eq:var_distr_loc}\\
 	\tilde f^b_{N, i} &\sim \text{LogNormal}(\mu_{f^b_{N, i}}, \sigma^2_{f^b_{N, i}}) \label{eq:var_distr_f}
 \end{align}
 
-% \jeff{I suggest writing the parameters of these distributions as functions of the padded tile. For example, I'd write
-% \[
-%     \tilde N_{rt} \sim \text{Categorical}\left(h_\eta(\tilde{x}_{rt})\right).
-% \]
-% Here $h_\eta$ is a neural network. ($\eta$ are variational parameters).
-% I didn't drop the $rt$ subscript above because I wanted to make the point that the same $h_\eta$ is applied to all tiles.
-% }
+\jeff{I suggest writing the parameters of these distributions as functions of the padded tile. For example, I'd write
+\[
+    \tilde N_{rt} \sim \text{Categorical}\left(h_\eta(\tilde{x}_{rt})\right).
+\]
+Here $h_\eta$ is a neural network. ($\eta$ are variational parameters).
+I didn't drop the $rt$ subscript above because I wanted to make the point that the same $h_\eta$ is applied to all tiles.
+}
+\bryan{
+I like this idea. I can introduce {\itshape padded} tiles,  
+\[
+\hat x^{(s,t)} = 
+    \{x_{hw} : R(s+1) + P \geq h > Rs - P \text{ and } 
+    R(t+1) + P\geq w > Rt - P\}.
+\]
+That is, we took the tiles from~\eqref{eq:tiles}
+and padded each tile with $P$ pixels. Note
+that tiles are disjoint, while padded tiles are not. 
 
-for $i = 1, ..., \tilde N$; $\tilde N = 1, ..., N_{max}$. The latent variables also fully factorize within each tile. Note that in the exact posterior, $N$ has support on the nonnegative integers; in the variational distribution, we truncate at an $N_{max}$ large.
+I want to say that a neural network 
+$h_\eta(\hat x^{(r,s)})$ that maps 
+to a common concatenated vector of 
+parameters describing the distributions. 
+
+We index into this giant vector to get individual distributional parameters. 
+I'm not sure how quite to denote this though ... for example to get the mean 
+parameter for the $(N,i)$-th location, we'd have $\mu_{\ell_{N, i}}(h_\eta(\hat x^{(r,t)}))$, which seems like too many indices.
+This is the problem with this section in general tbh ... more work will be needed on my part to figure out how to describe this. 
+}
+\jeff{I see your point, the notation is tricky. The main issue with $\mu_{\ell_{N, i}}(h_\eta(\hat x^{(r,t)}))$ is the double subscript. Also, it's not great have $\ell$ as a subscript of $\mu$ because $\ell$ is a random variable.
+}
+\jeff{
+Maybe  $\left[g_\eta(\tilde x_{rt})\right]_{N,i}$ could denote the location mean and variance for the $(N,i)$-th location?
+And $\left[h_\eta(\tilde x_{rt})\right]_{N,i}$ could denote the flux mean and variation?
+}
+
+for $i = 1, ..., \tilde N$; $\tilde N = 1, ..., N_{max}$. The latent variables also fully factorize within each tile. Note that in the exact posterior, $\tilde N$ has support on the nonnegative integers; in the variational distribution, we truncate at some large $N_{max}$. 
 % \jeff{Do we? I thought it was just the variational distribution that doesn't have support past $N_{max}$. The posterior has support over all natural numbers.}
 
 
@@ -241,20 +281,21 @@ These distributions were taken for convenience: fluxes are positive and right sk
 we place a normal distribution on the logit of the location scaled by $1 / S$. 
 
 \subsubsection{Neural network architecture}
+\label{sec:nn_archetecture}
 On each tile, the distributional parameters 
-in \eqref{eq:var_distr_n}-\eqref{eq:var_distr_f}, are the output of a neural network.
+in \eqref{eq:var_distr_n}-\eqref{eq:var_distr_f} are the output of a neural network.
 \jeff{The parameters of the variational distribution are the weights of the neural network, not the outputs.}
 \bryan{How do you recommend that I call the 
 parameters in \eqref{eq:var_distr_n}-\eqref{eq:var_distr_f}?
 The $\omega$, $\mu$'s, etc?}
-\jeff{See comment above. In short, I don't think we need $\omega$ and $\mu$.}
+\jeff{See comment above.}
 The input to the neural network is the $S \times S$ tile, padded with surrounding pixels.
 For cataloging the crowded starfield M2,
 we took $S = 2$ and padded the tile with three pixels. 
 For our test on a sparse field, we took $S = 50$ with no padding. 
 The architecture is shown schematically in Figure~\ref{fig:starnet_arch}. 
 
-\begin{figure}[!h]
+\begin{figure}[!ht]
     \centering
     \includegraphics[width=0.4\textwidth]{figures/starnet_archetecture2.png}
     \vspace{-0.5cm}
@@ -265,7 +306,7 @@ The architecture is shown schematically in Figure~\ref{fig:starnet_arch}.
 \end{figure}
 
 Consider the output dimension of the neural network. The categorical parameter $\omega$ lies on the 
-simplex and has dimension $N_{max} + 1$; for each $i = 1, ..., \tilde N$ and $\tilde N = 1, ..., N_{max}$, the location has a mean and variance on each coordinate; the flux has a mean and variance for each band. Thus, for star indexed by $(i, \tilde N)$, 
+simplex and has dimension $N_{max} + 1$; for each $i = 1, ..., \tilde N$ and $\tilde N = 1, ..., N_{max}$, the location has a mean and variance on each coordinate; the flux has a mean and variance for each band. Thus, for star indexed by $(\tilde N, i)$, 
 there are $2 \times (B + 2)$ parameters for its variational distribution. In total, the neural network has output dimension $(N_{max} + 1) + (B + 2) \times (N_{max}^2 + N_{max})$. 
 
 % Recall that locations on the 
@@ -280,4 +321,4 @@ On the $2\times 2$ tile, we set $N_{max} = 3$, and the output dimension of the n
 
 Moreover, the tiling amortizes the inference across image tiles: the same neural network is reused for each tile. 
 
-While the variational distribution factorizes over $2 \times 2$ tiles, we are not breaking the inference problem on the full image into embarrassingly parallel subproblems. We always evaluate the likelihood (when example, when computing the ELBO in~\eqref{eq:elbo}) on the full image. Light from a star within a 2 x 2 tile spills over into neighboring tiles, so the likelihood does not decouple into image tiles. 
+While the variational distribution factorizes over $2 \times 2$ tiles, we are not breaking the inference problem on the full image into embarrassingly parallel subproblems. We always evaluate the likelihood (example, when computing the ELBO in~\eqref{eq:elbo}) on the full image. Light from a star within a 2 x 2 tile spills over into neighboring tiles, so the likelihood does not decouple into image tiles. 

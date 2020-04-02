@@ -1,5 +1,8 @@
 For a given $H \times W$ pixel image, our goal is to infer a catalog of 
-stars; for each star, the catalog consists of a location, brightness, and color. Our space of latent variables 
+stars. The catalog specifies the number of stars 
+in the image, and for each star, the catalog 
+records its location, brightness, and color. 
+The space of latent variables 
 $\Theta$ is the collection of all possible catalogs of the form
 \begin{align}
     \theta := \{N, (\ell_i, f_{i,1}, ..., f_{i,B})_{i = 1}^N\},
@@ -7,29 +10,32 @@ $\Theta$ is the collection of all possible catalogs of the form
 \end{align}
 where the number of stars in the catalog
 is $N\in\mathbb{N}$;
-\jeff{Unfortunately I don't think astronomers define catalog this way. They think of a catalog as including uncertainty estimates, not as a particularly realization of some random variables.}
+\jeff{Unfortunately I don't think astronomers define catalog this way. They think of a catalog as including uncertainty estimates, not as a realization of some random variables.}
 \bryan{I think this is actually how Portillos refers to a catalog -- he does admit that this isn't 
 what astronomers traditionally think of a catalog. The reason we need this is because our posterior is really defined over the space of all possible catalogs -- each sample from the posterior is a catalog as defined in \eqref{eq:cat_formulation}. I'll try to set this up more explicitly in the introduction. }
+\jeff{Sounds good. I really like defining a catalog as a sample, not a distribution. If Portillo defines it this way too, perhaps we can make the new definition stick.}
 the location of the $i$th star is $\ell_i \in \Reals^2$;
 and the flux in the $b$th image band of the $i$th star is $f_{i, b}\in\Reals^+$. 
 
-Our prior is a distribution over the set of catalogs $\Theta$ is defined by a marked spatial Poisson process. That is, we first draw the number of stars contained in the $H\times W$ image:
+The prior is a distribution over the set of catalogs $\Theta$. In this work, we use a marked spatial Poisson process. That is, we first draw the number of stars contained in the $H\times W$ image:
 \begin{align}
 	N &\sim \text{Poisson}(\mu HW).
 \end{align}
 % \jeff{Better to talk about the marked point process later (or earlier, in the introduction). Just describe the model as simply as possible here.}
 Next, we draw locations
 \begin{align}
-  \ell_{i} &\sim \text{Uniform}([0, H] \times [0, W]) \quad \forall i = 1, ..., N. 
+  \ell_1, ..., \ell_N | N &\stackrel{iid}{\sim} \text{Uniform}([0, H] \times [0, W]). 
  \end{align}
 We draw fluxes in the first band from a power law distribution:
 \begin{align}
-    f_{i, 1} & \sim \text{Pareto}(f_{min}, \alpha) \quad \forall i = 1, ..., N. 
-\label{eq:flux_prior}
+    f_{1, 1}, ..., f_{N,1} | N & 
+    \stackrel{iid}{\sim} \text{Pareto}(f_{min}, \alpha) 
+    \label{eq:flux_prior}
 \end{align}
 We then draw colors,
 \begin{align}
-  c_{i, b}  & \sim \mathcal{N}(\mu_c, \sigma^2_c) \quad \forall b = 2, ..., B; i = 1, ..., N.
+  c_{1, b}, ..., c_{N,b} | N  & 
+      \stackrel{iid}{\sim} \mathcal{N}(\mu_c, \sigma^2_c) \quad \forall b = 2, ..., B
 \end{align}
 We call the first band the ``reference band" because fluxes in bands $2, ..., B$ are defined with respect to the first band. Given flux in the reference band $f_{i,1}$ and color $c_{i,b}$,
 the flux in the $b$th band is  $f_{i,b} = f_{i,1} \times 10^{c_{i,b} / 2.5}$.
@@ -70,16 +76,17 @@ on our image. We model the PSF as a weighted average between a Gaussian ``core" 
 where $r^2 = u^2 + w^2$. The PSF parameters vary by band. Define 
 $\pi := (\sigma_{1,b}, \sigma_{2,b}, \sigma_{P,b}, \gamma_b, p_{0,b})_{b=1}^B$ as the collection of PSF parameters across all bands. 
 
-The background intensity is modeled as with an affine function: 
+The background intensity is modeled with an affine function: 
 \begin{align}
     I_{ij}^{b} = \beta_0^{b} + \beta_1^{b} \times i + \beta_2^{b} \times j.
 \end{align}
 The background parameters are specific to the band. 
 
-The model parameters $\pi$ for the PSF and $\beta$ are estimated by the SDSS software pipeline and reported along with the release of each SDSS image; in Section~\ref{sec:model_params}, we propose a method to estimate these parameters jointly with the catalog. 
+The model parameters $\pi$ for the PSF and $\beta$ are estimated by the SDSS software pipeline and reported along with the release of each SDSS image. Alternatively, in Section~\ref{sec:model_params}, we propose a method to estimate these parameters jointly with the catalog. 
 
 Finally, we model the observed number of photoelectrons at pixel $(h,w)$ and band $b$ as Gaussian
-with mean and variance equal to $\lambda^b_{hw}$. This model is reasonable due to the law of rare events.
+with mean and variance equal to $\lambda^b_{hw}$. 
+% This model is reasonable due to the law of rare events and the Gaussian approximation to the Poisson.
 % \jeff{If we're actually using a Gaussian rather than a Poisson, it's probably better not to mention the Poisson.
 % Just say we model the number as Gaussian with var == mean.}
 Thus, the observed pixel intensities are
@@ -102,7 +109,7 @@ $f_{min}$ to correspond with the SDSS
 lower detection limit ($\approx$ 22 magnitude); we use a standard Gaussian for color priors. 
 
 One difference is that \cite{Portillo_2017, Feder_2019} use an exponential prior on $N$. We use a Poisson prior and set $\mu = 0.15$, slightly denser than the $0.1$ stars per pixel 
-brighter than 22mag found in the Hubble image of M2. 
+brighter than 22mag found in the Hubble catalog of M2. 
 
 In summary, we have detailed the likelihood
 $p(x | \theta)$ which describes the generation of an image $x$ given a catalog $\theta$. We have specified a prior distribution $p(\theta)$ over the space 

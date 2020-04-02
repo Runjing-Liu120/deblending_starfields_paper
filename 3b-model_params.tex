@@ -3,10 +3,14 @@ the specification of a PSF and a sky background. Let $\phi = (\pi^b, \beta^b)_{b
 \jeff{It's pretty unusual to use $\phi$ for model parameters, rather than $\theta$. Unless there's a reason, better to use $\theta$. It will be easier on the reader, leaving them with more attention to devote to understanding the substantive ideas in the paper.
 }
 \bryan{with the changes to the gen. model, I ended up using $\theta$ as latent variables :/}
+\jeff{It's pretty common in VI papers to make $z$ all the latent random variables rather than $\theta$.
+That way Greek letters can be used for non-random quantities (model parameters and variational parameters) while Roman letters denote random variables.
+}
+
 Our likelihood, and therefore posterior, now depend on $\phi$. We denote this dependence with a subscript, $p_\phi$. 
 
-We can simultaneously find an approximate posterior and 
-estimate model parameters by jointly optimizing 
+We can simultaneously infer a catalog $\theta$ and 
+estimate model parameters $\phi$ by optimizing 
 \begin{align}
 (\eta^*, \phi^*) = \argmin_{\phi, \eta} \; \mathrm{KL}\big (q_{\eta}(\theta |x) \| p_{\phi}(\theta | x)\big)\label{eq:em_obj}
 \end{align}
@@ -21,15 +25,15 @@ Variational EM~\cite{Jordan_intro_vi, neal2000varem, Beal2002varem} optimizes th
 \end{align}
 for iterations $t = 1, ..., T$. 
 
-The E-step objective is exactly same as the KL objective in variational inference, equation~\eqref{eq:kl_objective}, for fixed model parameters $\phi$. 
+The E-step objective is exactly same as the KL objective in \eqref{eq:kl_objective} for fixed model parameters $\phi$. 
 In other words, for fixed model parameters $\phi$, we are seeking the variational distribution closest the the true posterior under $\phi$. 
 
-Recall that minimizing the KL divergence is equivalent to maximizing the ELBO (equation~\eqref{eq:elbo}). We can thus rewrite the M-step as 
+Recall that minimizing the KL divergence is equivalent to maximizing the ELBO~\eqref{eq:elbo}. We can thus rewrite the M-step as 
 \begin{align}
     \text{{\bf M-step: }} \phi_{t} &= \argmax_{\phi} \; \Expect_{q_{\eta}(\theta | x)}\Big[\log p_\phi(x, \theta) - \log q_\eta(\theta)\Big] \\
     &= \argmax_{\phi} \; \Expect_{q_{\eta}(\theta | x)}\Big[\log p_\phi(x, \theta)\Big]    \label{eq:m_step}
 \end{align} 
-To estimate model parameters, the goal is to optimize the marginal log-likelihood $\log p_\phi(x)$; however, since $\log p_\phi(x)$ is intractable, we optimize a lower bound as a surrogate for $\log p_\phi(x)$. 
+To estimate model parameters, we would ideally optimize the marginal log-likelihood $\log p_\phi(x)$; however, since $\log p_\phi(x)$ is intractable, we optimize a lower bound as a surrogate for $\log p_\phi(x)$. 
 
 % \subsection{Estimation of the catalogue}
 % In previous work \cite{Brewer_2013, Portillo_2017, Feder_2019}, the posterior on

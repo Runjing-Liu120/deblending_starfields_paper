@@ -8,7 +8,7 @@ Our work targets applications where all sources are well-modeled as points witho
 Point sources are good models for surveys where the primary objects studied are stars, such as DECam~\cite{Schlafly_2018_DECam}, which imaged the center of our own Milky Way. Point source models are also used for surveys like WISE~\cite{Wright_2010_WISESurvey} whose telescope's resolution and the density of light sources did not allow for differentiation between stars and galaxies. 
 
 In this paper, we test our method on the crowded starfield M2 imaged by the Sloan Digital Sky Survey (SDSS). 
-Understanding these starfields are of scientific interest per se. The distribution 
+Understanding these starfields is of scientific interest per se. The distribution 
 of colors and fluxes in crowded starfields 
 can be used to estimate the age 
 of the starfield, which in turn lower bounds the 
@@ -22,53 +22,85 @@ For example, \cite{Bosch_2017_LSST} estimates that in the Large Synoptic Survey 
 
 \subsection{From algorithmic pipelines to probabilistic cataloging}
 
-Traditionally, most cataloging has been done using purely algorithmic pipelines, involving scanning the image for the brightest peaks, estimating fluxes, and subtracting out the estimated light source, and repeating. Most of these pipelines are not designed for crowded starfields; PHOTO~\cite{lupton2001sdss}, 
-the default SDSS cataloging pipeline, timed out on 
-the crowded starfield M2. 
-Not only do these pipelines fail in the crowded field 
-regime, but they do not produce statistically rigorous uncertainty estimates. TODO: this last statement is probably a generalization ... can I make this more precise?
+Traditionally, most cataloging has been done using purely algorithmic pipelines, involving scanning the image for the brightest peaks, estimating fluxes, subtracting out the estimated light source, and repeating. Most of these pipelines are not designed for crowded starfields; PHOTO~\cite{lupton2001sdss}, 
+the default SDSS cataloging pipeline, failed to 
+produce a catalog on 
+the crowded starfield M2~\cite{Portillo_2017}. 
+Not only do these pipelines fail in the crowded field
+regime, but they do not produce statistically rigorous error estimates that propagate 
+uncertainties accumulating in each step of the pipeline. 
 
 \cite{Brewer_2013, Portillo_2017, Feder_2019}
-propose {\itshape probabilistic} cataloging. A statistical model was developed, and instead of deriving a single catalog, they produced a Bayesian posterior distribution on the space of all possible catalogs. 
-Each sample from the posterior is a catalog; that is, each sample returns a list, potentially of varying length, consisting of stellar locations, fluxes, and colors. Uncertainties are fully quantified: for example, in an image with an ambiguously blended bright peak, some catalogs drawn from the posterior would contain multiple dim sources while others would contain one bright source. The relative weight the posterior distribution places on the one explanation over another represents the statistical confidence. 
+propose {\itshape probabilistic} cataloging.
+A statistical model was developed, and instead of deriving a single catalog, they produce a Bayesian posterior distribution on the space of all possible catalogs. 
+Each sample from the posterior is a catalog; that is, each sample returns a list, potentially of varying length, consisting of stellar locations, fluxes, and colors. Uncertainties are fully quantified: for example, in an image with an ambiguously blended bright peak, some catalogs drawn from the posterior would contain multiple dim sources while others would contain one bright source. The relative weight the posterior distribution places on one explanation over another represents the statistical confidence. 
 
-In \cite{Brewer_2013, Portillo_2017, Feder_2019},
-the posterior was computed using
-Markov chain Monte Carlo (MCMC). 
+In previous work on probabilistic cataloging, the posterior was computed using
+Markov chain Monte Carlo (MCMC).
+% \cite{Portillo_2017, Feder_2019} refer to their method 
+% as PCAT, short for ``Probabilistic CATaloging" (we will 
+% use ``probabilistic cataloging'' to refer to any procedure that produces a Bayesian posterior over possible catalogs; PCAT refers specifically the the MCMC procedure in~\cite{Portillo_2017, Feder_2019}). 
 However, the computational cost of MCMC is prohibitively large for
-large-scale astronomical surveys. \cite{Feder_2019} reported a runtime of 30 minutes for a $100\times 100$ pixel subimage of the globular cluster M2, roughly a $0.3\times0.3$ arcsecond patch of the sky.
-For comparison, in one night SDSS scans a region of size on the order of $10 \times 1000$ arcminutes. Extrapolating the 30 min runtime of \cite{Feder_2019}, 
-it would take about two months to process one night's data collection using MCMC. 
+large-scale astronomical surveys. \cite{Feder_2019}
+reports a runtime of 30 minutes for MCMC on a $100\times 100$ pixel subimage of the globular cluster M2, roughly a $0.3\times0.3$ arcsecond patch of the sky.
+For comparison, in one night SDSS scans a region of size on the order of $10 \times 1000$ arcminutes. Extrapolating the 30 minute runtime, MCMC would take about two months to process one night's data collection. 
 
 \subsection{Variational inference and neural networks}
 As an alternative to MCMC, we propose to construct an approximate posterior using variational inference~\cite{Blei_2017_vi_review,Jordan_intro_vi, Wainwrite_graph_models_vi}.
-Variational inference (VI) proposes a family of distributions and uses numerical optimization to find the distribution 
+With variational inference (VI), we propose a family of distributions and use numerical optimization to find the distribution 
 in the proposed family that is closest 
-to the approximate posterior in KL divergence. 
-With a sufficiently constrained family of distributions, the VI optimization problem is often orders of magnitude faster than sampling. 
+in KL divergence to the exact posterior. 
+With a sufficiently constrained family of distributions, the VI optimization problem can be orders of magnitude faster than MCMC. 
 
-One immediate challenge of applying variational inference to probabilistic cataloging is the transdimensionality 
+
+
+One immediate challenge in applying VI to probabilistic cataloging is the transdimensionality 
 of the latent variable space. The posterior 
-is defined over the space of all catalogs, and the the number of sources in a catalog is unknown and random in a Bayesian framework.
-Previous work on probabilistic cataloging employed Reversible Jump MCMC~\cite{Green95reversiblejump} to sample transdimensional catalogs. In Reverse Jump MCMC, auxiliary variables are added to encode the ``birth" of new sources 
+is defined over the space of all catalogs, and the number of sources in a catalog is unknown and random in a Bayesian framework.
+Previous work on probabilistic cataloging employed reversible jump MCMC~\cite{Green95reversiblejump} to sample transdimensional catalogs. In RJ-MCMC, auxiliary variables are added to encode the ``birth" of new sources 
 or the ``death" of existing sources in the Markov chain. Our challenge in VI is to construct a family of distributions on this transdimensional space. Section~\ref{sec:var_distr} discusses our construction: we define the variational distribution on catalogs of all possible size; that is, we define a distribution on a triangular array of latent locations and fluxes and map this to a distribution 
-on catalog space.
+on the space of all catalogs.
 
 The second challenge is to build a VI procedure 
 that can scale to the petabytes of data 
 modern astronomical surveys are poised to collected.
 We are not the first to propose a VI procedure
-that scales to entire surveys. 
+that scales Bayesian inference to entire surveys. 
 \cite{regier2019_celeste} also employed 
-VI, and with the help of a 650,000 core supercomputer, they constructed a catalog of the entire Sloan Digital Sky Survey. In their application of 
+VI, and with the help of a 650,000 core supercomputer, they constructed a catalog of the entire Sloan Digital Sky Survey based on Bayesian inference. 
+
+In their application of 
 VI, numerical optimization had to be re-run for every new collection of images. 
-In contrast, we employ {\itshape amortized} variational inference, where a neural network is trained to map input images to a variational distribution. After a one time cost to train the neural network, inference 
-on a new image requires a single forward pass through the neural network. Moreover, neural networks can evaluate batches of images in parallel 
-on a GPU. This amortization is critical for scaling up to large astronomical surveys. 
+\jeff{The most serious limitations of~\cite{regier2019_celeste} are that 1) the number of light sources is set by a preprocessing routine and fixed, 2) the variational distribution for some random variables is a point mass, including location.
+This paper fixes both problems by using stochastic optimization, whereas~\cite{regier2019_celeste} used deterministic optimization.
+Stochastic optimization is in general slower than deterministic optimization, but in this paper we get a speedup by using amortized inference.
+In addition to greater speed, amortized inference may be better at nonconvex optimization: by learning a policy from many examples we learn a policy for avoiding shallow local minima. No carefully hand-tuned initialization scheme is needed.
+}
+\bryan{Wait, could you explain a bit more about how stochastic optimization helps us avoid (1) and (2)? 
+I agree that these two issues should be mentioned, since
+simply saying "we are faster" than this other VI procedure might not be enough motivation for this work. }
+In contrast, we employ {\itshape amortized} variational inference, where a neural network is trained to map input images to a variational distribution. After a one-time cost to train the neural network, inference 
+on a new image requires a single forward pass through the neural network. In our 
+architecture, detailed in Section~\ref{sec:nn_archetecture}, the forward pass on 
+a $100 \times 100$ pixel subimage of M2 takes $\approx 0.2$ seconds (compare with 30min with MCMC). Moreover, neural networks can evaluate batches of images in parallel on a GPU. This amortization is critical for scaling up to large astronomical surveys.
 
-One primary 
+One limitation of neural networks is the large amount of labeled data needed for training. 
+In astronomy, knowledge of the physical system  often give rise to reasonably realistic simulators. 
+For example, \cite{Lanusse_2017_cmudeeplens}
+trained neural networks to detect Einstein rings, 
+a rare object astronomers use to study 
+the properties of dark matter; the neural network in \cite{Hezaveh_2017_nn_lensing_nature} also returned
+morphological parameters for each Einstein ring. 
+In both cases, the training data was generated from a simulator, so the ground truth labels (ring exists or not; the ring morphology) are known. The network is trained in a supervised fashion. Using simulated data is especially useful because the network can be trained on essentially unlimited data -- the bottleneck is the limit on computational resources, not the availability of labeled training data. 
 
-% Neural networks have seen tremendous success in supervised learning problems on image datasets. Neural networks have taken hold in astronomy as well, and they have been applied to image data from telescope surveys. For example, \cite{Lanusse_2017_cmudeeplens, huang2019finding} used neural networks to 
+In our work, we also make use of simulated data to train the neural network. However, we introduce the simulated data in the context of a statistical model. We do so by 
+connecting our training routine to the wake-sleep algorithm~\cite{Hinton1995wake_sleep}. 
+The neural network outputs are not simply ``labels" for the input image; rather, we are able to interpret the output as specifying an approximate Bayesian posterior in the context of a well-defined statistical model. 
+
+In summary, we leverage the predictive power and computational efficiency of neural networks to do 
+inference in the framework of a statistical model. 
+We also employ simulated data in our training procedure in a statistically principled way. In Section~\ref{sec:results}, we compare the catalog obtained from our variational posterior with the catalog derived from MCMC; we also compare with traditional cataloging approaches.  
+
 % detect Einstein rings; \cite{Hezaveh_2017_nn_lensing_nature} used
 % neural networks to infer morphological characteristics of the Einstein rings; 
 % in the context of deblending, 
