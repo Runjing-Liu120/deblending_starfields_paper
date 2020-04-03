@@ -7,9 +7,9 @@ in the image. Then for each star, the catalog
 records its location and its flux, or brightness,
 in each band. 
 The space of latent variables 
-$\Theta$ is the collection of all possible catalogs of the form
+$\mathcal{Z}$ is the collection of all possible catalogs of the form
 \begin{align}
-    \theta := \{N, (\ell_i, f_{i,1}, ..., f_{i,B})_{i = 1}^N\},
+    z := \{N, (\ell_i, f_{i,1}, ..., f_{i,B})_{i = 1}^N\},
     \label{eq:cat_formulation}
 \end{align}
 where the number of stars in the catalog
@@ -21,7 +21,7 @@ is $N\in\mathbb{N}$;
 the location of the $i$th star is $\ell_i \in \Reals^2$;
 the flux of the $i$th star in the $b$th band is $f_{i, b}\in\Reals^+$. 
 
-The prior is a distribution over the set of catalogs $\Theta$. In this work, we use a marked spatial Poisson process. That is, we first draw the number of stars contained in the $H\times W$ image:
+The prior is a distribution over the set of catalogs $\mathcal{Z}$. In this work, we use a marked spatial Poisson process. That is, we first draw the number of stars contained in the $H\times W$ image:
 \begin{align}
 	N &\sim \text{Poisson}(\mu HW).
 \end{align}
@@ -59,7 +59,7 @@ the flux in the $b$th band is  $f_{i,b} = f_{i,1} \times 10^{c_{i,b} / 2.5}$.
 % Having drawn $N$, we index into the $N$th row of triangular array, and use this set of locations and fluxes to construct 
 % the image. The expected number of photoelectrons measured at pixel $(h,w)$ in band $b$ is
 
-Having drawn a catalog $\theta = \{N, (\ell_i, f_{i,1}, ..., f_{i,B})_{i = 1}^N\}$,
+Having drawn a catalog $z = \{N, (\ell_i, f_{i,1}, ..., f_{i,B})_{i = 1}^N\}$,
 the expected number of photoelectrons measured at pixel $(h,w)$ in band $b$ is
 \begin{align}
   \lambda^b_{hw} = I^{b}_{hw} + \sum_{i = 1}^N f_{i,b} \mathcal{P}^b\big(h - \ell_{i}[1], w - \ell_{i}[2]\big),
@@ -95,14 +95,14 @@ with mean and variance equal to $\lambda^b_{hw}$.
 % Just say we model the number as Gaussian with var == mean.}
 Thus, the observed pixel intensities are
 \begin{align}
-  x_{hw}^b | \theta \overset{ind}{\sim} \mathcal{N}(\lambda^b_{hw}, \lambda^b_{hw})
+  x_{hw}^b | z \overset{ind}{\sim} \mathcal{N}(\lambda^b_{hw}, \lambda^b_{hw})
   \quad\forall b = 1, ..., B; h = 1,..., H; w = 1, ..., W. 
 \end{align}
 The scaling of variance with the expected intensity is reasonable due to the Poissonian nature of photon arrivals. 
 % \jeff{Better to use lowercase $x$ rather than $X$ if you're not going to use uppercase for all the random variables}
 Explicitly, the log-likelihood is
 \begin{align}
-    \log p(x | \theta) &= \sum_{b = 1}^{B} \sum_{h = 1}^H \sum_{w = 1}^W 
+    \log p(x | z) &= \sum_{b = 1}^{B} \sum_{h = 1}^H \sum_{w = 1}^W 
         \Big\{\frac{1}{2\lambda^b_{hw}}(x_{hw}^b  - \lambda^b_{hw})^2 - 
                \frac{1}{2}\log(2\pi\lambda^b_{hw})\Big\}
     \label{eq:loglik}.
@@ -117,9 +117,9 @@ One difference is that \cite{Portillo_2017, Feder_2019} use an exponential prior
 brighter than 22mag found in the Hubble catalog of M2. 
 
 In summary, we have detailed the likelihood
-$p(x | \theta)$ which describes the generation of an image $x$ given a catalog $\theta$. We have specified a prior distribution $p(\theta)$ over the space 
-of all catalogs $\Theta$. 
+$p(x | z)$ which describes the generation of an image $x$ given a catalog $z$. We have specified a prior distribution $p(z)$ over the space 
+of all catalogs $\mathcal{Z}$. 
 Our goal is to answer the question, ``given observed image $x$, which 
 catalogs best explain the data?"
-The question is answered by the posterior distribution $p(\theta | x)$. While 
+The question is answered by the posterior distribution $p(z | x)$. While 
 the exact posterior distribution is intractable, we detail our variational approximation in the next section. 

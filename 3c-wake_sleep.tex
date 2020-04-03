@@ -22,7 +22,7 @@ E-step objective with
 called the {\itshape sleep phase}. We will see in Section~\ref{sec:sleep_details} that a simple gradient estimator can be derived for the sleep phase objective, without 
 reparameterization or REINFORCE. 
 
-We comment on two key differences between the sleep objective~\eqref{eq:sleep_obj} and the E-step~\eqref{eq:e_step}. First note the difference in ordering of arguments to the $\KL$. 
+We comment on two key differences between the sleep objective~\eqref{eq:sleep_obj} and the E-step~\eqref{eq:e_step_kl}. First note the difference in ordering of arguments to the $\KL$. 
 While optimizing $\KL(q\|p)$ in equation~\eqref{eq:e_step} does not depend on the intractable 
 data likelihood $p_\phi(x)$, the $\KL$ with arguments reversed does. 
 As will be detailed in Section~\ref{sec:sleep_details}, the outer expectation over the data makes this optimization objective tractable without dependence on $\log p(x)$. 
@@ -32,21 +32,15 @@ in this case the $H\times W$ image. In contrast, the sleep objective seeks to mi
 
 Moreover, ``possible data" is defined under our generative model from Section~\ref{sec:gen_model}. It is imperative that our generative model $p_\phi(x)$ well-approximates the true underlying data-generating mechanism. 
 
-Therefore, a {\itshape wake phase} is employed to tune the model parameters. For fixed variational parameters $\eta$, the wake-phase objective is
-\begin{align}
-    \phi = \argmax_{\phi} \; \Expect_{q_{\eta}(\theta | x)}\Big[\log p_\phi(x, \theta)\Big], 
-    \label{eq:wake_elbo}
-\end{align}
-which is equivalent to the M-step~\eqref{eq:m_step} in variational EM.
+Therefore, in addition to the sleep-phase, we also incorporate the M-step~\eqref{eq:m_step} to estimate model parameters. In the context of the wake-sleep algorithm, the M-step is known as the ``wake-phase."
 
-In summary, the {\itshape wake-sleep} algorithm alternates
-between the two objectives 
+In summary, the {\itshape wake-sleep} algorithm alternates between the two objectives 
 \begin{align}
     \text{{\bf Sleep-phase: }} & 
     \eta_{t} = \argmin_{\eta} \Expect_{x \sim p(x)}\Big[\KL(p_{\phi_{t-1}}(\theta | x) \| q_\eta(\theta | x)\Big]
     \label{eq:sleep_phase_summary}
     \\
-    \text{{\bf Wake-phase: }} & \phi_{t} = \argmin_{\phi} \; \mathrm{KL}\big (q_{\eta_t}(\theta |x) \| p_{\phi}(\theta | x)\big), 
+    \text{{\bf Wake-phase: }} & \phi_{t} = \argmax_{\phi}\; \Expect_{q_{\eta_t}(z | x)}\Big[\log p_{\phi}(x, z) - \log q_{\eta_t}(z | x)\Big]
     \label{eq:wake_phase_summary}
 \end{align} 
 for iterations $t = 1, ..., T$. 
@@ -58,7 +52,7 @@ Stochastic gradients are easy to compute in the wake phase (M-step). Because the
 \end{align}
 While the E-step is not conducive to simple gradient estimators, we will see in Section~\ref{sec:sleep_details} that our sleep-phase objective
 results in a similarly straightforward gradient estimator as in~\eqref{eq:mstep_grad}. However,
-we note that a consequence of replacing the E-step with the sleep phase is that the wake-sleep algorithm no longer targets the singular KL objective~\eqref{eq:em_obj}. 
+we note that a consequence of replacing the E-step with the sleep phase is that the wake-sleep algorithm no longer targets the singular objective like the ELBO~\eqref{eq:em_obj}. 
 
 % Equation~\eqref{eq:wake_elbo} is equivalent to maximizing the ELBO in equation~\eqref{eq:elbo} with respect to model parameters $\phi$. 
 % Since maximizing the ELBO is equivalent to 

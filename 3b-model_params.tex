@@ -1,43 +1,49 @@
 The generative model from Section~\ref{sec:gen_model} requires
 the specification of a PSF and a sky background. Let $\phi = (\pi^b, \beta^b)_{b = 1}^B$ be the concatenation of the PSF and background parameters into a real-valued vector. 
-\jeff{It's pretty unusual to use $\phi$ for model parameters, rather than $\theta$. Unless there's a reason, better to use $\theta$. It will be easier on the reader, leaving them with more attention to devote to understanding the substantive ideas in the paper.
-}
-\bryan{with the changes to the gen. model, I ended up using $\theta$ as latent variables :/}
-\jeff{It's pretty common in VI papers to make $z$ all the latent random variables rather than $\theta$.
-That way Greek letters can be used for non-random quantities (model parameters and variational parameters) while Roman letters denote random variables.
-}
+% \jeff{It's pretty unusual to use $\phi$ for model parameters, rather than $\theta$. Unless there's a reason, better to use $\theta$. It will be easier on the reader, leaving them with more attention to devote to understanding the substantive ideas in the paper.
+% }
+% \bryan{with the changes to the gen. model, I ended up using $\theta$ as latent variables :/}
+% \jeff{It's pretty common in VI papers to make $z$ all the latent random variables rather than $\theta$.
+% That way Greek letters can be used for non-random quantities (model parameters and variational parameters) while Roman letters denote random variables.
+% }
 
 Our likelihood, and therefore posterior, now depend on $\phi$. We denote this dependence with a subscript, $p_\phi$. 
 
-We can simultaneously infer a catalog $\theta$ and 
+We can simultaneously infer a catalog $z$ and 
 estimate model parameters $\phi$ by optimizing 
+the ELBO in~\eqref{eq:elbo} for both variational parameters $\eta$ and model parameters $\phi$: 
 \begin{align}
-(\eta^*, \phi^*) = \argmin_{\phi, \eta} \; \mathrm{KL}\big (q_{\eta}(\theta |x) \| p_{\phi}(\theta | x)\big)\label{eq:em_obj}
+(\eta^*, \phi^*) = \argmax_{\eta, \phi} \Expect_{q_\eta(z | x)}\Big[\log p_\phi(x, z) - \log q_\eta(z | x)\Big].
+\label{eq:em_obj}
 \end{align}
-Variational EM~\cite{Jordan_intro_vi, neal2000varem, Beal2002varem} optimizes this objective with block coordinate descent on $\eta$ and $\phi$. Explicitly, 
+Variational EM~\cite{Jordan_intro_vi, neal2000varem, Beal2002varem} optimizes this objective with block coordinate ascent on $\eta$ and $\phi$. Explicitly, 
 \begin{align}
     \text{{\bf E-step: }} & 
-    \eta_{t} = \argmin_\eta \; \mathrm{KL}\big (q_{\eta    }(\theta |x) \| p_{\phi_{t - 1}}(\theta | x)\big)
+    \eta_{t} = \argmax_{\eta}\; \Expect_{q_\eta(z | x)}\Big[\log p_{\phi_{t-1}}(x, z) - \log q_\eta(z | x)\Big]
     \label{eq:e_step}
     \\
-    \text{{\bf M-step: }} & \phi_{t} = \argmin_{\phi} \; \mathrm{KL}\big (q_{\eta_t}(\theta |x) \| p_{\phi}(\theta | x)\big), 
+    \text{{\bf M-step: }} & \phi_{t} = \argmax_{\phi}\; \Expect_{q_{\eta_t}(z | x)}\Big[\log p_{\phi}(x, z) - \log q_{\eta_t}(z | x)\Big]
     \label{eq:m_step}
 \end{align}
 for iterations $t = 1, ..., T$. 
 
-The E-step objective is exactly same as the KL objective in \eqref{eq:kl_objective} for fixed model parameters $\phi$. 
-In other words, for fixed model parameters $\phi$, we are seeking the variational distribution closest the the true posterior under $\phi$. 
+To estimate model parameters, we would ideally optimize the marginal log-likelihood $\log p_\phi(x)$. However, since $\log p_\phi(x)$ is intractable, we optimize the ELBO as a surrogate for $\log p_\phi(x)$ in the M-step. The ELBO is a lower bound on the 
+$\log p_\phi(x)$, and is equal when $q_\eta(z | x)$ 
+= $p_\phi(z | x)$. 
 
-Recall that minimizing the KL divergence is equivalent to maximizing the ELBO~\eqref{eq:elbo}. We can thus rewrite the M-step as 
+Recall maximizing the ELBO with respect to $\eta$ 
+is equivalent to minimizing the KL in~\eqref{eq:kl_objective}.
+We can thus rewrite the E-step as 
 \begin{align}
-    \text{{\bf M-step: }} \phi_{t} &= \argmax_{\phi} \; \Expect_{q_{\eta}(\theta | x)}\Big[\log p_\phi(x, \theta) - \log q_\eta(\theta)\Big] \\
-    &= \argmax_{\phi} \; \Expect_{q_{\eta}(\theta | x)}\Big[\log p_\phi(x, \theta)\Big]    \label{eq:m_step}
+    \text{{\bf E-step: }} \eta_{t} &= \argmax_{\eta}\; \Expect_{q_\eta(z | x)}\Big[\log p_{\phi}(x, z) - \log q_\eta(z | x)\Big] \\
+    &= \argmin_{\eta} \; \mathrm{KL}\Big[\,q_\eta(z | x)\, \| \,p_\phi(z | x )\,\Big] \label{eq:e_step_kl}
 \end{align} 
-To estimate model parameters, we would ideally optimize the marginal log-likelihood $\log p_\phi(x)$; however, since $\log p_\phi(x)$ is intractable, we optimize a lower bound as a surrogate for $\log p_\phi(x)$. 
+In other words, in the E-step, we fix $\phi$ and seek the variational distribution closest the the true posterior under $\phi$. 
+
 
 % \subsection{Estimation of the catalogue}
 % In previous work \cite{Brewer_2013, Portillo_2017, Feder_2019}, the posterior on
-% the latent variables $(\theta, c)$ was approximated using MCMC. In \cite{Portillo_2017, Feder_2019},
+% the latent variables $(z, c)$ was approximated using MCMC. In \cite{Portillo_2017, Feder_2019},
 % a method was proposed to further reduce the posterior samples to a single point estimate
 % which they call a {\itshape condensed catalogue}.
 %
@@ -46,7 +52,7 @@ To estimate model parameters, we would ideally optimize the marginal log-likelih
 % is to characterize the posterior using the maximum a posteriori estimate. Using the
 % generative model from Section~\ref{sec:gen_model}, the joint loglikelihood is
 % \begin{align}
-%   \log \mathcal{L}(\theta,& c) \stackrel{c}{=} \overbrace{\sum_{b = 1}^B \sum_{w = 1}^W \sum_{h = 1}^H
+%   \log \mathcal{L}(z,& c) \stackrel{c}{=} \overbrace{\sum_{b = 1}^B \sum_{w = 1}^W \sum_{h = 1}^H
 %         \Big\{-\frac{1}{2}\log{\lambda_{hw}^b} - \frac{(x_{hw}^b - \lambda_{hw}^b)^2}{2\lambda_{hw}^b}\Big\}}^
 %         \text{Gaussian likelihood} + ...\notag\\
 %         & ... + \underbrace{N\log(\mu HW) + \log N!}_\text{Poisson prior on $N$} -
