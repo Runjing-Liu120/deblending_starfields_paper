@@ -43,7 +43,7 @@ Markov chain Monte Carlo (MCMC).
 However, the computational cost of MCMC is prohibitively large for
 large-scale astronomical surveys. \cite{Feder_2019}
 reports a runtime of 30 minutes for MCMC on a $100\times 100$ pixel subimage of the globular cluster M2, roughly a $0.3\times0.3$ arcsecond patch of the sky.
-For comparison, in one night SDSS scans a region of size on the order of $10 \times 1000$ arcminutes. Extrapolating the 30 minute runtime, MCMC would take about two months to process one night's data collection. 
+For comparison, in one night SDSS scans a region of size on the order of $10 \times 1000$ arcminutes. Extrapolating the 30 minute runtime, MCMC would take about two months to process one night's data collection.
 
 \subsection{Variational inference and neural networks}
 As an alternative to MCMC, we propose to construct an approximate posterior using variational inference~\cite{Blei_2017_vi_review,Jordan_intro_vi, Wainwrite_graph_models_vi}.
@@ -52,25 +52,22 @@ in the proposed family that is closest
 in KL divergence to the exact posterior. 
 With a sufficiently constrained family of distributions, the VI optimization problem can be orders of magnitude faster than MCMC. 
 
+We are not the first to propose a VI procedure
+that scales Bayesian inference to the terabytes of data collected by astronomical surveys. 
+Celeste \cite{regier2019_celeste} also employed 
+VI, and with the help of a 650,000 core supercomputer, they constructed a catalog of the entire Sloan Digital Sky Survey based on Bayesian inference. 
 
-
-One immediate challenge in applying VI to probabilistic cataloging is the transdimensionality 
-of the latent variable space. The posterior 
-is defined over the space of all catalogs, and the number of sources in a catalog is unknown and random in a Bayesian framework.
+However, one serious limitation of Celeste is that the number of light sources in a given image is treated as known and fixed in their statistical model; thus, it had to be set by a preprocessing routine. In this work, the number of sources is assumed to be unknown. This results in a transdimensional latent variable space since 
+the posterior is defined over the space of all catalogs, and the number of sources in a catalog is unknown and random.
 Previous work on probabilistic cataloging employed reversible jump MCMC~\cite{Green95reversiblejump} to sample transdimensional catalogs. In RJ-MCMC, auxiliary variables are added to encode the ``birth" of new sources 
 or the ``death" of existing sources in the Markov chain. Our challenge in VI is to construct a family of distributions on this transdimensional space. Section~\ref{sec:var_distr} discusses our construction: we define the variational distribution on catalogs of all possible size; that is, we define a distribution on a triangular array of latent locations and fluxes and map this to a distribution 
 on the space of all catalogs.
 
-The second challenge is to build a VI procedure 
-that can scale to the petabytes of data 
-modern astronomical surveys are poised to collected.
-We are not the first to propose a VI procedure
-that scales Bayesian inference to entire surveys. 
-\cite{regier2019_celeste} also employed 
-VI, and with the help of a 650,000 core supercomputer, they constructed a catalog of the entire Sloan Digital Sky Survey based on Bayesian inference. 
-
-In their application of 
-VI, numerical optimization had to be re-run for every new collection of images. 
+Secondly, in Celeste, numerical optimization had to be re-run for every new collection of images. 
+In contrast, we employ {\itshape amortized} variational inference, where a neural network is trained to map input images to a variational distribution. After a one-time cost to train the neural network, inference 
+on a new image requires a single forward pass through the neural network. In our 
+architecture, detailed in Section~\ref{sec:nn_archetecture}, the forward pass on 
+a $100 \times 100$ pixel subimage of M2 takes $\approx 0.2$ seconds (compare with 30min with MCMC). Moreover, neural networks can evaluate batches of images in parallel on a GPU. This amortization is extremely advantageous for scaling up to large astronomical surveys.
 \jeff{The most serious limitations of~\cite{regier2019_celeste} are that 1) the number of light sources is set by a preprocessing routine and fixed, 2) the variational distribution for some random variables is a point mass, including location.
 This paper fixes both problems by using stochastic optimization, whereas~\cite{regier2019_celeste} used deterministic optimization.
 Stochastic optimization is in general slower than deterministic optimization, but in this paper we get a speedup by using amortized inference.
@@ -79,21 +76,15 @@ In addition to greater speed, amortized inference may be better at nonconvex opt
 \bryan{Wait, could you explain a bit more about how stochastic optimization helps us avoid (1) and (2)? 
 I agree that these two issues should be mentioned, since
 simply saying "we are faster" than this other VI procedure might not be enough motivation for this work. }
-In contrast, we employ {\itshape amortized} variational inference, where a neural network is trained to map input images to a variational distribution. After a one-time cost to train the neural network, inference 
-on a new image requires a single forward pass through the neural network. In our 
-architecture, detailed in Section~\ref{sec:nn_archetecture}, the forward pass on 
-a $100 \times 100$ pixel subimage of M2 takes $\approx 0.2$ seconds (compare with 30min with MCMC). Moreover, neural networks can evaluate batches of images in parallel on a GPU. This amortization is critical for scaling up to large astronomical surveys.
 
 One limitation of neural networks is the large amount of labeled data needed for training. 
 In astronomy, knowledge of the physical system  often give rise to reasonably realistic simulators. 
-For example, \cite{Lanusse_2017_cmudeeplens}
-trained neural networks to detect Einstein rings, 
-a rare object astronomers use to study 
-the properties of dark matter; the neural network in \cite{Hezaveh_2017_nn_lensing_nature} also returned
+For example, simulators were used in \cite{Lanusse_2017_cmudeeplens} to train trained neural networks to detect Einstein rings, 
+a rare object found in astronomical surveys and used to study dark matter; the neural network in \cite{Hezaveh_2017_nn_lensing_nature} also returned
 morphological parameters for each Einstein ring. 
-In both cases, the training data was generated from a simulator, so the ground truth labels (ring exists or not; the ring morphology) are known. The network is trained in a supervised fashion. Using simulated data is especially useful because the network can be trained on essentially unlimited data -- the bottleneck is the limit on computational resources, not the availability of labeled training data. 
+In both cases, because the training data was generated from a simulator, the ground truth labels (ring exists or not; the ring morphology) are known. The network is trained in a supervised fashion. Using simulated data is especially useful because the network can be trained on essentially unlimited data -- the bottleneck is the limit on computational resources, not the availability of labeled training data. 
 
-In our work, we also make use of simulated data to train the neural network. However, we introduce the simulated data in the context of a statistical model. We do so by 
+In our work, we also make use of simulated data to train our neural network. However, we introduce the simulated data in the context of a statistical model. We do so by 
 connecting our training routine to the wake-sleep algorithm~\cite{Hinton1995wake_sleep}. 
 The neural network outputs are not simply ``labels" for the input image; rather, we are able to interpret the output as specifying an approximate Bayesian posterior in the context of a well-defined statistical model. 
 

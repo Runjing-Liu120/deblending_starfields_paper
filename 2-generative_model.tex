@@ -1,7 +1,11 @@
-For a given $H \times W$ pixel image, our goal is to infer a catalog of 
-stars. The catalog specifies the number of stars 
-in the image, and for each star, the catalog 
-records its location, brightness, and color. 
+Light sources in the sky radiate photons. A telescope image records the number of photons that arrive at each pixel. Often, telescope images consists of multiple filter bands, each absorbing photons within a specified wavelength. 
+
+For a given $H \times W$ pixel image with $B$ filter bands, our goal is to infer a catalog of 
+stars. 
+The catalog first specifies the number of stars 
+in the image. Then for each star, the catalog 
+records its location and its flux, or brightness,
+in each band. 
 The space of latent variables 
 $\Theta$ is the collection of all possible catalogs of the form
 \begin{align}
@@ -10,12 +14,12 @@ $\Theta$ is the collection of all possible catalogs of the form
 \end{align}
 where the number of stars in the catalog
 is $N\in\mathbb{N}$;
-\jeff{Unfortunately I don't think astronomers define catalog this way. They think of a catalog as including uncertainty estimates, not as a realization of some random variables.}
-\bryan{I think this is actually how Portillos refers to a catalog -- he does admit that this isn't 
-what astronomers traditionally think of a catalog. The reason we need this is because our posterior is really defined over the space of all possible catalogs -- each sample from the posterior is a catalog as defined in \eqref{eq:cat_formulation}. I'll try to set this up more explicitly in the introduction. }
-\jeff{Sounds good. I really like defining a catalog as a sample, not a distribution. If Portillo defines it this way too, perhaps we can make the new definition stick.}
+% \jeff{Unfortunately I don't think astronomers define catalog this way. They think of a catalog as including uncertainty estimates, not as a realization of some random variables.}
+% \bryan{I think this is actually how Portillos refers to a catalog -- he does admit that this isn't 
+% what astronomers traditionally think of a catalog. The reason we need this is because our posterior is really defined over the space of all possible catalogs -- each sample from the posterior is a catalog as defined in \eqref{eq:cat_formulation}. I'll try to set this up more explicitly in the introduction. }
+% \jeff{Sounds good. I really like defining a catalog as a sample, not a distribution. If Portillos defines it this way too, perhaps we can make the new definition stick.}
 the location of the $i$th star is $\ell_i \in \Reals^2$;
-and the flux in the $b$th image band of the $i$th star is $f_{i, b}\in\Reals^+$. 
+the flux of the $i$th star in the $b$th band is $f_{i, b}\in\Reals^+$. 
 
 The prior is a distribution over the set of catalogs $\Theta$. In this work, we use a marked spatial Poisson process. That is, we first draw the number of stars contained in the $H\times W$ image:
 \begin{align}
@@ -30,14 +34,14 @@ We draw fluxes in the first band from a power law distribution:
 \begin{align}
     f_{1, 1}, ..., f_{N,1} | N & 
     \stackrel{iid}{\sim} \text{Pareto}(f_{min}, \alpha) 
-    \label{eq:flux_prior}
+    \label{eq:flux_prior}.
 \end{align}
-We then draw colors,
+Fluxes in the other bands are defined in terms of ``colors." The colors are drawn,
 \begin{align}
   c_{1, b}, ..., c_{N,b} | N  & 
-      \stackrel{iid}{\sim} \mathcal{N}(\mu_c, \sigma^2_c) \quad \forall b = 2, ..., B
+      \stackrel{iid}{\sim} \mathcal{N}(\mu_c, \sigma^2_c) \quad \forall b = 2, ..., B.
 \end{align}
-We call the first band the ``reference band" because fluxes in bands $2, ..., B$ are defined with respect to the first band. Given flux in the reference band $f_{i,1}$ and color $c_{i,b}$,
+Given flux in the first band band $f_{i,1}$ and color $c_{i,b}$,
 the flux in the $b$th band is  $f_{i,b} = f_{i,1} \times 10^{c_{i,b} / 2.5}$.
 \jeff{Is the reference band always 1? I usually think of the r band as having index 3. What does Portillo do?}
 \bryan{I didn't actually mean the index of the band in the telescope -- just wanted an enumerate of bands $1, ..., B$}
@@ -71,10 +75,10 @@ on our image. We model the PSF as a weighted average between a Gaussian ``core" 
 \begin{align}
     \mathcal{P}(u,w) = \frac{\exp(\frac{-r^2}{2\sigma_1^2}) + 
                             b \exp(\frac{-r^2}{2\sigma_2^2}) + 
-                            p_0(1 + \frac{r^2}{\gamma\sigma^2_P})^{-\beta/2} }{1 + b + p_0},
+                            p_0(1 + \frac{r^2}{\gamma\sigma^2_P})^{-\gamma/2} }{1 + b + p_0},
 \end{align}
 where $r^2 = u^2 + w^2$. The PSF parameters vary by band. Define 
-$\pi := (\sigma_{1,b}, \sigma_{2,b}, \sigma_{P,b}, \gamma_b, p_{0,b})_{b=1}^B$ as the collection of PSF parameters across all bands. 
+$\pi := (\sigma_{1}^{(b)}, \sigma_{2}^{(b)}, \sigma_{P}^{(b)}, \gamma^{(b)}, p_{0}^{(b)})_{b=1}^B$ as the collection of PSF parameters across all bands. 
 
 The background intensity is modeled with an affine function: 
 \begin{align}
@@ -94,6 +98,7 @@ Thus, the observed pixel intensities are
   x_{hw}^b | \theta \overset{ind}{\sim} \mathcal{N}(\lambda^b_{hw}, \lambda^b_{hw})
   \quad\forall b = 1, ..., B; h = 1,..., H; w = 1, ..., W. 
 \end{align}
+The scaling of variance with the expected intensity is reasonable due to the Poissonian nature of photon arrivals. 
 % \jeff{Better to use lowercase $x$ rather than $X$ if you're not going to use uppercase for all the random variables}
 Explicitly, the log-likelihood is
 \begin{align}
@@ -117,4 +122,4 @@ of all catalogs $\Theta$.
 Our goal is to answer the question, ``given observed image $x$, which 
 catalogs best explain the data?"
 The question is answered by the posterior distribution $p(\theta | x)$. While 
-the exact posterior distribution is intractable, we detail our variational approximation to the posterior distribution in the next section. 
+the exact posterior distribution is intractable, we detail our variational approximation in the next section. 
