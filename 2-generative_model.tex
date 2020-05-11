@@ -1,9 +1,9 @@
-Light sources in the sky radiate photons. A telescope image records the number of photons that arrive at each pixel. Often, telescope images consists of multiple filter bands, each absorbing photons within a specified wavelength. 
+Stars in the sky radiate photons. A telescope image records the number of photons that arrive at each pixel. Telescope images also consist of multiple filter bands, each absorbing photons within a specified range of wavelengths. 
 
 For a given $H \times W$ pixel image with $B$ filter bands, our goal is to infer a catalog of 
 stars. 
-The catalog first specifies the number of stars 
-in the image. Then for each star, the catalog 
+The catalog specifies the number of stars 
+in the image; then for each star, the catalog 
 records its location and its flux, or brightness,
 in each band. 
 The space of latent variables 
@@ -18,7 +18,7 @@ is $N\in\mathbb{N}$;
 % \bryan{I think this is actually how Portillos refers to a catalog -- he does admit that this isn't 
 % what astronomers traditionally think of a catalog. The reason we need this is because our posterior is really defined over the space of all possible catalogs -- each sample from the posterior is a catalog as defined in \eqref{eq:cat_formulation}. I'll try to set this up more explicitly in the introduction. }
 % \jeff{Sounds good. I really like defining a catalog as a sample, not a distribution. If Portillos defines it this way too, perhaps we can make the new definition stick.}
-the location of the $i$th star is $\ell_i \in \Reals^2$;
+the location of the $i$th star is $\ell_i \in \Reals^2$; and 
 the flux of the $i$th star in the $b$th band is $f_{i, b}\in\Reals^+$. 
 
 The prior is a distribution over the set of catalogs $\mathcal{Z}$. In this work, we use a marked spatial Poisson process. That is, we first draw the number of stars contained in the $H\times W$ image:
@@ -36,13 +36,13 @@ We draw fluxes in the first band from a power law distribution:
     \stackrel{iid}{\sim} \text{Pareto}(f_{min}, \alpha) 
     \label{eq:flux_prior}.
 \end{align}
-Fluxes in the other bands are defined in terms of ``colors." The colors are drawn,
+Fluxes in the other bands are defined in terms of ``colors." The colors are drawn as
 \begin{align}
   c_{1, b}, ..., c_{N,b} | N  & 
-      \stackrel{iid}{\sim} \mathcal{N}(\mu_c, \sigma^2_c) \quad \forall b = 2, ..., B.
+      \stackrel{iid}{\sim} \mathcal{N}(\mu_c, \sigma^2_c), \quad b = 2, ..., B.
 \end{align}
-Given flux in the first band band $f_{i,1}$ and color $c_{i,b}$,
-the flux in the $b$th band is  $f_{i,b} = f_{i,1} \times 10^{c_{i,b} / 2.5}$.
+Given flux in the first band $f_{i,1}$ and color $c_{i,b}$,
+the flux in band $b$ is  $f_{i,b} = f_{i,1} \times 10^{c_{i,b} / 2.5}$.
 \jeff{Is the reference band always 1? I usually think of the r band as having index 3. What does Portillo do?}
 \bryan{I didn't actually mean the index of the band in the telescope -- just wanted an enumerate of bands $1, ..., B$}
 % the flux in the $b$th band $f_{i,b}$ is $f_{i,1} \times 10^{c_{i,b} / 2.5}$.
@@ -73,16 +73,16 @@ is a function
 describing how a stellar point source appears
 on our image. We model the PSF as a weighted average between a Gaussian ``core" and a power-law ``wing" as described in~\cite{Xin2018psf}. For each band, the PSF has the form
 \begin{align}
-    \mathcal{P}(u,w) = \frac{\exp(\frac{-r^2}{2\sigma_1^2}) + 
-                            b \exp(\frac{-r^2}{2\sigma_2^2}) + 
-                            p_0(1 + \frac{r^2}{\gamma\sigma^2_P})^{-\gamma/2} }{1 + b + p_0},
+    \mathcal{P}(r) = \frac{\exp(\frac{-r^2}{2\sigma_1^2}) + 
+                            \zeta \exp(\frac{-r^2}{2\sigma_2^2}) + 
+                            \rho(1 + \frac{r^2}{\gamma\sigma^2_P})^{-\gamma/2} }{1 + \zeta + \rho},
 \end{align}
 where $r^2 = u^2 + w^2$. The PSF parameters vary by band. Define 
-$\pi := (\sigma_{1}^{(b)}, \sigma_{2}^{(b)}, \sigma_{P}^{(b)}, \gamma^{(b)}, p_{0}^{(b)})_{b=1}^B$ as the collection of PSF parameters across all bands. 
+$\pi := (\sigma_{1}^{(b)}, \sigma_{2}^{(b)}, \sigma_{P}^{(b)}, \gamma^{(b)}, \zeta^{(b)}, \rho^{(b)})_{b=1}^B$ as the collection of PSF parameters across all bands. 
 
-The background intensity is modeled with an affine function: 
+The background intensity at pixel $(h,w)$ is modeled with an affine function: 
 \begin{align}
-    I_{ij}^{b} = \beta_0^{b} + \beta_1^{b} \times i + \beta_2^{b} \times j.
+    I_{hw}^{b} = \beta_0^{b} + \beta_1^{b} \times h + \beta_2^{b} \times w.
 \end{align}
 The background parameters are specific to the band. 
 
@@ -95,12 +95,15 @@ with mean and variance equal to $\lambda^b_{hw}$.
 % Just say we model the number as Gaussian with var == mean.}
 Thus, the observed pixel intensities are
 \begin{align}
-  x_{hw}^b | z \overset{ind}{\sim} \mathcal{N}(\lambda^b_{hw}, \lambda^b_{hw})
-  \quad\forall b = 1, ..., B; h = 1,..., H; w = 1, ..., W. 
+  x_{hw}^b | z \overset{ind}{\sim} \mathcal{N}(\lambda^b_{hw}, \lambda^b_{hw}),
+  \quad 
+  b = 1, ..., B; \;
+  h = 1,..., H; \; 
+  w = 1, ..., W. 
 \end{align}
-The scaling of variance with the expected intensity is reasonable due to the Poissonian nature of photon arrivals. 
+The scaling of variance with the expected intensity is motivated by the Poissonian nature of photon arrivals. 
 % \jeff{Better to use lowercase $x$ rather than $X$ if you're not going to use uppercase for all the random variables}
-Explicitly, the log-likelihood is
+Explicitly, the log likelihood is
 \begin{align}
     \log p(x | z) &= \sum_{b = 1}^{B} \sum_{h = 1}^H \sum_{w = 1}^W 
         \Big\{\frac{1}{2\lambda^b_{hw}}(x_{hw}^b  - \lambda^b_{hw})^2 - 
@@ -109,17 +112,9 @@ Explicitly, the log-likelihood is
 \end{align}
 
 The likelihood and priors described above are similar to those
-presented in~\cite{Portillo_2017, Feder_2019}. We set $\alpha = 2$; we set 
-$f_{min}$ to correspond with the SDSS 
-lower detection limit ($\approx$ 22 magnitude); we use a standard Gaussian for color priors. 
+in previous probabilistic cataloging methods~\cite{Brewer_2013, Portillo_2017, Feder_2019, regier2019_celeste}. Like~\cite{Portillo_2017, Feder_2019}, the slope of the power law on fluxes is set at  $\alpha = 2$; we set the minimum flux $f_{min}$ to correspond with the SDSS 
+lower detection limit ($\approx$ 22 magnitude); and we use a standard Gaussian for color priors, which only disfavors extremely atypical colors, $|c_{i,b}| > 3$. 
 
 One difference is that \cite{Portillo_2017, Feder_2019} use an exponential prior on $N$. We use a Poisson prior and set $\mu = 0.15$, slightly denser than the $0.1$ stars per pixel 
 brighter than 22mag found in the Hubble catalog of M2. 
 
-In summary, we have detailed the likelihood
-$p(x | z)$ which describes the generation of an image $x$ given a catalog $z$. We have specified a prior distribution $p(z)$ over the space 
-of all catalogs $\mathcal{Z}$. 
-Our goal is to answer the question, ``given observed image $x$, which 
-catalogs best explain the data?"
-The question is answered by the posterior distribution $p(z | x)$. While 
-the exact posterior distribution is intractable, we detail our variational approximation in the next section. 

@@ -19,24 +19,24 @@ the ELBO in~\eqref{eq:elbo} for both variational parameters $\eta$ and model par
 Variational EM~\cite{Jordan_intro_vi, neal2000varem, Beal2002varem} optimizes this objective with block coordinate ascent on $\eta$ and $\phi$. Explicitly, 
 \begin{align}
     \text{{\bf E-step: }} & 
-    \eta_{t} = \argmax_{\eta}\; \Expect_{q_\eta(z | x)}\Big[\log p_{\phi_{t-1}}(x, z) - \log q_\eta(z | x)\Big]
+    \eta_{t} = \argmax_{\eta}\; \Expect_{q_\eta(z | x)}\Big[\log p_{\phi_{t-1}}(x, z) - \log q_\eta(z | x)\Big]; 
     \label{eq:e_step}
     \\
-    \text{{\bf M-step: }} & \phi_{t} = \argmax_{\phi}\; \Expect_{q_{\eta_t}(z | x)}\Big[\log p_{\phi}(x, z) - \log q_{\eta_t}(z | x)\Big]
+    \text{{\bf M-step: }} & \phi_{t} = \argmax_{\phi}\; \Expect_{q_{\eta_t}(z | x)}\Big[\log p_{\phi}(x, z) - \log q_{\eta_t}(z | x)\Big],
     \label{eq:m_step}
 \end{align}
 for iterations $t = 1, ..., T$. 
 
-To estimate model parameters, we would ideally optimize the marginal log-likelihood $\log p_\phi(x)$. However, since $\log p_\phi(x)$ is intractable, we optimize the ELBO as a surrogate for $\log p_\phi(x)$ in the M-step. The ELBO is a lower bound on the 
-$\log p_\phi(x)$, and is equal when $q_\eta(z | x)$ 
+To estimate model parameters, we would ideally optimize the marginal log-likelihood $\log p_\phi(x)$. However, since $\log p_\phi(x)$ is intractable, the M-step optimizes the ELBO as a surrogate for $\log p_\phi(x)$. The ELBO is a lower bound on 
+$\log p_\phi(x)$; it is equal to $\log p_\phi(x)$ when $q_\eta(z | x)$ 
 = $p_\phi(z | x)$. 
 
-Recall maximizing the ELBO with respect to $\eta$ 
+Recall maximizing the ELBO with respect to variational paramters $\eta$ 
 is equivalent to minimizing the KL in~\eqref{eq:kl_objective}.
 We can thus rewrite the E-step as 
 \begin{align}
     \text{{\bf E-step: }} \eta_{t} &= \argmax_{\eta}\; \Expect_{q_\eta(z | x)}\Big[\log p_{\phi}(x, z) - \log q_\eta(z | x)\Big] \\
-    &= \argmin_{\eta} \; \mathrm{KL}\Big[\,q_\eta(z | x)\, \| \,p_\phi(z | x )\,\Big] \label{eq:e_step_kl}
+    &= \argmin_{\eta} \; \mathrm{KL}\Big[\,q_\eta(z | x)\, \| \,p_\phi(z | x )\,\Big].  \label{eq:e_step_kl}
 \end{align} 
 In other words, in the E-step, we fix $\phi$ and seek the variational distribution closest the the true posterior under $\phi$. 
 

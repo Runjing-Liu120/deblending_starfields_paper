@@ -7,7 +7,7 @@
 \usepackage{subcaption}
 \usepackage{booktabs}
 \usepackage{hyperref}
-
+\usepackage{float}
 %\pdfminorversion=4
 % NOTE: To produce blinded version, replace "0" with "1" below.
 \newcommand{\blind}{0}
@@ -29,10 +29,10 @@
 \DeclareMathOperator*{\argmin}{arg\,min}
 
 \usepackage{soul}
-\usepackage{todonotes}
+\usepackage[disable]{todonotes}
 \newcommand{\jeff}[2][]{\todo[inline,color=blue!30, #1]{#2 \mbox{--Jeff}}}
 \newcommand{\bryan}[2][]{\todo[inline,color=green!30, #1]{#2 \mbox{--Bryan}}}
-
+ 
 
 \begin{document}
 
@@ -104,10 +104,19 @@ The text of your abstract. 200 or fewer words.
 
 \section{Results}
 \label{sec:results}
-\input{5-results}
+\input{5a-results-synth_data}
+\input{5b-results-m2}
 
+% \section{Discussion}
+% \label{sec:discussion}
+% \input{6-discussion}
 
 \bibliographystyle{unsrt}
 % \bibliographystyle{Chicago} doesn't work for some reason
 \bibliography{bibliography}
+
+\appendix
+\section{Results on Stripe-82}
+\input{A1-results-sparse_field}
+
 \end{document}
