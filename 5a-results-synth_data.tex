@@ -15,20 +15,21 @@ In this toy example, we simulate a $20\times20$ image with one band, shown in Fi
     \label{fig:toy_example}
 \end{figure}
 
-In our generative model, we set the Poisson prior parameter $\mu = 4$ and flux power law slope $\alpha = 0.5$. With these these prior parameters, we compare optimizing the ELBO and the sleep phase objective. First, in Figure~\ref{fig:optim_path}, we evaluate the ELBO at the example $20\times 20$ image as the optimization proceeds. In the left-most plot, we optimized the ELBO using stochastic gradient descent with the REINFORCE estimator. The optimization did not converge, likely due to the high variance of the REINFORCE estimator. In the middle plot, we integrated out the discrete random variable, and computed stochastic gradients using the reparameterization trick. The resulting stochastic gradients exhibit lower variance, and the optimization was able to converge to stationary points. However, even with low-variance gradients, the variational distribution gets stuck at stationary points where the ELBO is non-optimal depending on the initialization (e.g. restarts 3 and 6). In contrast, optimizing the sleep phase consistently converges to a similar ELBO across all restarts. 
+In our generative model, we set the Poisson prior parameter $\mu = 4$ and flux power law slope $\alpha = 0.5$. With these these prior parameters, we compare optimizing the ELBO and the sleep phase objective. First, in Figure~\ref{fig:optim_path} (top row), we evaluate the ELBO at the example $20\times 20$ image as the optimization proceeds. In the left-most plot, we optimized the ELBO using stochastic gradient descent with the REINFORCE estimator. The optimization did not converge, likely due to the high variance of the REINFORCE estimator. In the middle plot, we integrated out the discrete random variable, and computed stochastic gradients using the reparameterization trick. The resulting stochastic gradients exhibit lower variance, and the optimization was able to converge to stationary points. However, even with low-variance gradients, the variational distribution gets stuck at stationary points where the ELBO is non-optimal depending on the initialization (e.g. restarts 3 and 6). In contrast, optimizing the sleep phase consistently converges to a similar ELBO across all restarts. 
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[width = \textwidth]{figures/optim_path_compare.png}
-    \includegraphics[width = 0.6\textwidth]{figures/optim_path_detect_compare.png}
-    \caption{ }
+    \begin{subfigure}[t]{\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figures/optim_path_compare.png}
+    \end{subfigure}
+    
+    \begin{subfigure}[t]{\textwidth}
+    \centering
+    \includegraphics[width=0.55\textwidth]{figures/optim_path_detect_compare.png}
+    \end{subfigure}
+    \vspace{-3em}
+    \caption{(Top) The ELBO as the optimization progresses, for six random restarts. Bold pink line is the sleep phase ELBO path, averaged over six restarts. (Bottom) Detections from two variational posteriors. Blue dots are true stars, red ``x" are MAP locations under the variational posterior. }
     \label{fig:optim_path}
 \end{figure}
 
-\begin{figure}[!ht]
-    \centering
-    \includegraphics[width = 0.6\textwidth]{figures/optim_path_detect_compare.png}
-    \vspace{-1.5em}
-    \caption{In blue, the locations of the true stars. In red, the MAP locations under the variational distribution. (Left) The MAP locations with the variational distribution found by optimizing the ELBO, from one particular restart. (Right) The MAP locations with the variational distribution found by optimizing the sleep phase. }
-    \label{fig:compare_elbo_sleep_toy_example}
-\end{figure}
