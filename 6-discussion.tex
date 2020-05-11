@@ -1,0 +1,7 @@
+Probabilistic cataloging provides a framework to 
+produce catalogs with statistically principled uncertainties. We defined a statistical model, and uncertainties are captured by a Bayesian posterior over the space of all catalogs. 
+These uncertainties are especially important in the cataloging of crowded starfields, where many light sources are blended; there is ambiguity not only in the location and fluxes of individual light sources, but also in the number of sources. 
+
+In previous work on probabilistic cataloging, samples from the posterior were obtained using MCMC. While MCMC eventually converges to the exact posterior, its computational cost prohibits its application to large-scale astronomical surveys. 
+
+Instead, we applied variational inference, and constructed an approximate posterior. The approximate posterior was defined using a neural network. Once trained, the neural network can be cheaply evaluated on batches of images to produce probabilistic catalogs. 

@@ -1,4 +1,3 @@
-
 \documentclass[12pt]{article}
 \usepackage{amsmath}
 \usepackage{graphicx,psfrag,epsf}
@@ -7,7 +6,8 @@
 \usepackage{url} % not crucial - just used below for the URL
 \usepackage{subcaption}
 \usepackage{booktabs}
-
+\usepackage{hyperref}
+\usepackage{float}
 %\pdfminorversion=4
 % NOTE: To produce blinded version, replace "0" with "1" below.
 \newcommand{\blind}{0}
@@ -29,10 +29,10 @@
 \DeclareMathOperator*{\argmin}{arg\,min}
 
 \usepackage{soul}
-\usepackage{todonotes}
+\usepackage[disable]{todonotes}
 \newcommand{\jeff}[2][]{\todo[inline,color=blue!30, #1]{#2 \mbox{--Jeff}}}
 \newcommand{\bryan}[2][]{\todo[inline,color=green!30, #1]{#2 \mbox{--Bryan}}}
-
+ 
 
 \begin{document}
 
@@ -46,7 +46,7 @@
 
 \if1\blind
 {
-  \title{\bf Title}
+  \title{\bf Reweighted Wake-Sleep for Deblending Crowded Starfields}
   \author{Author 1\thanks{
     The authors gratefully acknowledge \textit{please remember to list all relevant funding sources in the unblinded version}}\hspace{.2cm}\\
     Department of YYY, University of XXX\\
@@ -62,7 +62,7 @@
   \bigskip
   \bigskip
   \begin{center}
-    {\LARGE\bf Title}
+    {\LARGE\bf Reweighted Wake-Sleep for Deblending Crowded Starfields}
 \end{center}
   \medskip
 } \fi
@@ -80,6 +80,7 @@ The text of your abstract. 200 or fewer words.
 \spacingset{1.45} % DON'T change the spacing!
 \section{Introduction}
 \label{sec:intro}
+\input{1-introduction}
 
 \section{The generative model}
 \label{sec:gen_model}
@@ -103,10 +104,19 @@ The text of your abstract. 200 or fewer words.
 
 \section{Results}
 \label{sec:results}
-\input{5-results}
+\input{5a-results-synth_data}
+\input{5b-results-m2}
 
+% \section{Discussion}
+% \label{sec:discussion}
+% \input{6-discussion}
 
 \bibliographystyle{unsrt}
 % \bibliographystyle{Chicago} doesn't work for some reason
 \bibliography{bibliography}
+
+\appendix
+\section{Results on Stripe-82}
+\input{A1-results-sparse_field}
+
 \end{document}

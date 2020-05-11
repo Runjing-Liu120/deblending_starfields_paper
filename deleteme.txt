@@ -1,0 +1,66 @@
+In traditional variational inference, the divergence between 
+the variational posterior $q$ and the true posterior $p$ is 
+measured by the ``reverse" KL divergence, defined as the 
+$q$-weighted average difference between $\log q$ and $\log p$. In other words, the reverse KL divergence
+is defined by an expectation with integrating distribution $q$. 
+
+In simple models, for example when $p$ and $q$ are appropriate classes of exponential families, 
+the expectation over $q$ can be written explicitly as a function of the parameters of $q$. Therefore, the minimizer of the KL can be solved either in closed form or by employing deterministic optimization~\cite{Blei_2017_vi_review}. 
+
+In our setting of amortized variational inference, the parameters of $q$ are neural network weights. When analytic expectations are unavailable, as in our case, 
+sampling methods have been employed in conjunction with modern auto-differentiation tools to compute stochastic gradients. Optimization is done with stochastic gradient descent. Examples include black-box variational inference (BBVI)~\cite{ranganath2013black} 
+and automatic-differentiation variational inference (ADVI)~\cite{kucukelbir2016automatic}. The latter 
+is closely related to the reparameterization trick \cite{kingma2013autoencoding, rezende2014stochastic} proposed to train deep generative models using the KL objective. 
+These approaches all sample latent variables from $q$ and produce an unbiased estimate 
+for the gradient of the KL. 
+
+However, the reparameterization trick does not apply when any latent variables are discrete, in our case, the number of stars. The REINFORCE estimator~\cite{Williams1992reinforce}, which BBVI adapts, produces an unbiased stochastic gradient for both continuous and discrete latent variables. However, the REINFORCE estimator often suffers from high variance in practice, and so the resulting stochastic optimization is slow. 
+
+The key difficulty is that the the objective function is 
+an expectation with integrating distribution on $q$, the  distribution to be optimized. To avoid this issue, the {\itshape wake-sleep} algorithm considers the ``forward" KL divergence, defined as the
+$p$-weighted average difference between $\log p$ and $\log q$;  in other words, the expectation is taken over $p$. To make the forward KL divergence tractable, a second average is taken over possible data. In other words, the neural network is trained so that {\itshape on average over possible input images $x$}, the 
+variational distribution returned by the neural network is close to the true posterior in forward KL divergence. 
+
+Low-variance stochastic gradients are easy to compute using the wake-sleep algorithm, and we show that these low-variance gradients result in faster optimization than using the REINFORCE gradient estimator. 
+However, in addition to greater speed, amortized inference may be better at nonconvex optimization: by learning a policy from many examples we learn a policy for avoiding shallow local minima. 
+
+
+
+% In simple models, for example when both $p$ and $q$ are related exponential families, the expectation can be written explicitly as a function of the parameters of $q$~\cite{Blei_2017_vi_review}. Therefore, the KL can be minimized either in closed form, or by using deterministic optimization. However, in our case, the parameters of $q$ are neural network weights. In this setting, ~\cite{rezende2014stochastic,kingma2013autoencoding} propose 
+% stochastic optimization, where an unbiased gradient of the KL divergence is computed from samples of $q$. 
+
+
+
+
+
+% One limitation of neural networks is the large amount of data needed for training.
+% In astronomy, knowledge of the physical system  often give rise to reasonably realistic simulators for data. For example, simulators were used in \cite{Lanusse_2017_cmudeeplens} trained neural networks to detect Einstein rings, 
+% a rare object found in astronomical surveys and used to study dark matter; the neural network in \cite{Hezaveh_2017_nn_lensing_nature} also returned
+% morphological parameters for each Einstein ring. 
+% In both cases, because the training data was generated from a simulator, the ground truth labels (ring exists or not; the ring morphology) are known. The network is trained in a supervised fashion. Using simulated data is especially useful because the network can be trained on essentially unlimited data -- the bottleneck is the limit on computational resources, not the availability of training data. 
+
+% In our work, we also make use of simulated data to train our neural network. However, we introduce the simulated data in the context of a statistical model. We do so using the wake-sleep algorithm~\cite{Hinton1995wake_sleep}. 
+% The neural network outputs are not simply ``labels" for the input image; rather, we are able to interpret the output as specifying an approximate Bayesian posterior in the context of a well-defined statistical model. 
+
+% In summary, we leverage the predictive power and computational efficiency of neural networks to do 
+% inference in the framework of a statistical model. 
+% We also employ simulated data in our training procedure in a statistically principled way. In Section~\ref{sec:results}, we compare the catalog obtained from our variational posterior with the catalog derived from MCMC; we also compare with traditional cataloging approaches.  
+
+% detect Einstein rings; \cite{Hezaveh_2017_nn_lensing_nature} used
+% neural networks to infer morphological characteristics of the Einstein rings; 
+% in the context of deblending, 
+% \cite{Reiman_2019_gans_deblend} used 
+% GANS to separate two overlapping galaxies. 
+
+% Several factors contribute to the success of neural networks. Firstly, neural networks are computationally efficient; multiple images can be easily evaluated in parallel on a GPU.
+% Secondly, a well-trained neural network is able to generalize beyond the data on which is was trained. This combined with computational efficiency is extremely beneficial for sky surveys: after training a neural network on a subset of the survey, the remaining images in the survey can be evaluated quickly in batches using only forward-passes through the network. 
+
+% In this paper, we combine the flexibility of neural networks with a formal statistical model. This enables the neural network output to be interpreted in a statistically principled way: the output of our neural network will be a distribution that approximates the Bayesian posterior.
+
+% Secondly, we train the neural network using {\itshape wake-sleep} training. This allows our neural network to be trained using unlimited simulated data. Using simulated data to train neural networks is common practice is astronomy (see for example~\cite{Lanusse_2017_cmudeeplens, huang2019finding}). However, we also make the connection with a formal statistical model 
+% and introduce the simulated data in a principled way. TODO: yikes ... this paragraph is terrible and needs work. 
+
+% In Section~\ref{sec:gen_model} we introduce 
+% the generative model. Section~\ref{sec:var_inference} details the variational distribution and discuss training of the neural network. Section~\ref{sec:related_work} makes connections with previous cataloging software. In Section~\ref{sec:results}, we compare 
+% our variational inference procedure with MCMC as well as more traditional cataloging software pipelines. Section 6 concludes. 
+

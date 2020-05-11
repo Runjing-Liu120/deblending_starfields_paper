@@ -1,67 +1,58 @@
-The generative model from section~\ref{sec:gen_model} requires
-the specification of a PSF and a sky background. 
-For the subimage of M2 we examine, 
-we take the background at pixel $(i, j)$ to be an affine function in $i$ and $j$, so 
+The generative model from Section~\ref{sec:gen_model} requires
+the specification of a PSF and a sky background. Let $\phi = (\pi^b, \beta^b)_{b = 1}^B$ be the concatenation of the PSF and background parameters into a real-valued vector. 
+% \jeff{It's pretty unusual to use $\phi$ for model parameters, rather than $\theta$. Unless there's a reason, better to use $\theta$. It will be easier on the reader, leaving them with more attention to devote to understanding the substantive ideas in the paper.
+% }
+% \bryan{with the changes to the gen. model, I ended up using $\theta$ as latent variables :/}
+% \jeff{It's pretty common in VI papers to make $z$ all the latent random variables rather than $\theta$.
+% That way Greek letters can be used for non-random quantities (model parameters and variational parameters) while Roman letters denote random variables.
+% }
+
+Our likelihood, and therefore posterior, now depend on $\phi$. We denote this dependence with a subscript, $p_\phi$. 
+
+We can simultaneously infer a catalog $z$ and 
+estimate model parameters $\phi$ by optimizing 
+the ELBO in~\eqref{eq:elbo} for both variational parameters $\eta$ and model parameters $\phi$: 
 \begin{align}
-    I_{ij}^{b} = \beta_0^{b} + \beta_1^{b} \times i + \beta_2^{b} \times j
+(\eta^*, \phi^*) = \argmax_{\eta, \phi} \Expect_{q_\eta(z | x)}\Big[\log p_\phi(x, z) - \log q_\eta(z | x)\Big].
+\label{eq:em_obj}
 \end{align}
-where $\beta^ := (\beta_0^{b}, \beta_1^{b}, \beta_2^{b})$ are model parameters to be estimated, and 
-vary by band $b$. 
-
-
-We model the PSF as a weighted average between a Gaussian ``core" and a power-law ``wing" as described in~\cite{Xin2018psf}. For a given band, the PSF is modeled as 
-\begin{align}
-    \mathcal{P}(x, y) = \frac{\exp(\frac{-r^2}{2\sigma_1^2}) + 
-                            b \exp(\frac{-r^2}{2\sigma_2^2}) + 
-                            p_0(1 + \frac{r^2}{\gamma\sigma^2_P})^{-\beta/2} }{1 + b + p_0},
-\end{align}
-where $r^2 = x^2 + y^2$. Though not explicit here, we allow the PSF parameters
-$\pi := (\sigma_1, \sigma_2, \sigma_P, \gamma, p_0)$ to vary by band as well. 
-
-Let $\phi = (\beta^b, \pi^b)_{b = 1}^B$
-be the concatenation of all model parameters into a real-valued vector. 
-\jeff{It's pretty unusual to use $\phi$ for model parameters, rather than $\theta$. Unless there's a reason, better to use $\theta$. It will be much easier on the reader, leaving them with more attention to devote to understanding the substantive ideas in the paper.
-}
-Our likelihood, and therefore posterior, now depend on $\phi$. We denote this dependence with a subscript, $\Prob_\phi$. 
-
-We can simultaneously find an approximate posterior and 
-estimate model parameters by jointly optimizing 
-\begin{align}
-(\eta^*, \phi^*) = \argmin_{\phi, \eta} \; \mathrm{KL}\big (q_{\eta}(N, \ell, f |X) \| P_{\phi}(N, \ell, f | X)\big)\label{eq:em_obj}
-\end{align}
-Variational EM~\cite{Jordan_intro_vi, neal2000varem, Beal2002varem} optimizes this objective with block coordinate descent on $\eta$ and $\phi$. Explicitly, 
+Variational EM~\cite{Jordan_intro_vi, neal2000varem, Beal2002varem} optimizes this objective with block coordinate ascent on $\eta$ and $\phi$. Explicitly, 
 \begin{align}
     \text{{\bf E-step: }} & 
-    \eta_{t} = \argmin_\eta \; \mathrm{KL}\big (q_{\eta    }(N, \ell, f |X) \| \Prob_{\phi_{t - 1}}(N, \ell, f | X)\big)
+    \eta_{t} = \argmax_{\eta}\; \Expect_{q_\eta(z | x)}\Big[\log p_{\phi_{t-1}}(x, z) - \log q_\eta(z | x)\Big]; 
     \label{eq:e_step}
     \\
-    \text{{\bf M-step: }} & \phi_{t} = \argmin_{\phi} \; \mathrm{KL}\big (q_{\eta_t}(N, \ell, f |X) \| \Prob_{\phi}(N, \ell, f | X)\big), 
+    \text{{\bf M-step: }} & \phi_{t} = \argmax_{\phi}\; \Expect_{q_{\eta_t}(z | x)}\Big[\log p_{\phi}(x, z) - \log q_{\eta_t}(z | x)\Big],
     \label{eq:m_step}
 \end{align}
 for iterations $t = 1, ..., T$. 
 
-The E-step objective is exactly same as the KL objective in variational inference, equation~\ref{eq:kl_objective}, for fixed model parameters $\phi$. 
-In other words, for fixed model parameters $\phi$, we are seeking the variational distribution closest the the true posterior under $\phi$. 
+To estimate model parameters, we would ideally optimize the marginal log-likelihood $\log p_\phi(x)$. However, since $\log p_\phi(x)$ is intractable, the M-step optimizes the ELBO as a surrogate for $\log p_\phi(x)$. The ELBO is a lower bound on 
+$\log p_\phi(x)$; it is equal to $\log p_\phi(x)$ when $q_\eta(z | x)$ 
+= $p_\phi(z | x)$. 
 
-Recall that minimizing the KL divergence is equivalent to maximizing the ELBO (equation~\eqref{eq:elbo}). We can thus rewrite the M-step as 
+Recall maximizing the ELBO with respect to variational paramters $\eta$ 
+is equivalent to minimizing the KL in~\eqref{eq:kl_objective}.
+We can thus rewrite the E-step as 
 \begin{align}
-    \text{{\bf M-step: }} \phi_{t} &= \argmax_{\phi} \; \Expect_{q_{\eta}(N, \ell, f | X)}\Big[\log \Prob_\phi(X, N, \ell, f) - \log q_\eta(N, \ell, f)\Big] \\
-    &= \argmax_{\phi} \; \Expect_{q_{\eta}(N, \ell, f | X)}\Big[\log \Prob_\phi(X, N, \ell, f)\Big]    \label{eq:m_step}
+    \text{{\bf E-step: }} \eta_{t} &= \argmax_{\eta}\; \Expect_{q_\eta(z | x)}\Big[\log p_{\phi}(x, z) - \log q_\eta(z | x)\Big] \\
+    &= \argmin_{\eta} \; \mathrm{KL}\Big[\,q_\eta(z | x)\, \| \,p_\phi(z | x )\,\Big].  \label{eq:e_step_kl}
 \end{align} 
-To estimate model parameters, the goal is to optimize the marginal log-likelihood $\log \Prob_\phi(X)$; however, since $\log \Prob_\phi(X)$ is intractable, we optimize a lower bound as a surrogate for $\log \Prob_\phi(X)$. 
+In other words, in the E-step, we fix $\phi$ and seek the variational distribution closest the the true posterior under $\phi$. 
+
 
 % \subsection{Estimation of the catalogue}
 % In previous work \cite{Brewer_2013, Portillo_2017, Feder_2019}, the posterior on
-% the latent variables $(N, \ell, f, c)$ was approximated using MCMC. In \cite{Portillo_2017, Feder_2019},
+% the latent variables $(z, c)$ was approximated using MCMC. In \cite{Portillo_2017, Feder_2019},
 % a method was proposed to further reduce the posterior samples to a single point estimate
 % which they call a {\itshape condensed catalogue}.
 %
 % While MCMC allows for the careful quantification of uncertainties, its computational cost
 % is prohibitively large for large scale astronomical surveys. One possible alternative
 % is to characterize the posterior using the maximum a posteriori estimate. Using the
-% generative model from section~\ref{sec:gen_model}, the joint loglikelihood is
+% generative model from Section~\ref{sec:gen_model}, the joint loglikelihood is
 % \begin{align}
-%   \log \mathcal{L}(N, \ell, f,& c) \stackrel{c}{=} \overbrace{\sum_{b = 1}^B \sum_{w = 1}^W \sum_{h = 1}^H
+%   \log \mathcal{L}(z,& c) \stackrel{c}{=} \overbrace{\sum_{b = 1}^B \sum_{w = 1}^W \sum_{h = 1}^H
 %         \Big\{-\frac{1}{2}\log{\lambda_{hw}^b} - \frac{(x_{hw}^b - \lambda_{hw}^b)^2}{2\lambda_{hw}^b}\Big\}}^
 %         \text{Gaussian likelihood} + ...\notag\\
 %         & ... + \underbrace{N\log(\mu HW) + \log N!}_\text{Poisson prior on $N$} -

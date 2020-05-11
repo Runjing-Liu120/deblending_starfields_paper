@@ -22,10 +22,13 @@
 % \subsection{Cataloging of stellar fields}
 % TODO
 
-In addition to the telescope images, the data releases of SDSS also contain 
-a corresponding catalog and estimates of background and PSF. These estimates were obtained using the cataloger PHOTO~\cite{lupton2001sdss}. However, PHOTO was not designed for crowded starfields and timed out when attempting to catalog M2. 
+\jeff{It may be better to discuss related work within the Introduction and Discussion sections, rather than having a dedicated Related Work section.
+}
 
-DAOPHOT~\cite{stetson2987daophot} is an algorithmic routine designed for crowded starfields. To detect stars, the observed image is convolved with a Gaussian kernel. The convolved image is scanned for peaks above a given threshold, which are then labeled as stars. In Section~\ref{sec:results}, we compare our method with the catalog reported in \cite{An_2008_m2}, where DAOPHOT was used to catalog M2. 
+In addition to the telescope images, the data releases of SDSS also contain 
+a corresponding catalog and estimates of background and PSF. These estimates were obtained using the cataloger PHOTO~\cite{lupton2001sdss}. However, PHOTO was not designed for crowded starfields and timed out when it attempted to catalog M2. 
+
+DAOPHOT~\cite{stetson2987daophot} is an algorithmic routine designed for crowded starfields. To detect stars, the observed image is convolved with a Gaussian kernel. The convolved image is scanned for peaks above a given threshold, which are then labeled as stars. In Section~\ref{sec:results}, we compare our method with \cite{An_2008_m2}, where DAOPHOT was used to catalog M2. 
 
 \cite{Brewer_2013, Portillo_2017, Feder_2019} also employed probabilistic modeling, though inference was done using MCMC. \cite{Portillo_2017, Feder_2019} called their procedure PCAT (Probabilistic CATaloging). \cite{Feder_2019} is the extension 
 of \cite{Portillo_2017} to multiband images. Our generative model is identical to PCAT, except PCAT used an exponential prior on the number of stars instead of Poisson. 
