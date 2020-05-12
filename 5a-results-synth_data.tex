@@ -19,7 +19,7 @@ In our generative model, we set the Poisson prior parameter $\mu = 4$ and flux p
 
 In the bottom left of Figure~\ref{fig:optim_path}, we display the MAP locations after getting stuck in local minima in optimizing the ELBO. In the tile with two stars, both MAP locations were placed on one star. Ideally, one of the locations would be shifted to the second star. However, to move one location to the second star, the optimization path must traverse a region where the log-likelihood is lower than the current configuration. The displayed configuration is a local optima where the gradient with respect to location is approximately zero. In contrast, the sleep phase optimization consistently places MAP locations around the four true stars. An example using the first restart is shown. 
 
-\begin{figure}[!ht]
+\begin{figure}[!htb]
     \centering
     \begin{subfigure}[t]{0.9\textwidth}
     \centering
@@ -34,3 +34,19 @@ In the bottom left of Figure~\ref{fig:optim_path}, we display the MAP locations 
     \label{fig:optim_path}
 \end{figure}
 
+
+
+\begin{figure}[!htb]
+    \centering
+    \begin{subfigure}[t]{0.9\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figures/gradzero_cartoon.png}
+    \end{subfigure}
+    \begin{subfigure}[t]{\textwidth}
+    \centering
+    \includegraphics[width=0.55\textwidth]{figures/gradzero_cartoon2.png}
+    \end{subfigure}
+    \vspace{-3em}
+    \caption{(Top) The ELBO as the optimization progresses, for six random restarts. Bold pink line is the sleep phase ELBO path, averaged over six restarts. (Bottom) Detections from two variational posteriors. Blue dots are true stars. Red ``x" are MAP locations under the variational posterior. }
+    \label{fig:optim_path}
+\end{figure}
