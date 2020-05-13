@@ -66,7 +66,7 @@ Our factorization has a spatial structure. We decompose the full $H \times W$ im
     \tilde x_{st} = \{x_{hw} : Rs \leq h \leq R(s+1) \text{ and } Rt \leq w \leq R(t+1)\}.
     \label{eq:tiles}
 \end{align}
-Let $S = \frac{H}{R}$ and $T = \frac{W}{R}$ (we assume that $H$ and $W$ are multiples of $R$). The tiles cover the image, so $s$ and $t$ range over $s = 1, ..., S$ and $t = 1, ..., T$, respectively. See Figure~\ref{fig:ex_tiles} for a schematic.
+Let $S = \frac{H}{R}$ and $T = \frac{W}{R}$ and we assume that $H$ and $W$ are multiples of $R$. The tiles cover the image, so $s$ and $t$ range over $s = 1, ..., S$ and $t = 1, ..., T$. See Figure~\ref{fig:ex_tiles} for a schematic.
 % \jeff{Also, we should define what tiles are.}
 % \jeff{The dimension of the tiles maybe better in uppercase: the other ``structural constants'' are uppercase (e.g., $H$, $W$).}
 \begin{figure}[!ht]
@@ -86,7 +86,7 @@ For the locations and fluxes, we construct a {\itshape triangular array}  of lat
     \tilde f^{(s, t)} &= (\tilde f_{N, i}^{(s, t)} : i = 1, ..., N; N = 1, 2, ...).
 \end{align}
 While locations on the full image are parameterized to be
-$\ell_i \in [0, H]\times[0, W]$, locations on tiles are parameterized to be $\tilde\ell_{N, i}^{(s, t)} \in [0, R]\times[0, R]$. The fluxes $\tilde f_{N, i}^{(s, t)}$ are positive. 
+$\ell_i \in [0, H]\times[0, W]$, locations on tiles are parameterized to be $\tilde\ell_{N, i}^{(s, t)} \in [0, R]\times[0, R]$. The fluxes $\tilde f_{N, i}^{(s, t)}$ are vectors (one flux for each band) in $\mathbb{R}^B$ where each entry is positive. 
 
 We call $(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)})_{s=1,t=1}^{S,T}$ the {\itshape tile latent variables}; 
 succinctly, denote tile latent variables as $\tilde z$. 
@@ -245,7 +245,6 @@ $(s,t)$ in this subsection,
 	\tilde \ell_{\tilde N, i} / R &\sim \text{LogitNormal}(\mu_{\ell_{\tilde N, i}}, \text{diag}(\nu_{\ell_{\tilde N, i}}) )\label{eq:var_distr_loc}; \\
 	\tilde f^b_{\tilde N, i} &\sim \text{LogNormal}(\mu_{f^b_{\tilde N, i}}, \sigma^2_{f^b_{\tilde N, i}}) \label{eq:var_distr_f}
 \end{align}
-
 \jeff{I suggest writing the parameters of these distributions as functions of the padded tile. For example, I'd write
 \[
     \tilde N_{rt} \sim \text{Categorical}\left(h_\eta(\tilde{x}_{rt})\right).
@@ -280,7 +279,6 @@ This is the problem with this section in general tbh ... more work will be neede
 Maybe  $\left[g_\eta(\tilde x_{rt})\right]_{N,i}$ could denote the location mean and variance for the $(N,i)$-th location?
 And $\left[h_\eta(\tilde x_{rt})\right]_{N,i}$ could denote the flux mean and variation?
 }
-
 for $i = 1, ..., \tilde N$; $\tilde N = 1, ..., N_{max}$. The latent variables also fully factorize within each tile. Note that in the exact posterior, $\tilde N$ has support on the nonnegative integers; in the variational distribution, we truncate at some large $N_{max}$. 
 % \jeff{Do we? I thought it was just the variational distribution that doesn't have support past $N_{max}$. The posterior has support over all natural numbers.}
 
@@ -300,27 +298,26 @@ The $\omega$, $\mu$'s, etc?}
 The input to the neural network is a $S \times S$ tile, padded with surrounding pixels.
 For cataloging the crowded starfield M2 (Section~\ref{sec:m2_results}),
 we took $S = 2$ and padded the tile with three pixels. 
-For our test on a sparse field (Section~\ref{sec:sparse_field}), we took $S = 50$ with no padding. 
+% For our test on a sparse field (Section~\ref{sec:sparse_field}), we took $S = 50$ with no padding. 
 
-Let $\hat x^{(s,t)}$ denote the padded tile and $h_\eta$ be the neural network, which returns the collection of distributional parameters
+Let $\hat x^{(s,t)}$ denote the padded tile (which includes all $B$ bands) and $h_\eta$ be the neural network, which returns the collection of distributional parameters
 \begin{align}
     h_\eta(\hat x^{(s,t)}) = (\omega^{(s,t)}, \mu_\ell^{(s,t)}, \nu_{\ell}^{(s,t)}, \mu_f^{(s,t)}, \sigma^{(s,t)}_f).
     \label{eq:nn_output}
 \end{align}
 The same neural network is evaluated for all tiles $(s,t)$. Our variational parameters are neural network weights, here denoted $\eta$. 
-The architecture is shown schematically in Figure~\ref{fig:starnet_arch}. 
+The architecture is fairly standard (Figure~\ref{fig:starnet_arch}), consisting of several convolutional layers followed by a series of fully connected layers. Convolutional layers are useful in our problem of localizing stars as they make the network invariant to shifts in stellar location. The size of the convolutional kernel in the first layer is taken to be three pixels, roughly the full width at half maximum (FWHM) of the PSF. The optimization of the architecture is left for future work; our primary contribution in this paper is the application of neural networks to provide a variational posterior for cataloging starfields, not the network archetecture per se. 
 
-\begin{figure}[!ht]
+\begin{figure}[!tb]
     \centering
-    \includegraphics[width=0.4\textwidth]{figures/starnet_archetecture2.png}
+    % \includegraphics[width=0.4\textwidth]{figures/starnet_archetecture2.png}
+    \includegraphics[width=\textwidth]{figures/starnet_archetecture3.png}
     \vspace{-0.5cm}
-    \caption{For cataloging M2, the neural network returning parameters for the variational distribution on each 2 x 2 image tile.
-    On a sparse field, the neural network architecture is the same, 
-    except the input is a $50 \times 50$ image tile. }
+    \caption{The neural network returning parameters for the variational distribution on each 2 x 2 image tile. For cataloging M2, the input image is an $8\times 8$ padded tile, and the network is responsible for returning variational parameters for the cetner $2\times 2$ tile. }
     \label{fig:starnet_arch}
 \end{figure}
 
-Consider the output dimension of the neural network. For each tile $(s,t)$, the categorical parameter $\omega^{(s,t)}$
+Note the output dimension of the neural network. For each tile $(s,t)$, the categorical parameter $\omega^{(s,t)}$
 lies on the simplex and has dimension $N_{max} + 1$. 
 For $i = 1, ..., \tilde N$ and $\tilde N = 1, ..., N_{max}$, the location has a mean and variance on each coordinate, and the flux has a mean and variance for each band. Thus, for star indexed by $(\tilde N, i)$, 
 there are $2 \times (B + 2)$ parameters for its variational distribution. In total, the neural network has output dimension $(N_{max} + 1) + (B + 2) \times (N_{max}^2 + N_{max})$. 
@@ -334,4 +331,4 @@ there are $2 \times (B + 2)$ parameters for its variational distribution. In tot
 Thus, factorizing the variational distribution spatially controls the output dimension of the neural network. On a crowded starfield with $H = W = 100$, the number of imaged stars is on the order of $10^3$. If the neural network were to return a variational distribution on the full $100\times 100$ image, the output dimension would be on the order of $10^6$. 
 On the $2\times 2$ tile, we set $N_{max} = 3$, and the output dimension of the neural network with two bands is 53. 
 
-While the variational distribution factorizes over $2 \times 2$ tiles, we are not breaking the inference problem on the full image into embarrassingly parallel subproblems. We always evaluate the likelihood (example, when computing the ELBO in~\eqref{eq:elbo}) on the full image. Light from a star within a 2 x 2 tile spills over into neighboring tiles, so the likelihood does not decouple across image tiles. 
+We emphasize that while the variational distribution factorizes over $2 \times 2$ tiles, we are not breaking the inference problem on the full image into embarrassingly parallel subproblems. We always evaluate the likelihood (example, when computing the ELBO in~\eqref{eq:elbo}) on the full image. Light from a star within a 2 x 2 tile spills over into neighboring tiles, so the likelihood does not decouple across image tiles. 

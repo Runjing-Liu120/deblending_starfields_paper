@@ -31,14 +31,14 @@ To estimate model parameters, we would ideally optimize the marginal log-likelih
 $\log p_\phi(x)$; it is equal to $\log p_\phi(x)$ when $q_\eta(z | x)$ 
 = $p_\phi(z | x)$. 
 
-Recall maximizing the ELBO with respect to variational paramters $\eta$ 
+Recall maximizing the ELBO with respect to variational parameters $\eta$ 
 is equivalent to minimizing the KL in~\eqref{eq:kl_objective}.
 We can thus rewrite the E-step as 
 \begin{align}
-    \text{{\bf E-step: }} \eta_{t} &= \argmax_{\eta}\; \Expect_{q_\eta(z | x)}\Big[\log p_{\phi}(x, z) - \log q_\eta(z | x)\Big] \\
-    &= \argmin_{\eta} \; \mathrm{KL}\Big[\,q_\eta(z | x)\, \| \,p_\phi(z | x )\,\Big].  \label{eq:e_step_kl}
+    \text{{\bf E-step: }} \eta_{t} &= \argmax_{\eta}\; \Expect_{q_\eta(z | x)}\Big[\log p_{\phi}(x, z) - \log q_\eta(z | x)\Big]  \label{eq:e_step_kl1} \\
+    &= \argmin_{\eta} \; \mathrm{KL}\Big[\,q_\eta(z | x)\, \| \,p_\phi(z | x )\,\Big].  \label{eq:e_step_kl2}
 \end{align} 
-In other words, in the E-step, we fix $\phi$ and seek the variational distribution closest the the true posterior under $\phi$. 
+In other words, in the E-step, we fix $\phi$ and seek the variational distribution closest to the true posterior under $\phi$. 
 
 
 % \subsection{Estimation of the catalogue}
