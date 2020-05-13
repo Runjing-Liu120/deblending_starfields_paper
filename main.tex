@@ -10,7 +10,7 @@
 \usepackage{float}
 %\pdfminorversion=4
 % NOTE: To produce blinded version, replace "0" with "1" below.
-\newcommand{\blind}{0}
+\newcommand{\blind}{1}
 
 \usepackage{amsfonts}
 \usepackage{wrapfig}
@@ -45,7 +45,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Reweighted Wake-Sleep for Deblending Crowded Starfields
-\if0\blind
+\if1\blind
 {
   \title{\bf  A Variational Inference Approach to Deblending Crowded Starfields using the Wake-sleep Algorithm}
   \author{Runjing Liu\thanks{
@@ -61,7 +61,7 @@
   \maketitle
 } \fi
 
-\if1\blind
+\if0\blind
 {
   \bigskip
   \bigskip
@@ -74,7 +74,11 @@
 
 \bigskip
 \begin{abstract}
-The text of your abstract. 200 or fewer words.
+Catalogs of light sources derived from astronomical surveys are the primary source of information about the universe beyond our solar system. A key step in catalog construction is ``deblending,” the task of identifying and characterizing each imaged light source. As modern telescopes peer deeper into space, images become increasingly crowded with light sources and the challenge of reliably deblending sources becomes critical for scientific analysis. 
+
+In these crowded fields where sources cannot be unambiguously separated, it also becomes important to provide calibrated uncertainty estimates that can be propagated to downstream analyses. Probabilistic cataloging defines a statistical model on the raw telescope images and captures the uncertainties in catalog construction by the Bayesian posterior. However, the computational cost of MCMC is prohibitively large for the terabytes of data collected by modern astronomical surveys. In this work, we propose a method, Starnet, which uses amortized variational inference. We train a neural network to produce an approximate posterior using the wake-sleep algorithm. Like variational EM, this algorithm finds approximate posteriors while estimating model parameters such as the point spread function. However, the ELBO objective in the E-step of variational EM is replaced by an alternative KL divergence. We find that in this application, the wake-sleep algorithm is better able to avoid local minima. 
+
+Our algorithm is scalable to large astronomical surveys and provides a framework building towards the goal of producing a pipeline whereby uncertainties are fully propagated from raw image to catalog to downstream analysis. 
 \end{abstract}
 
 \noindent%
@@ -111,7 +115,8 @@ The text of your abstract. 200 or fewer words.
 \section{Results}
 \label{sec:results}
 \input{5a-results-synth_data}
-\input{5b-results-m2}
+\input{5b-results-deblending}
+\input{5c-results-m2}
 
 \section{Discussion}
 \label{sec:discussion}
