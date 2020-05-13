@@ -62,10 +62,10 @@ the flux in band $b$ is  $f_{i,b} = f_{i,1} \times 10^{c_{i,b} / 2.5}$.
 Having drawn a catalog $z = \{N, (\ell_i, f_{i,1}, ..., f_{i,B})_{i = 1}^N\}$,
 the expected number of photoelectrons measured at pixel $(h,w)$ in band $b$ is
 \begin{align}
-  \lambda^b_{hw} = I^{b}_{hw} + \sum_{i = 1}^N f_{i,b} \mathcal{P}^b\big(h - \ell_{i}[1], w - \ell_{i}[2]\big),
+  \lambda^b_{hw} = I^{b}(h, w) + \sum_{i = 1}^N f_{i,b} \mathcal{P}^b\big(h - \ell_{i}[1], w - \ell_{i}[2]\big),
   \label{eq:expected_intensity}
 \end{align}
-where $I^{b}_{hw}$ is the background intensity, which we allow to vary by pixel and band. $\mathcal{P}^b$ is the point spread function (PSF) for band $b$. The PSF
+where $I^{b}$ is the background intensity, which we allow to vary by pixel and band. $\mathcal{P}^b$ is the point spread function (PSF) for band $b$. The PSF
 is a function 
 \begin{align}
 \mathcal{P}^b : \Reals \times \Reals \mapsto \Reals^+,
@@ -73,20 +73,20 @@ is a function
 describing how a stellar point source appears
 on our image. We model the PSF as a weighted average between a Gaussian ``core" and a power-law ``wing" as described in~\cite{Xin2018psf}. For each band, the PSF has the form
 \begin{align}
-    \mathcal{P}(r) = \frac{\exp(\frac{-r^2}{2\sigma_1^2}) + 
-                            \zeta \exp(\frac{-r^2}{2\sigma_2^2}) + 
-                            \rho(1 + \frac{r^2}{\gamma\sigma^2_P})^{-\gamma/2} }{1 + \zeta + \rho},
+    \mathcal{P}(h, w) = \frac{\exp(\frac{-(h^2 + w^2)}{2\sigma_1^2}) + 
+                            \zeta \exp(\frac{-(h^2 + w^2)}{2\sigma_2^2}) + 
+                            \rho(1 + \frac{h^2 + w^2}{\gamma\sigma^2_P})^{-\gamma/2} }{1 + \zeta + \rho},
 \end{align}
-where $r^2 = u^2 + w^2$. The PSF parameters vary by band. Define 
+The PSF parameters vary by band. Define 
 $\pi := (\sigma_{1}^{(b)}, \sigma_{2}^{(b)}, \sigma_{P}^{(b)}, \gamma^{(b)}, \zeta^{(b)}, \rho^{(b)})_{b=1}^B$ as the collection of PSF parameters across all bands. 
 
 The background intensity at pixel $(h,w)$ is modeled with an affine function: 
 \begin{align}
-    I_{hw}^{b} = \beta_0^{b} + \beta_1^{b} \times h + \beta_2^{b} \times w.
+    I^{b}(h,w) = \beta_0^{b} + \beta_1^{b} \times h + \beta_2^{b} \times w.
 \end{align}
 The background parameters are specific to the band. 
 
-The model parameters $\pi$ for the PSF and $\beta$ are estimated by the SDSS software pipeline and reported along with the release of each SDSS image. Alternatively, in Section~\ref{sec:model_params}, we propose a method to estimate these parameters jointly with the catalog. 
+The model parameters $\pi$ for the PSF and $\beta$ are estimated by the SDSS software pipeline and reported along with the release of each SDSS image. Alternatively, in Section~\ref{sec:model_params}, we propose a method to estimate these parameters jointly with the approximate posterior. 
 
 Finally, we model the observed number of photoelectrons at pixel $(h,w)$ and band $b$ as Gaussian
 with mean and variance equal to $\lambda^b_{hw}$. 
@@ -113,8 +113,8 @@ Explicitly, the log likelihood is
 
 The likelihood and priors described above are similar to those
 in previous probabilistic cataloging methods~\cite{Brewer_2013, Portillo_2017, Feder_2019, regier2019_celeste}. Like~\cite{Portillo_2017, Feder_2019}, the slope of the power law on fluxes is set at  $\alpha = 2$; we set the minimum flux $f_{min}$ to correspond with the SDSS 
-lower detection limit ($\approx$ 22 magnitude); and we use a standard Gaussian for color priors, which only disfavors extremely atypical colors, $|c_{i,b}| > 3$. 
+lower detection limit ($\approx$ 22 magnitude); and we use a standard Gaussian for the color prior, which only disfavors extremely atypical colors, $|c_{i,b}| > 3$. 
 
 One difference is that \cite{Portillo_2017, Feder_2019} use an exponential prior on $N$. We use a Poisson prior and set $\mu = 0.15$, slightly denser than the $0.1$ stars per pixel 
-brighter than 22mag found in the Hubble catalog of M2. 
+brighter than 22mag found in the Hubble catalog of M2. In Appendix TODO we find that our results are fairly insensitive to the choice of Poisson mean. 
 
