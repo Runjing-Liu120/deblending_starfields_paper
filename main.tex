@@ -44,26 +44,30 @@
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\if1\blind
+% Reweighted Wake-Sleep for Deblending Crowded Starfields
+\if0\blind
 {
-  \title{\bf Reweighted Wake-Sleep for Deblending Crowded Starfields}
-  \author{Author 1\thanks{
-    The authors gratefully acknowledge \textit{please remember to list all relevant funding sources in the unblinded version}}\hspace{.2cm}\\
-    Department of YYY, University of XXX\\
-    and \\
-    Author 2 \\
-    Department of ZZZ, University of WWW}
+  \title{\bf  A Variational Inference Approach to Deblending Crowded Starfields using the Wake-sleep Algorithm}
+  \author{Runjing Liu\thanks{
+    The authors gratefully acknowledge \textit{please remember to list all relevant funding sources in the unblinded version}. NSF graduate research fellowship etc ... }\hspace{.2cm}\\
+    Department of Statistics, University of California, Berkeley\\
+    \\
+    Jeff Regier \\
+    Department of Statistics, University of Michigan\\
+    \\
+    Jon D. McAuliffe \\
+    The Voleon Group \\
+    Department of Statistics, University of California, Berkeley}
   \maketitle
 } \fi
 
-\if0\blind
+\if1\blind
 {
   \bigskip
   \bigskip
   \bigskip
   \begin{center}
-    {\LARGE\bf Reweighted Wake-Sleep for Deblending Crowded Starfields}
+    {\LARGE\bf A Variational Inference Approach to Deblending Crowded Starfields using the Wake-sleep Algorithm}
 \end{center}
   \medskip
 } \fi
@@ -99,21 +103,21 @@ The text of your abstract. 200 or fewer words.
 \label{sec:wake_sleep}
 \input{3c-wake_sleep}
 
-\section{Related work}
-\label{sec:related_work}
-\input{4-related_work}
+% NO LONGER NEEDED
+% \section{Related work}
+% \label{sec:related_work}
+% \input{4-related_work}
 
 \section{Results}
 \label{sec:results}
 \input{5a-results-synth_data}
 \input{5b-results-m2}
 
-% \section{Discussion}
-% \label{sec:discussion}
-% \input{6-discussion}
+\section{Discussion}
+\label{sec:discussion}
+\input{6-discussion}
 
 \bibliographystyle{unsrt}
-% \bibliographystyle{Chicago} doesn't work for some reason
 \bibliography{bibliography}
 
 \appendix
