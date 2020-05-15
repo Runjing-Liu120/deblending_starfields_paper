@@ -10,7 +10,7 @@ is closely related to the reparameterization trick \cite{kingma2013autoencoding,
 These approaches all sample latent variables from $q_\eta$ and produce an unbiased estimate 
 for the gradient of the KL; the optimization is done with stochastic gradient descent. 
 
-However, the reparameterization trick does not apply when a latent variable is discrete, in our case, the number of stars $N$. The REINFORCE estimator~\cite{Williams1992reinforce}, which BBVI adapts, produces an unbiased stochastic gradient for both continuous and discrete latent variables. However, these gradients often suffer from high variance in practice, and so the resulting stochastic optimization is slow. See Appendix TODO for details concerning both the reparameterization and REINFORCE estimators. 
+However, the reparameterization trick does not apply when a latent variable is discrete -- in our case, the number of stars $N$. The REINFORCE estimator~\cite{Williams1992reinforce}, which BBVI adapts, produces an unbiased stochastic gradient for both continuous and discrete latent variables. However, these gradients often suffer from high variance in practice, and so the resulting stochastic optimization is slow. See Appendix TODO for details concerning both the reparameterization and REINFORCE estimators. 
 
 Stochastic gradients are difficult to compute in the E-step~\eqref{eq:e_step} because the integrating distribution depends on the optimization parameter, $\eta$. 
 The wake-sleep algorithm, originally proposed by~\cite{Hinton1995wake_sleep}, replaces the 
@@ -50,7 +50,7 @@ Stochastic gradients are easy to compute in the wake phase (M-step). Because the
     \nabla_\phi \log p_\phi(x, z) \quad \text{ for } z\sim q_\eta. 
     \label{eq:mstep_grad}
 \end{align}
-While the E-step~\eqref{eq:e_step} is not conducive to simple gradient estimators, we will see in Section~\ref{sec:sleep_details} that the sleep-phase objective
+While the E-step~\eqref{eq:e_step} is not conducive to simple gradient estimators, we will see in Section~\ref{sec:sleep_details} that the sleep phase objective
 results in a similarly straightforward gradient estimator as in~\eqref{eq:mstep_grad}. 
 In Section~\ref{sec:estep_sleep_compare}, 
 we compare optimizing the E-step with optimizing the sleep phase. In our application, we find that
@@ -79,7 +79,7 @@ the ELBO objective in the E-step suffers from poor local optima where the variat
 
 \subsubsection{Decomposing the sleep objective}
 \label{sec:sleep_details}
-In this section, we decompose the sleep-phase objective in~\eqref{eq:sleep_obj} for closer study. 
+In this section, we decompose the sleep phase objective in~\eqref{eq:sleep_obj} for closer study. 
 We take $\phi$ as fixed in this section, and drop the explicit dependence of $p$ on $\phi$.
 
 First, we show that the objective does not depend on the intractable term $p(x)$. 
@@ -90,7 +90,7 @@ We write
 &=\argmin_{\eta} \; \mathbb E_{p(x)}\Big[\mathbb E_{p(z | x)}\Big( - \log q_\eta(z | x) \Big)\Big]\\
 &=\argmin_{\eta} \; \mathbb E_{p(x, z)}\Big[- \log q_\eta(z | x) \Big]\label{eq:sleep_loss_simple}.
 \end{align}
-Crucially, the integrating distribution is $p$, which does not depend on the optimization parameter $\eta$.
+Crucially, the integrating distribution is $p(x,z)$, which does not depend on the optimization parameter $\eta$.
 In the E-step of variational EM, the integrating distribution is $q_\eta$, resulting in the need for reparameterization or other adjustments to compute stochastic gradients. 
 Here, unbiased stochastic gradients can be obtained simply as 
 \begin{align}

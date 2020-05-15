@@ -11,11 +11,14 @@ We found that in this application, the wake-sleep algorithm was able to avoid th
 
 Beyond to scalability, another key advantage our approach has over MCMC is the ability to estimate model parameters such as the PSF and sky background.
 While the current work focuses on PSF models, our method can be extended to more general sources such as galaxies.
-Each source would have an additional latent variable specifying whether it is a star or galaxy. If the source is a galaxy, it would have shape parameters along with its location, flux, and color. The statistical model would need to include likelihoods for galaxy sources in addition to the PSF model.
+Each source would have an additional latent variable specifying whether it is a star or galaxy. If the source is a galaxy, it would have latent variables describing its shape in addition to its location, flux, and color variables. The statistical model would need to include likelihoods for galaxy sources in addition to the PSF model.
 
-One promising direction is to also use neural networks in the wake phase. Following~\cite{Regier2015ADG}, one possibility is to fit a deep generative model for galaxies, where a neural network takes as input low-dimensional source parameters and outputs a galaxy image. Neural networks would be trained in both the sleep and wake phase -- the sleep phase trains the approximate posterior while the wake phase trains the galaxy model. 
+One promising direction is to also use neural networks in the wake phase and fit a deep generative model for galaxies~\cite{Regier2015ADG}. Here, a neural network encodes a conditional likelihood of galaxy images given source latent variables. Thus, neural networks would be trained in both the sleep and wake phase -- the sleep phase trains the approximate posterior while the wake phase trains the galaxy model. Using a neural network to encode a likelihood extends the flexibility of galaxy models beyond simple parametric forms. 
 
-More ambitiously, models for celestial objects such as cosmic rays and bleed trails could be estimated in our framework. Currently, these objects need to be removed by a preprocessing routine before a catalog can be produced. 
+Going even further, models for celestial artifacts such as cosmic rays and bleed trails could be estimated in this framework.
+Currently, pixels corresponding to these objects need to be masked by a preprocessing routine before a catalog can be produced. 
+Including these artifacts in our statistical model allows for the quantification of uncertainties in their detection. 
+Moreover, credible intervals for latent variables of interest can be computed by marginalizing out the uncertainties in artifact detection. 
+In this way, the uncertainties in artifact detection can be propagated to uncertainties for variables of interest. 
 
-Our ultimate goal is to provide a pipeline from raw images to catalogs to estimators, where each step, including all preprocessing steps, fully propagates uncertainties to the next. In this work, we removed one limitation of most modern deblenders like Celeste or Scarlet~\cite{scarlet2018}: the need to specify the number of sources in an image. 
-Our methodology provides a promising framework to achieve this end goal :) TODO ... 
+Our ultimate goal is to provide a pipeline from raw images to catalogs to downstream analyses, where errors are appropriately quantified in each step. Our method is scalable, works well on deblending, provides approximate inference in achieving this goal .... TODO. 
