@@ -65,12 +65,12 @@ uncertainties accumulating in each step of the pipeline.
 
 Previous work in \cite{Brewer_2013, Portillo_2017, Feder_2019}
 propose {\itshape probabilistic} cataloging.
-They propose a statistical model consisting of a likelihood for the observed image and a prior distribution on possible catalogs. Instead of deriving a single catalog, they produce a Bayesian posterior distribution on the space of all possible catalogs. 
+They propose a statistical model consisting of a likelihood for the observed image and a prior distribution over possible catalogs. Instead of deriving a single catalog, they produce a Bayesian posterior distribution over the set of all possible catalogs. 
 Each sample from the posterior is a catalog; that is, posterior samples are tables, potentially of varying length, consisting of stellar locations, fluxes, and colors. 
 Uncertainties are fully quantified by the posterior distribution. 
 For example, in an image with an ambiguously blended bright peak, some catalogs drawn from the posterior would contain multiple dim sources while others would contain one bright source. 
 The relative weight the posterior distribution places on one explanation over another represents the statistical confidence in that explanation. 
-Moreover, a distribution over the space of all catalogs induces a distribution on any estimate derived from a catalog. Therefore, uncertainties can be fully propagated to downstream analyses.  
+Moreover, a distribution over the set of all catalogs induces a distribution on any estimate derived from a catalog. Therefore, uncertainties can be fully propagated to downstream analyses.  
 
 In previous work on probabilistic cataloging, the posterior was computed using Markov chain Monte Carlo (MCMC).
 \cite{Portillo_2017, Feder_2019} refer to their method as PCAT, short for ``Probabilistic CATaloging."\footnote{
@@ -100,7 +100,7 @@ This results in a transdimensional latent variable space
 since the posterior is defined over the set of all catalogs, and the number of sources in a catalog is unknown and random.
 Previous work on probabilistic cataloging employed reversible jump MCMC~\cite{Green95reversiblejump} to sample transdimensional catalogs. In RJ-MCMC, auxiliary variables are added to encode the ``birth" of new sources 
 or the ``death" of existing sources in the Markov chain. Our challenge in VI is to construct a family of distributions on this transdimensional space. Section~\ref{sec:var_distr} discusses our construction: we define the variational distribution over catalogs of all possible size; that is, we define a distribution on a triangular array of latent locations and fluxes, and we map this to a distribution 
-on the space of all catalogs.
+on the set of all catalogs.
 
 Secondly, in Celeste, numerical optimization had to be re-run for every new collection of images. 
 In contrast, we employ {\itshape amortized} variational inference, where a neural network is trained to map input images to a variational distribution.
@@ -138,7 +138,7 @@ In our work, we also make use of simulated data for training. However, we introd
 In addition, we train the network to provide an approximate Bayesian posterior as discussed in the previous subsection, rather than a simple class label. 
 
 To do so, we employ the wake-sleep algorithm~\cite{Hinton1995wake_sleep}. 
-In the sleep-phase of the algorithm, we generate images and their corresponding catalogs from the statistical model. 
+In the sleep phase of the algorithm, we generate images and their corresponding catalogs from the statistical model. 
 The loss function in the sleep phase encourages the neural network to map simulated images to distributions $q$ that place probability mass on the their corresponding catalogs.
 Minimizing this loss is equivalent to minimizing the ``forward" KL divergence between the variational distribution $q$ and the true posterior $p$, defined as $p$-weighted average difference between $\log p$ and $\log q$. 
 
@@ -152,12 +152,12 @@ Thus, in the ``wake" phase, the variational distribution is fixed, and model par
 This is equivalent to the M-step in variational EM~\cite{Jordan_intro_vi, neal2000varem, Beal2002varem}.
 In this application, the wake-phase is used to estimate the point spread function and the sky background in telescope images. 
 
-In summary, we take advantage of the flexibility of neural networks to construct a mapping from telescope images to an approximate Bayesian posterior on the space of all catalogs. To train the neural network, we employ simulated data in a statistically principled way. 
+In summary, we take advantage of the flexibility of neural networks to construct a mapping from telescope images to an approximate Bayesian posterior on the set of all catalogs. To train the neural network, we employ simulated data in a statistically principled way. 
 Because both the image and the catalog are known in the simulated data, we are able to recover a mapping that avoids shallow local minima in a difficult nonconvex optimization problem. 
 Model parameters such as the point spread function are also tuned. 
 
-We call our method to produce probabilistic catalogs {\itshape Starnet.}
-In Section 5, we comparethe catalog obtained from Starnet with the MCMC-based cataloger PCAT;
+We call our method to produce probabilistic catalogs {\itshape StarNet.}
+In Section 5, we comparethe catalog obtained from StarNet with the MCMC-based cataloger PCAT;
 we also compare with traditional cataloging approaches.
 
 % However, in addition to greater speed, amortized inference may be better at nonconvex optimization: by learning a policy from many examples we learn a policy for avoiding shallow local minima. 
