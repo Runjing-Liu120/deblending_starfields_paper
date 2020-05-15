@@ -1,12 +1,21 @@
-Probabilistic cataloging provides a framework to 
-produce catalogs with statistically principled uncertainties. We defined a statistical model, and uncertainties are captured by a Bayesian posterior over the space of all catalogs.
-In previous work on probabilistic cataloging, samples from the posterior were obtained using MCMC. While samples eventually converge to the exact posterior, the computational cost of MCMC prohibits its application to large-scale astronomical surveys. 
+Probabilistic modeling provides a framework to 
+produce catalogs with statistically principled uncertainties.
+We defined a statistical model, and uncertainties are captured by a Bayesian posterior over the space of all catalogs.
+In previous work on probabilistic cataloging, samples from the posterior were obtained using MCMC. 
+While samples eventually converge to the exact posterior in theory, the computational cost of MCMC prohibits its application to large-scale astronomical surveys. 
 
-In this work, we produced an approximate Bayesian posterior using amortized variational inference, which has potential to scale Bayesian inference to large astronomical surveys. We employed neural networks to efficiently return approximate posteriors for a given image. We chose to train the neural network using the wake-sleep algorithm which optimizes an objective different than the usual ELBO. We found that in this application, the wake-sleep algorithm was able to avoid the local minima present in the ELBO objective. 
+In this work, we produced an approximate Bayesian posterior using amortized variational inference, which has potential to scale Bayesian inference to large astronomical surveys.
+After a one time cost of training, the network efficiently returns approximate posteriors for batches of images.
+We chose to train the neural network using the wake-sleep algorithm which optimizes an objective different than the ELBO used in traditional variational inference. 
+We found that in this application, the wake-sleep algorithm was able to avoid the local minima present in the ELBO objective. 
 
-In addition to doing inference, we also estimated model parameters such as the PSF and sky background. While the current work focuses on PSF models, our method can be extended to more general sources such as galaxies.
-In addition to location, flux, and color, each source would also have shape parameters. One could assume a known parametric model for a galaxy, such as exponential or de-Vaucouleurs profile. 
+Beyond to scalability, another key advantage our approach has over MCMC is the ability to estimate model parameters such as the PSF and sky background.
+While the current work focuses on PSF models, our method can be extended to more general sources such as galaxies.
+Each source would have an additional latent variable specifying whether it is a star or galaxy. If the source is a galaxy, it would have shape parameters along with its location, flux, and color. The statistical model would need to include likelihoods for galaxy sources in addition to the PSF model.
 
-Alternatively, one could fit a deep generative model for galaxies~\cite{Regier2015ADG} using the wake-sleep algorithm. Here, a neural network takes as input low-dimensional source parameters and outputs a galaxy image. Neural networks would be trained in both the sleep and wake phase -- the sleep phase trains the approximate posterior while the wake phase trains the galaxy model. We believe that our training procedure. 
+One promising direction is to also use neural networks in the wake phase. Following~\cite{Regier2015ADG}, one possibility is to fit a deep generative model for galaxies, where a neural network takes as input low-dimensional source parameters and outputs a galaxy image. Neural networks would be trained in both the sleep and wake phase -- the sleep phase trains the approximate posterior while the wake phase trains the galaxy model. 
 
-We believe that this training procedure holds great promise
+More ambitiously, models for celestial objects such as cosmic rays and bleed trails could be estimated in our framework. Currently, these objects need to be removed by a preprocessing routine before a catalog can be produced. 
+
+Our ultimate goal is to provide a pipeline from raw images to catalogs to estimators, where each step, including all preprocessing steps, fully propagates uncertainties to the next. In this work, we removed one limitation of most modern deblenders like Celeste or Scarlet~\cite{scarlet2018}: the need to specify the number of sources in an image. 
+Our methodology provides a promising framework to achieve this end goal :) TODO ... 

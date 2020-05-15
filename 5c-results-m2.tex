@@ -1,15 +1,17 @@
 \subsection{Results on M2}
+We tested Starnet on the SDSS image of M2, a crowded starfield found in run 2583, camcol 2, and field 136.
+M2 was also imaged in the ACS Globular Cluster Survey~\cite{Sarajedini_2007}
+using the Hubble Space telescope (HST),
+which has $\approx20$ times the angular resolution and $\approx30$ times the exposure of the Sloan telescope. The reported catalog from this Hubble survey was used as ground truth to 
+validate our results.
+
+We focused on a specific $100 \times 100$ subimage of M2 that \cite{Portillo_2017, Feder_2019} cataloged using PCAT.
+This subimage is located $\approx2$ arcseconds away from the heavily saturated core of the cluster;
+even in this subimage, the HST catalog contained over 1000 stars brighter than the 22nd magnitude in its F606W band.
 
 \subsubsection{Runtime} 
 \label{sec:runtime}
-We ran the wake-sleep algorithm on $100 \times 100$ images. 
-% \jeff{An encoder network can be trained, but not a variational approximation.
-% A variational approximation can be ``selected''. Or the variational parameters can be fit/trained.
-% }
-However, our variational posterior is defined on images of arbitrary size
-% \jeff{Our variational approximation to the posterior is \textit{defined} for images of arbitrary size. It's not ``evaluated''.}
-by tiling the image into $R \times R$ tiles. On the crowded starfield described below, we used $R = 2$. 
-
+We tiled the $100\times 100$ image into $2\times 2$ tiles. The neural network inputs were the $2\times2$ tiles padded by three pixels (see Figure~\ref{fig:starnet_arch}). 
 We ran the initial sleep phase~\eqref{eq:sleep_phase_summary}
 % \jeff{What does it mean to ``train'' a sleep phase?}
 with the PSF and background set to SDSS estimates. We trained for 200 epochs with 200 images per epoch with  
@@ -21,10 +23,10 @@ the initial sleep phase took approximately 10 minutes.
 
 We ran two further wake-sleep cycles. Each cycle took approximately a minute. The subsequent sleep phases were shorter (10 epochs with 200 images each), and the wake phase employed SGD, with the gradient estimator in \eqref{eq:mstep_grad}. 
 
-After training, evaluating the approximate posterior on a $100 \times 100$ 
-image took $\approx 0.2$ seconds. By comparison, the reported runtime of PCAT, which uses MCMC, is 30 minutes on the same $100 \times 100$ subimage of M2~\cite{Feder_2019}. 
+After training, evaluating the approximate posterior on the $100 \times 100$ image of M2 took $\approx 0.2$ seconds. 
+By comparison, the reported runtime of PCAT, which uses MCMC, is 30 minutes on the same $100 \times 100$ image~\cite{Feder_2019}. 
 
-The speed of our procedure at inference time (which excludes training time) enables our method to scale up to large astronomical surveys. A single SDSS image is $1489 \times 2048$ pixels. Projecting the reported runtime of PCAT to the full image, 
+We emphasize that the speed of our procedure at inference time (which excludes training time) enables our method to scale up to large astronomical surveys. A single SDSS image is $1489 \times 2048$ pixels. Projecting the reported runtime of PCAT to the full image, 
 we would expect a runtime of 
 $\approx 30\text{min} \times 14 \times 20 = 8400$min, or almost six days. 
 \jeff{What would be the runtime of PCAT for all of SDSS? You can get the relevant information about SDSS here: \url{https://www.sdss.org/dr13/scope/}.
@@ -53,26 +55,12 @@ consists of over 8000 runs for a total of nearly one million images, MCMC will b
 
 \subsubsection{Inference}
 \label{sec:m2_results}
-We tested Starnet (TODO: to avoid saying ``our method" so much in this section, I gave our method a name. If this name works, I'll introduce it in earlier sections) on the SDSS image of M2, a crowded starfield found in run 2583, camcol 2, and field 136.
-M2 was also imaged in the ACS Globular Cluster Survey~\cite{Sarajedini_2007}
-using the Hubble Space telescope (HST),
-which has $\approx20$ times the angular resolution and $\approx30$ times the exposure of the Sloan telescope. The reported catalog from this Hubble survey was used as ground truth to 
-validate our results.
-
-We focused on a specific $100 \times 100$ subimage of M2 that \cite{Portillo_2017, Feder_2019} cataloged using PCAT.
-This subimage is located $\approx2$ arcseconds away from the heavily saturated core of the cluster;
-even in this subimage, the HST catalog contained over 1000 stars brighter than the 22nd magnitude in its F606W band.
-
-We compared Starnet with PCAT and DAOPHOT. The DAOPHOT catalog of M2 was reported in 
+We compared Starnet with PCAT and DAOPHOT~\cite{stetson2987daophot}. DAOPHOT is an algorithmic routine designed for crowded starfields. 
+To detect stars, the observed image is convolved with a Gaussian kernel. 
+The convolved image is scanned for peaks above a given threshold, which are then labeled as stars. The DAOPHOT catalog of M2 was reported in 
 \cite{An_2008_m2}. While DAOPHOT returned photometry for all five SDSS bands, 
 we chose to model only the $r$ and $i$ bands for Starnet and PCAT. We found that for Starnet and PCAT, the inclusion of more bands did not significantly improve
 the quality of our detections on metrics defined below. 
-\jeff{It didn't? That seems like a problem. Did it improve our true negative rate at least?}
-\bryan{For Portillos, they said it was because the 
-alignment problem became more pronounced as bands were added, and they didn't even report results for three bands. I tried three bands, and our results were similar to the two band results. }
-\jeff{You might examine a pair of blended stars we don't get right with just one band, where the colors of the stars are very different. Wouldn't using multiple bands rather than just one let us correctly deblend this pair?}
-\bryan{Oh -- so I should say, that certainly two bands is better than one band. It's just three (or more) bands didn't improve much more than two bands. Is that better?}
-% \jeff{What is positive predictive value? Is that what's described below? Better to define the term before using it.}
 
 Both DAOPHOT and the Hubble survey reported a ``traditional" catalog, that is, a list of stellar locations, fluxes, and 
 error bars nominally representing marginal uncertainties.
@@ -140,7 +128,7 @@ Figure~\ref{fig:example_subimages} shows four $10\times10$ subimages, and overla
 
 Figure~\ref{fig:example_subimages_sampled} shows sampled catalogs from both our wake-sleep approximate posterior as well as from PCAT.
 Our variational approximate posterior appeared to show larger uncertainties
-than PCAT. This is in agreement with the discussion of Section~\ref{sec:kl_q_p}. 
+than PCAT. 
 \newpage
 
 \begin{figure}[H]
