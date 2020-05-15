@@ -1,5 +1,5 @@
 \subsection{Results on M2}
-We tested Starnet on the SDSS image of M2, a crowded starfield found in run 2583, camcol 2, and field 136.
+We tested StarNet on the SDSS image of M2, a crowded starfield found in run 2583, camcol 2, and field 136.
 M2 was also imaged in the ACS Globular Cluster Survey~\cite{Sarajedini_2007}
 using the Hubble Space telescope (HST),
 which has $\approx20$ times the angular resolution and $\approx30$ times the exposure of the Sloan telescope. The reported catalog from this Hubble survey was used as ground truth to 
@@ -11,7 +11,7 @@ even in this subimage, the HST catalog contained over 1000 stars brighter than t
 
 \subsubsection{Runtime} 
 \label{sec:runtime}
-We tiled the $100\times 100$ image into $2\times 2$ tiles. The neural network inputs were the $2\times2$ tiles padded by three pixels (see Figure~\ref{fig:starnet_arch}). 
+We tiled the $100\times 100$ image into $2\times 2$ tiles. The neural network inputs were the $2\times2$ tiles padded by three pixels (see Figure~\ref{fig:StarNet_arch}). 
 We ran the initial sleep phase~\eqref{eq:sleep_phase_summary}
 % \jeff{What does it mean to ``train'' a sleep phase?}
 with the PSF and background set to SDSS estimates. We trained for 200 epochs with 200 images per epoch with  
@@ -55,17 +55,17 @@ consists of over 8000 runs for a total of nearly one million images, MCMC will b
 
 \subsubsection{Inference}
 \label{sec:m2_results}
-We compared Starnet with PCAT and DAOPHOT~\cite{stetson2987daophot}. DAOPHOT is an algorithmic routine designed for crowded starfields. 
+We compared StarNet with PCAT and DAOPHOT~\cite{stetson2987daophot}. DAOPHOT is an algorithmic routine designed for crowded starfields. 
 To detect stars, the observed image is convolved with a Gaussian kernel. 
 The convolved image is scanned for peaks above a given threshold, which are then labeled as stars. The DAOPHOT catalog of M2 was reported in 
 \cite{An_2008_m2}. While DAOPHOT returned photometry for all five SDSS bands, 
-we chose to model only the $r$ and $i$ bands for Starnet and PCAT. We found that for Starnet and PCAT, the inclusion of more bands did not significantly improve
+we chose to model only the $r$ and $i$ bands for StarNet and PCAT. We found that for StarNet and PCAT, the inclusion of more bands did not significantly improve
 the quality of our detections on metrics defined below. 
 
 Both DAOPHOT and the Hubble survey reported a ``traditional" catalog, that is, a list of stellar locations, fluxes, and 
 error bars nominally representing marginal uncertainties.
 \jeff{Do these catalogs contain any uncertainty estimates?}
-In the context of probabilistic cataloging (Starnet and PCAT), the posterior 
+In the context of probabilistic cataloging (StarNet and PCAT), the posterior 
 defines a distribution over catalogs -- each draw from the posterior returns a catalog 
 (of potentially varying length) of stellar locations and fluxes. 
 
@@ -81,13 +81,13 @@ to the 22.5th magnitude; all dimmer stars were absorbed into the sky intensity.
 
 Table~\ref{tab:summary_stats} reports the PPV and TPR for the considered cataloging methods.
 % \jeff{Summary statistics of what? Could you say something like ``Table~\ref{tab:summary_stats} reports the performance of these methods'' instead? That would be more descriptive.}
-For Starnet, the TPR and PPV were computed at the maximum a posteriori (MAP) catalog under
+For StarNet, the TPR and PPV were computed at the maximum a posteriori (MAP) catalog under
 the variational distribution. For PCAT, the TPR and PPV were computed for each catalog sampled from their posterior and averaged over 300 posterior samples. 
 
 \jeff{A lot of sentences that have ``we'' as the subject can be rewritten in way that doesn't mention us (without switching to passive voice, which often doesn't sound good). It makes the writing easier to understand because typically ``we'' are not really central to the idea we're trying to convey. 
 So you might say thing like ``Our method performed better than PCAT in terms of TPR and PPV'' rather than all four of the follow sentences: ``We compute the the TPR and PPV for our method. We compared it to PCAT. We found that our method performed better than PCAT. Note that we used the MAP estimate to compute TPR.''
 }
-Training Starnet using only the sleep phase (optimizing~\eqref{eq:sleep_obj} at the SDSS estimates of the model parameters) returned 
+Training StarNet using only the sleep phase, that is optimizing~\eqref{eq:sleep_obj} at the SDSS estimates of the model parameters, returned 
 a MAP catalog with a TPR of 0.52 and PPV of 0.45. Two further cycles of wake-sleep training improved the PPV to 0.62; the TPR decreased slightly to 0.49. We found that the catalog did not improve after the second iteration of wake-sleep. The wake-sleep PPV was also better than PCAT by 0.26. Furthermore, the TPR of PCAT
 only improved by 0.02 over wake-sleep, even though PCAT predicted roughly 50\% more stars than wake-sleep. 
 % , and ran 
@@ -147,13 +147,13 @@ than PCAT.
     \includegraphics[width=0.6\textwidth]{figures/example_subimages_samples.png}
     \caption{Four 10$\times$10 subimages from
     M2. Blue dots are Hubble stars brighter than the 22nd magnitude.
-    We print display the posterior samples from our wake-sleep variational
+    We display the posterior samples from our wake-sleep variational
     posterior (left) and from the MCMC chain of PCAT (right). }
     \label{fig:example_subimages_sampled}
 \end{figure}
 \newpage
 
-Figure~\ref{fig:z-score_calibration} examines the calibration of the uncertainties under Starnet. We evaluated the wake-sleep approximate posterior 
+Figure~\ref{fig:z-score_calibration} examines the calibration of the uncertainties under StarNet. We evaluated the wake-sleep approximate posterior 
 conditional on the true number of stars in the Hubble catalog. 
 Thus, each star in our estimated catalog was matched with exactly one Hubble star
 by finding the permutation of Hubble stars that had the largest log-likelihood under our variational distribution $q_\eta$. For each star, we computed the z-score $(y - \hat y) / \hat \sigma$, where $y$ is the true log-flux or 
@@ -223,7 +223,7 @@ As evidenced in Figure~\ref{fig:psf_profiles}, our wake-sleep PSF did not change
     \includegraphics[width=0.99\textwidth]{figures/psf_profiles.png}
     \caption{Estimated versus true PSF profiles on M2. The Hubble PSF was
     obtained by optimizing the likelihood conditioned on locations and fluxes
-    from the Hubble catalog. }
+    from the Hubble catalog. TODO: this image is not that informative, I think I'll remove this. }
     \label{fig:psf_profiles}
 \end{figure}
 

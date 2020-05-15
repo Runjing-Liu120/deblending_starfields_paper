@@ -54,7 +54,7 @@ In the bottom left of Figure~\ref{fig:optim_path}, we display the MAP locations 
     \label{fig:optim_path}
 \end{figure}
 
-Figure~\ref{fig:gradzero_cartoon} shows schematic of this general phenomenon. When the estimated location is far from the true location, the gradient of the ELBO with respect to location vanishes. Because the PSF is nearly zero everywhere except for a few pixels around each location, a small shift in location does not significantly change the likelihood unless the estimated location is within a ``PSF radius" of the true location. On the other hand, the sleep-phase objective is quadratic in the estimated location -- see~\eqref{eq:gaussian_sleep_loss}. Thus, the further the estimated location from the true location, the larger the gradient. The gradient does not vanish in the sleep phase objective. 
+Figure~\ref{fig:gradzero_cartoon} shows schematic of this general phenomenon. When the estimated location is far from the true location, the gradient of the ELBO with respect to location vanishes. Because the PSF is nearly zero everywhere except for a few pixels around each location, a small shift in location does not significantly change the likelihood unless the estimated location is within a ``PSF radius" of the true location. On the other hand, the sleep phase objective is quadratic in the estimated location -- see~\eqref{eq:gaussian_sleep_loss}. Thus, the further the estimated location from the true location, the larger the gradient. The gradient does not vanish in the sleep phase objective. 
 
 \begin{figure}[!htb]
     \centering
