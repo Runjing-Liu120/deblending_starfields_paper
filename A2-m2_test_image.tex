@@ -10,21 +10,24 @@ We ran the wake-sleep algorithm on the red region, and here, we examine the resu
 \end{figure}
 
 \begin{figure}[ht]
-\begin{minipage}[b]{0.6\textwidth}
+\begin{subfigure}{\textwidth}
 \centering
 \includegraphics[width = \textwidth]{figures/summary_statistics_m2_alt.png}
-\end{minipage}\hfill
-\begin{minipage}[b]{0.39\textwidth}
-\centering
-\begin{tabular}{rrr}
+\end{subfigure}
+\begin{subfigure}{\textwidth}
+\begin{center}
+\begin{tabular}{lrrr}
 \toprule
-     mu &   TPR &   PPV \\
+ &   TPR &   PPV &  F1 score  \\
 \midrule
- 1000.0 &  0.49 &  0.69 \\
- 1500.0 &  0.49 &  0.64 \\
- 2000.0 &  0.52 &  0.49 \\
+ Sleep-only &  0.51 &  0.47 &      0.49 \\
+ Wake-sleep &  0.49 &  0.64 &      0.56  \\
+Sleep-only (test) &  0.43 &  0.45 & 0.44 \\
+ Wake-sleep (test) &  0.40 &  0.53 &      0.45  \\
 \bottomrule
 \end{tabular}
-\end{minipage}\hfill
-\caption{foo}
+\par\vspace{0pt}
+\end{center}
+\end{subfigure}\hfill
+\caption{Results on the test region of M2. }
 \end{figure}
