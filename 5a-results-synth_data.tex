@@ -4,8 +4,8 @@
 In this subsection, we compare the posteriors obtained by optimizing the sleep phase objective~\eqref{eq:sleep_phase_summary} 
 versus optimizing the E-step objective~\eqref{eq:e_step}, also known as the ELBO. 
 We demonstrate on a toy example that there exist shallow optima in the ELBO where the variational posterior on locations does not concentrate around the true locations.
-We show that the sleep phase objective is able to avoid these shallow optima. 
-We use simulated data with known PSF and background for this example, so the wake-phase (M-step) is not needed. 
+On this example, the sleep phase objective is able to avoid these shallow optima. 
+Because the data were simulated with known PSF and background for this example, the wake-phase (M-step) is not needed. 
 
 In this toy example, we simulated a $20\times20$ single-band image, shown in Figure~\ref{fig:toy_example}.
 The image has four stars, each with the same flux. It is divided into four $10\times 10$ tiles, which are the inputs to the neural network. The image, call it $x_{test}$, was fixed for this experiment. 
@@ -37,7 +37,8 @@ The reparameterized gradients exhibited lower variance, and the optimization was
 However, depending on the initialization, the variational distribution converged to points where the ELBO is non-optimal (e.g. restarts 3 and 6). 
 In contrast, optimizing the sleep phase consistently converged to a similar ELBO across all restarts. 
 
-In the bottom left of Figure~\ref{fig:optim_path}, we display the MAP locations found after getting stuck in a local minima. In the tile with two stars, both MAP locations were placed on one star. Ideally, one of the locations would be shifted to the second star. However, to move one location to the second star, the optimization path must traverse a region where the log-likelihood is lower than the current configuration. The displayed configuration is a local optima where the gradient with respect to its locations is approximately zero. In contrast, the sleep phase optimization consistently placed MAP locations around the four true stars. An example using the first restart is shown. 
+The bottom left of Figure~\ref{fig:optim_path} displays the MAP locations found after getting stuck in a local minima. In the tile with two stars, both MAP locations were placed on one star. Ideally, one of the locations would be shifted to the second star. However, to move one location to the second star, the optimization path must traverse a region where the log-likelihood is lower than the current configuration. The displayed configuration is a local optima where the gradient with respect to its locations is approximately zero. In contrast, the sleep phase optimization consistently placed MAP locations around the four true stars. An example using the first restart is shown in the bottom right of~Figure~\ref{fig:optim_path}.
+\jeff{Where is it shown?}
 
 \begin{figure}[!htb]
     \centering
@@ -72,8 +73,8 @@ Figure~\ref{fig:gradzero_cartoon} shows schematic of this general phenomenon. Wh
     \label{fig:gradzero_cartoon}
 \end{figure}
 
-Also note that we required analytically integrating out $N$ on this toy example in order to construct low-variance gradients. 
-In this example, we set $N_{max}$ on each tile to be two; in other words, the neural network infers either 0, 1, or 2 stars on each tile.
+Also note low-variance gradients were constructed by analytically integrating $N$ in the objective, so the reparameterization trick can be applied. 
+In this example, $N_{max} = 2$ so the neural network infers either 0, 1, or 2 stars on each tile. 
 Since the variational distribution factorizes over the four tiles, integrating $N$ is a summation of $3^4 = 81$ terms.
 On larger images with more tiles, analytically integrating $N$ would be computationally infeasible, and REINFORCE gradients would be required. 
 

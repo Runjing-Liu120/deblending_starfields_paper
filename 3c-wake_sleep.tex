@@ -32,7 +32,7 @@ in this case the $H\times W$ image. In contrast, the sleep objective seeks to mi
 
 Moreover, ``possible data" is defined under our generative model from Section~\ref{sec:gen_model}. Therefore, it is imperative that our generative model $p_\phi(x)$ well-approximates the true underlying data-generating mechanism. 
 
-Thus, in addition to the sleep phase, we also incorporate the M-step~\eqref{eq:m_step} to estimate model parameters. In the context of the wake-sleep algorithm, the M-step is known as the ``wake-phase."
+Thus, in addition to the sleep phase, the wake-sleep algorithm also incorporate the M-step~\eqref{eq:m_step} to estimate model parameters. In the context of the wake-sleep algorithm, the M-step is known as the ``wake-phase."
 
 In summary, the {\itshape wake-sleep} algorithm alternates between the two objectives 
 \begin{align}
@@ -53,7 +53,7 @@ Stochastic gradients are easy to compute in the wake phase (M-step). Because the
 While the E-step~\eqref{eq:e_step} is not conducive to simple gradient estimators, we will see in Section~\ref{sec:sleep_details} that the sleep phase objective
 results in a similarly straightforward gradient estimator as in~\eqref{eq:mstep_grad}. 
 In Section~\ref{sec:estep_sleep_compare}, 
-we compare optimizing the E-step with optimizing the sleep phase. In our application, we find that
+we compare optimizing the E-step with optimizing the sleep phase. In our application of localizing stars,
 the ELBO objective in the E-step suffers from poor local optima where the variational distribution is far from the true posterior in KL divergence; the sleep phase objective appears to better avoid these local optima. 
 
 % However,
@@ -97,7 +97,7 @@ Here, unbiased stochastic gradients can be obtained simply as
     g = -\nabla_\eta \log q_\eta(z | x) \quad \text{ for } (z, x)\sim p(x, z).
 \end{align}
 
-In other words, we simulate {\itshape complete} data $(z, x)$ from our generative model and evaluate the loss $-\log q_\eta(z | x)$. 
+In other words, the sleep phase simulates {\itshape complete} data $(z, x)$ from the generative model and evaluates the loss $-\log q_\eta(z | x)$. 
 Here, ``complete data" refers to the image along with its catalog. 
 The loss encourages the neural network to map images $x$ to a probability distribution $q_{\eta}(\cdot | x)$ that places large mass on the catalog $z$.
 
@@ -144,7 +144,7 @@ $\mu_{n,i}$ is the predicted value for that latent variable from the neural netw
 $\sigma_{n,i}$ is also outputted by the neural network, representing uncertainty -- the second term encourages small uncertainties, but this is 
 balanced by the scaling of the error $(y_{n,i} - \mu_{n,i})^2$ in the first term. 
 
-In summary, the sleep phase results in a supervised learning problem on complete data simulated from our generative model. In Section~\ref{sec:estep_sleep_compare}, we will see the benefits of using complete data and optimizing the losses~\eqref{eq:cross_entropy_loss}-\eqref{eq:gaussian_sleep_loss}  rather than the traditional ELBO employed in the E-step. 
+In summary, the sleep phase results in a supervised learning problem on complete data simulated from our generative model. In Section~\ref{sec:estep_sleep_compare}, we will see the benefits of using complete data and optimizing the losses~\eqref{eq:cross_entropy_loss} and \eqref{eq:gaussian_sleep_loss}  rather than the traditional ELBO employed in the E-step. 
 
 % \subsubsection{Reverse versus forward KL}
 % \label{sec:kl_q_p}
