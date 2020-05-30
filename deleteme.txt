@@ -64,3 +64,17 @@ However, in addition to greater speed, amortized inference may be better at nonc
 % the generative model. Section~\ref{sec:var_inference} details the variational distribution and discuss training of the neural network. Section~\ref{sec:related_work} makes connections with previous cataloging software. In Section~\ref{sec:results}, we compare 
 % our variational inference procedure with MCMC as well as more traditional cataloging software pipelines. Section 6 concludes. 
 
+One limitation of neural networks is the large amount of data often needed for training.
+In astronomy, knowledge of the physical system sometimes give rise to reasonably realistic simulators for data. 
+For example, \cite{Lanusse_2017_cmudeeplens} used simulators to train neural networks to detect Einstein rings, 
+a rare object found in astronomical surveys and used to study dark matter; the neural network in \cite{Hezaveh_2017_nn_lensing_nature} also returned
+morphological parameters for each Einstein ring. 
+In both cases, because the training data was generated from a simulator, the ground truth labels (ring exists or not; the ring morphology) are known. 
+The network is trained in a supervised fashion. 
+Using realistic simulated data is especially useful because the network can be trained on essentially unlimited data -- the bottleneck is the limit on computational resources, not the availability of training data. 
+
+In our work, we also make use of simulated data for training. However, we introduce the simulated data in the context of a statistical model.
+\jeff{I wouldn't even present our work as using simulated data in the first place. It's potentially misleading. We're just using wake-sleep to minimize the forward KL.
+Maybe in the discussion section you could talk about the connection between sleep training with training with simulated data, if you think it's helpful for our explaining the good performance.}
+In addition, we train the network to provide an approximate Bayesian posterior as discussed in the previous subsection, rather than a simple class label. 
+

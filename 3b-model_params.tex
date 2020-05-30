@@ -38,10 +38,10 @@ We can thus rewrite the E-step as
     \text{{\bf E-step: }} \eta_{t} &= \argmax_{\eta}\; \Expect_{q_\eta(z | x)}\Big[\log p_{\phi}(x, z) - \log q_\eta(z | x)\Big]  \label{eq:e_step_kl1} \\
     &= \argmin_{\eta} \; \mathrm{KL}\Big[\,q_\eta(z | x)\, \| \,p_\phi(z | x )\,\Big].  \label{eq:e_step_kl2}
 \end{align} 
-In other words, in the E-step, we fix $\phi$ and seek the variational distribution closest to the true posterior under $\phi$. 
+In other words, the E-step fixes $\phi$ and seeks the variational distribution closest to the true posterior under $\phi$. 
 
 
-% \subsection{Estimation of the catalogue}
+% \subsection{Estimating of the catalogue}
 % In previous work \cite{Brewer_2013, Portillo_2017, Feder_2019}, the posterior on
 % the latent variables $(z, c)$ was approximated using MCMC. In \cite{Portillo_2017, Feder_2019},
 % a method was proposed to further reduce the posterior samples to a single point estimate
