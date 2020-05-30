@@ -88,7 +88,7 @@ the variational distribution. For PCAT, the TPR and PPV were computed for each c
 So you might say thing like ``Our method performed better than PCAT in terms of TPR and PPV'' rather than all four of the follow sentences: ``We compute the the TPR and PPV for our method. We compared it to PCAT. We found that our method performed better than PCAT. Note that we used the MAP estimate to compute TPR.''
 }
 Training StarNet using only the sleep phase, that is optimizing~\eqref{eq:sleep_obj} at the SDSS estimates of the model parameters, returned 
-a MAP catalog with a TPR of 0.52 and PPV of 0.45. Two further cycles of wake-sleep training improved the PPV to 0.62; the TPR decreased slightly to 0.49. We found that the catalog did not improve after the second iteration of wake-sleep. The wake-sleep PPV was also better than PCAT by 0.26. Furthermore, the TPR of PCAT
+a MAP catalog with a TPR of 0.52 and PPV of 0.45. Two further cycles of wake-sleep training improved the PPV to 0.62; the TPR decreased slightly to 0.49. The catalog did not noticeably improve after the second iteration of wake-sleep. The wake-sleep PPV was also better than PCAT by 0.26. Furthermore, the TPR of PCAT
 only improved by 0.02 over wake-sleep, even though PCAT predicted roughly 50\% more stars than wake-sleep. 
 % , and ran 
 % a first sleep phase (optimizing equation~\ref{eq:sleep_obj}). We compare the 
@@ -124,7 +124,7 @@ uniformly better than DAOPHOT. Wake-sleep had a PPV higher than PCAT for all mag
 \end{figure}
 
 
-Figure~\ref{fig:example_subimages} shows four $10\times10$ subimages, and overlays the wake-sleep MAP catalog on the Hubble catalog. We also display the DAOPHOT catalog and one catalog sample from PCAT.
+Figure~\ref{fig:example_subimages} shows four $10\times10$ subimages, and overlays the wake-sleep MAP catalog on the Hubble catalog. The DAOPHOT catalog and one catalog sample from PCAT are also shown. 
 
 Figure~\ref{fig:example_subimages_sampled} shows sampled catalogs from both our wake-sleep approximate posterior as well as from PCAT.
 Our variational approximate posterior appeared to show larger uncertainties
@@ -146,9 +146,8 @@ than PCAT.
     \centering
     \includegraphics[width=0.6\textwidth]{figures/example_subimages_samples.png}
     \caption{Four 10$\times$10 subimages from
-    M2. Blue dots are Hubble stars brighter than the 22nd magnitude.
-    We display the posterior samples from our wake-sleep variational
-    posterior (left) and from the MCMC chain of PCAT (right). }
+    M2. Blue dots are Hubble stars brighter than the 22nd magnitude. (Left) Posterior samples from the wake-sleep variational
+    posterior and (right) posterior samples from the MCMC chain of PCAT. }
     \label{fig:example_subimages_sampled}
 \end{figure}
 \newpage
@@ -159,13 +158,13 @@ Thus, each star in our estimated catalog was matched with exactly one Hubble sta
 by finding the permutation of Hubble stars that had the largest log-likelihood under our variational distribution $q_\eta$. For each star, we computed the z-score $(y - \hat y) / \hat \sigma$, where $y$ is the true log-flux or 
 logit-location; $\hat y$ is the mean of the Gaussian variational distribution, and $\hat\sigma$ the standard deviation.
 If the uncertainties were perfectly calibrated, the distribution of the z-scores would be a standard Gaussian. 
-We see from Figure~\ref{fig:z-score_calibration} that 
-the tails of our empirical z-score distribution are slightly larger than standard Gaussian, suggesting that our error is somewhat under-estimated. 
+In Figure~\ref{fig:z-score_calibration}, the tails of our empirical z-score distribution are slightly larger than standard Gaussian, suggesting that our error is somewhat under-estimated. 
 
 \begin{figure}[ht]
     \centering
     \includegraphics[width=0.99\textwidth]{figures/z-score_calibration.png}
-    \caption{The calibration of uncertainties in our variational posterior. Conditional on the true number of stars, we computed the z-score of the true logit-location or log-flux evaluated at our variational posterior. 
+    \caption{The calibration of uncertainties in the wake-sleep variational posterior. 
+    Conditional on the true number of stars, displayed are histograms of the z-score of the true logit-location or log-flux evaluated at our variational posterior. 
     The empirical mean and variance for the logit-location z-scores are 0.27 and 1.91, respectively; the empirical mean and variance for the log-flux z-scores are 0.17 and 1.53, respectively. 
 }
     \label{fig:z-score_calibration}

@@ -4,21 +4,40 @@ We defined a statistical model, and uncertainties are captured by a Bayesian pos
 In previous work on probabilistic cataloging, samples from the posterior were obtained using MCMC. 
 While samples eventually converge to the exact posterior in theory, the computational cost of MCMC prohibits its application to large-scale astronomical surveys. 
 
-In this work, we produced an approximate Bayesian posterior using amortized variational inference, which has potential to scale Bayesian inference to large astronomical surveys.
+Our method instead produces an approximate Bayesian posterior using amortized variational inference, which has potential to scale Bayesian inference to large astronomical surveys.
 After a one time cost of training, the network efficiently returns approximate posteriors for batches of images.
-We chose to train the neural network using the wake-sleep algorithm which optimizes an objective different than the ELBO used in traditional variational inference. 
-We found that in this application, the wake-sleep algorithm was able to avoid the local minima present in the ELBO objective. 
+The neural network is trained using the wake-sleep algorithm which optimizes an objective different than the ELBO used in traditional variational inference. 
+In this problem of localizing stars, 
+the ELBO suffers from shallow optimum. 
+The wake-sleep algorithm produced approximate posteriors that were more reliably concentrated around the true catalogs. 
+\jeff{This paper reads a lot like a narrative still. The term ``we'' shows up several hundred times, often unnecessarily, for example. (Perhaps one third of these occurrences could be safely eliminated by reworking sentences.) It's preferable to focus the reader on the model/results rather than on our experiences.
+}
+% \jeff{Wake-sleep didn't really avoid the minima---it optimized a different objective entirely.}
 
-Beyond to scalability, another key advantage our approach has over MCMC is the ability to estimate model parameters such as the PSF and sky background.
+In addition to scalability, a key advantage our approach has over MCMC is the ability to estimate model parameters such as the PSF and sky background.
 While the current work focuses on PSF models, our method can be extended to more general sources such as galaxies.
 Each source would have an additional latent variable specifying whether it is a star or galaxy. If the source is a galaxy, it would have latent variables describing its shape in addition to its location, flux, and color variables. The statistical model would need to include likelihoods for galaxy sources in addition to the PSF model.
 
 One promising direction is to also use neural networks in the wake phase and fit a deep generative model for galaxies~\cite{Regier2015ADG}. Here, a neural network encodes a conditional likelihood of galaxy images given source latent variables. Thus, neural networks would be trained in both the sleep and wake phase -- the sleep phase trains the approximate posterior while the wake phase trains the galaxy model. Using a neural network to encode a likelihood extends the flexibility of galaxy models beyond simple parametric forms. 
 
-Going even further, models for celestial artifacts such as cosmic rays and bleed trails could be estimated in this framework.
+Going even further, models for artifacts such as cosmic rays and bleed trails~\cite{Desai_2016} could be estimated in this framework.
+% \jeff{Readers likely won't know what cosmic rays and bleed trails are. Maybe cite something here that explains them, for the curious reader.}
+These artifacts produce artificial bright spots in an image which do not correspond to celestial objects.
 Currently, pixels corresponding to these objects need to be masked by a preprocessing routine before a catalog can be produced. 
-Including these artifacts in our statistical model allows for the quantification of uncertainties in their detection. 
+However, including these artifacts in a statistical model allows for the quantification of uncertainties in their detection. 
 Moreover, credible intervals for latent variables of interest can be computed by marginalizing out the uncertainties in artifact detection. 
 In this way, the uncertainties in artifact detection can be propagated to uncertainties for variables of interest. 
 
-Our ultimate goal is to provide a pipeline from raw images to catalogs to downstream analyses, where errors are appropriately quantified in each step. Our method is scalable, works well on deblending, provides approximate inference in achieving this goal .... TODO. 
+Our ultimate goal is to provide a pipeline from raw images to catalogs to downstream analyses, where errors are appropriately quantified in each step. 
+The size of the data in upcoming surveys is immense by any standard. 
+Our method holds promise for scaling inference to meet the challenges of these future surveys. 
+Our statistical framework lays the foundation for future work in building flexible models to incorporate the cataloging of all celestial objects. 
+
+% provides a statistical framework for 
+
+
+% Our method is scalable, works well on deblending, provides approximate inference in achieving this goal .... TODO. 
+
+\jeff{I think there's a bibtex command like ``max\_names'' that will insert et al. You might want to cap the number of names at 6: some of these citations are really long.}
+\jeff{A lot of the citations have letters in the wrong case. e.g. ``decam'' instead of ``DECam'', ``lsst'' instead of ``LSST'', ``markov'' instead of ``Markov'', ``Cmu'' instead of ``CMU'', etc.}
+\jeff{Also some first names are spelled out in full while others are initials.}
