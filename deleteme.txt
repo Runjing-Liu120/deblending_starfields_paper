@@ -78,3 +78,62 @@ In our work, we also make use of simulated data for training. However, we introd
 Maybe in the discussion section you could talk about the connection between sleep training with training with simulated data, if you think it's helpful for our explaining the good performance.}
 In addition, we train the network to provide an approximate Bayesian posterior as discussed in the previous subsection, rather than a simple class label. 
 
+
+
+
+\jeff{
+Some of the text below may be useful in the introduction. It explains the challenge in terms statisticians are more likely to connect with.
+I haven't published it elsewhere, so feel free to include any parts verbatim if they are useful.
+
+\textit{
+Light source separation is challenging for several reasons.
+First, it is an unsupervised problem with a sample size of one: there is not labeled data with known ground truth, and there is only one night sky, which is imaged many times.
+Second, many stars and galaxies too faint to be unambiguously resolved. For these light sources, providing calibrated uncertainty estimates of our predictions is as important as making accurate predictions.
+Third, many stars and galaxies overlap with other light sources---as many as 68\% of galaxies are expected to overlap with others in upcoming LSST survey.
+As telescopes improve, even more galaxies will appear to overlap.
+Fourth, the scale of the data is immense by any standard. The upcoming LSST survey, scheduled to begin data collection in 2022, is expected to produce 50 petabytes of astronomical images over its lifetime.
+}
+}
+
+
+
+Finally, the likelihood of $x^b_{hw}$, the observed number of photoelectrons at pixel $(h,w)$ and band $b$, is Gaussian
+with mean and variance equal to $\lambda^b_{hw}$. 
+% This model is reasonable due to the law of rare events and the Gaussian approximation to the Poisson.
+% \jeff{If we're actually using a Gaussian rather than a Poisson, it's probably better not to mention the Poisson.
+% Just say we model the number as Gaussian with var == mean.}
+Thus, the observed pixel intensities are
+\begin{align}
+  x_{hw}^b | z \overset{ind}{\sim} \mathcal{N}(\lambda^b_{hw}, \lambda^b_{hw}),
+  \quad 
+  b = 1, ..., B; \;
+  h = 1,..., H; \; 
+  w = 1, ..., W. 
+\end{align}
+The scaling of variance with the expected intensity is motivated by the Poissonian nature of photon arrivals. 
+% \jeff{Better to use lowercase $x$ rather than $X$ if you're not going to use uppercase for all the random variables}
+Explicitly, the log likelihood is
+\begin{align}
+    \log p(x | z) &= \sum_{b = 1}^{B} \sum_{h = 1}^H \sum_{w = 1}^W 
+        \Big\{\frac{1}{2\lambda^b_{hw}}(x_{hw}^b  - \lambda^b_{hw})^2 - 
+               \frac{1}{2}\log(2\pi\lambda^b_{hw})\Big\}
+    \label{eq:loglik}.
+\end{align}
+
+The likelihood and priors described above are similar to those
+in previous probabilistic cataloging methods~\cite{Brewer_2013, Portillo_2017, Feder_2019, regier2019_celeste}. 
+The only difference between our model and~\cite{Portillo_2017, Feder_2019} is that we use a Poisson prior on $N$, while \cite{Portillo_2017, Feder_2019} use an exponential prior. 
+
+In \cite{Brewer_2013}, a broken power law prior was used for the flux. 
+Further hyper-priors were placed on the parameters of the broken power law, and the parameters of the broken power law were treated as latent variables. This would be analogous to placing a hyper-prior on $\alpha$ in \eqref{eq:flux_prior} in our model. 
+Alternatively, though not explored in this work, $\alpha$ can be optimized as a model parameter along with the PSF and sky background. 
+The same principle applies to the Poisson prior parameter, $\mu$. 
+
+
+
+% In catalog M2, we use the same prior parameters as~\cite{Portillo_2017, Feder_2019}: the slope of the power law on fluxes is set at  $\alpha = 2$; the minimum flux $f_{min}$ to corresponds to the SDSS 
+% lower detection limit ($\approx$ 22 magnitude); and the color prior has a standard Gaussian prior, which only disfavors extremely atypical colors, $|c_{i,b}| > 3$. 
+
+% One difference is that \cite{Portillo_2017, Feder_2019} use an exponential prior on $N$. We use a Poisson prior and set $\mu = 0.15$, slightly denser than the $0.1$ stars per pixel 
+% brighter than 22mag found in the Hubble catalog of M2. Appendix TODO shows that our model is insensitive to the choice of Poisson mean. 
+

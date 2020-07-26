@@ -1,36 +1,15 @@
-Astronomical surveys play an important role in developing scientific knowledge of the universe. 
-The raw data in the form of telescope images are the primary source of information about the universe beyond our solar system. 
-Often, the information in the raw data is consolidated into catalogs. 
-Catalogs record light sources as stars, galaxies, or other objects; 
+Astronomical surveys are an important source of scientific knowledge about the universe as telescope images are the primary source of information about the universe beyond our solar system. 
+Often, the data collected are consolidated into catalogs which record light sources as stars, galaxies, or other objects; 
 they also list their physical parameters such as flux, color, and morphology. 
 In many cases, these catalogs are the starting point for downstream analyses of astronomical images.
 For example, the Argonaut map which maps the 3D distribution of interstellar dust is based on the fluxes and colors of stars~\cite{Green_2019_argonaut}. 
 Spatial distributions of galaxies have been used to validate theoretical models of dark matter and dark energy~\cite{Eisenstein_2005_darkmatter}. 
 
-\jeff{
-Some of the text below may be useful in the introduction. It explains the challenge in terms statisticians are more likely to connect with.
-I haven't published it elsewhere, so feel free to include any parts verbatim if they are useful.
-
-\textit{
-Light source separation is challenging for several reasons.
-First, it is an unsupervised problem with a sample size of one: there is not labeled data with known ground truth, and there is only one night sky, which is imaged many times.
-Second, many stars and galaxies too faint to be unambiguously resolved. For these light sources, providing calibrated uncertainty estimates of our predictions is as important as making accurate predictions.
-Third, many stars and galaxies overlap with other light sources---as many as 68\% of galaxies are expected to overlap with others in upcoming LSST survey.
-As telescopes improve, even more galaxies will appear to overlap.
-Fourth, the scale of the data is immense by any standard. The upcoming LSST survey, scheduled to begin data collection in 2022, is expected to produce 50 petabytes of astronomical images over its lifetime.
-}
-}
-
-Our method considers applications where all sources are well-modeled as points without spatial extent. Estimation of location, fluxes, and color is the primary goal.
-Point sources are good models for surveys where the primary objects studied are stars, such as DECam~\cite{Schlafly_2018_DECam}, which imaged the center of our own Milky Way. 
-On the other hand, WISE~\cite{Wright_2010_WISESurvey} used point source models for cataloging because its telescope resolution and the density of light sources did not allow for differentiation between stars and galaxies. 
-
-In this paper, we test our method on the globular cluster M2 imaged by the Sloan Digital Sky Survey (SDSS). 
-Understanding these starfields is of scientific interest per se.
-The distribution of colors and fluxes in crowded starfields 
-can be used to estimate the age 
-of the starfield, which in turn lower bounds the 
-age of the universe~\cite{Isochrome_fitting}. 
+We consider applications where all sources are well-modeled as points without spatial extent.
+We validate our method on the M2 globular cluster imaged by the Sloan Digital Sky Survey (SDSS), a region of the sky densely populated by stars.
+The analysis of colors and fluxes distributions within
+such starfields provide insight into stellar evolution~\cite{Isochrome_fitting}.
+Other applications of point-source models include DECam~\cite{Schlafly_2018_DECam}, which imaged the center of our own Milky Way and WISE~\cite{Wright_2010_WISESurvey}, whose telescope resolution did not allow for differentiation between stars and galaxies.
 
 % \begin{wrapfigure}{r}{0.5\textwidth}
 %   \centering
@@ -41,7 +20,7 @@ age of the universe~\cite{Isochrome_fitting}.
 \begin{figure}[!tb]
   \centering
     \includegraphics[width=0.3\textwidth]{figures/m2.png}
-  \caption{The globular cluster M2 as imaged by SDSS. }
+  \caption{The M2 globular cluster as imaged by SDSS. }
 \end{figure}
 
 For all the aforementioned applications, a key obstacle 

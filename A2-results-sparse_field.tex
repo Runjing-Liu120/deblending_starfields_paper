@@ -12,14 +12,16 @@ images. After ten minutes of sleep training, we produced a catalog on the full $
 This image is contained in Stripe 82, a region of the sky repeatedly imaged by SDSS. Averaging images from different runs boosts the signal to noise ratio and this {\itshape co-added} image can be analyzed to obtain a ground truth. 
 
 However, this region of the sky also contains galaxies, which are 
-not well-modelled by a PSF. A future paper will extend our generative model to include galaxies. For our setup, we trained Starnet using only the sleep phase (otherwise the model will try to use the PSF to explain both stars and galaxies in the wake-phase). 
+not well-modelled by a PSF. A future paper will extend our generative model to include galaxies. For our setup, we trained StarNet using only the sleep phase (otherwise the model will try to use the PSF to explain both stars and galaxies in the wake-phase). 
 
 Since this region of the sky is more sparse, we tile the image into $50\times 50$ tiles; $N_{max}$ on the tiles is three. 
 
 Figure~\ref{fig:sparse_field} shows a $500\times 500$ subimage with 
 our MAP catalog overlaid with the ground truth. We also report the 
 TPR, comparing the stars in the co-added catalog with our estimated stars. (We have false defections, namely galaxies, and thus 
-do not report the PPV). Of the stars in the co-added catalog with brightness at least $22.5$mag, we achieved a TPR of 90\%. 
+do not report the PPV). Of the stars in the co-added catalog with brightness at least $22.5$mag, we achieved a TPR of 89\% (on this larger image, a star is considered detected if there is an estimated star within three pixels). PHOTO, the default cataloger used by SDSS, had a TPR or 93\%. 
+
+We believe that our results would improve with the addition of a galaxy model. Currently, most of the missed stars occur when a large galaxy within a tile causes all $N_{max}$ detections to be placed around the galaxy -- the remaining stars in the image go undetected. Even so, our TPR is comparable with PHOTO, and can catalog entire SDSS runs (which can contain up to ~5000 images) in minutes. 
 
 
 \begin{figure}

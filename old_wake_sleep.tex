@@ -10,7 +10,7 @@ is closely related to the reparameterization trick \cite{kingma2013autoencoding,
 These approaches all sample latent variables from $q_\eta$ and produce an unbiased estimate 
 for the gradient of the KL; the optimization is done with stochastic gradient descent. 
 
-However, the reparameterization trick does not apply when a latent variable is discrete -- in our case, the number of stars $N$. The REINFORCE estimator~\cite{Williams1992reinforce}, which BBVI adapts, produces an unbiased stochastic gradient for both continuous and discrete latent variables. However, these gradients often suffer from high variance in practice, and so the resulting stochastic optimization is slow. See Appendix TODO for details concerning both the reparameterization and REINFORCE estimators. 
+However, the reparameterization trick does not apply when a latent variable is discrete -- in our case, the number of stars $N$. The REINFORCE estimator~\cite{Williams1992reinforce}, which BBVI adapts, produces an unbiased stochastic gradient for both continuous and discrete latent variables. However, these gradients often suffer from high variance in practice, and so the resulting stochastic optimization is slow. See Appendix~\ref{sec:reparam_details} for details concerning both the reparameterization and REINFORCE estimators. 
 
 Stochastic gradients are difficult to compute in the E-step~\eqref{eq:e_step} because the integrating distribution depends on the optimization parameter, $\eta$. 
 The wake-sleep algorithm, originally proposed by~\cite{Hinton1995wake_sleep}, replaces the 

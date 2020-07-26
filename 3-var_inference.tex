@@ -1,31 +1,20 @@
-The previous section presented the likelihood $p(x | z)$, which describes the generation of an image $x$ given a catalog $z$, as well as a prior distribution $p(z)$ over the space of all catalogs. 
-The central quantity in Bayesian statistics is the posterior distribution $p(z|x)$, which captures the likelihood of a certain catalog $z$ given 
-an observed image $x$. 
+The central quantity in Bayesian statistics is the posterior distribution $p(z|x)$; for our model, the posterior is the distribution of catalogs given an observed image $x$. 
 
-% \jeff{Better to just say something about the posterior being the quantity of interest, rather than doing this question thing.}
 However, in most
 nontrivial probabilistic models, including ours, the posterior distribution is intractable to calculate.
-%\jeff{It's more like certain functionals of the posterior distribution we're after; e.g., the mean and some measures of uncertainty. 
-%Perhaps we just want to say here that ``A central quantity in Bayesian statistics is the posterior distribution'', rather that saying what we ``seek''.  My concern is that astronomy reviewers will say that the posterior isn't what matters for scientific inference....it's population-level quantities or something like that. We need to address that concern in the introduction and the discussion section, but it'd be better to avoid having this discussion in the VI section.
-%}
-% However, in most nontrivial probabilistic models, including ours, the posterior distribution is intractable.
-% \jeff{Can you say ``computing the posterior distribution exactly is intractable'' here instead?
-% An ``exact posterior distribution'' isn't really a thing. Only ``posterior distribution'' is defined.
-% }
 
 Variational inference~\cite{Blei_2017_vi_review, Jordan_intro_vi, Wainwrite_graph_models_vi}
 posits a family of distributions $\mathcal{Q}$ and seeks
 the distribution $q^*\in \mathcal{Q}$ that is closest to the posterior
-in $\KL$ divergence. Suppose the family of distributions $\mathcal{Q}$ is parameterized by a real-valued vector $\eta$. We seek the optimal $\eta^*$ 
-satisfying
+in $\KL$ divergence. We select a family of distributions $\mathcal{Q}$ indexed by a real-valued vector $\eta$. We seek $\eta^*$ satisfying
 \begin{align}
    \eta^* &= \argmin_{\eta} \mathrm{KL}\Big[\,q_\eta(z | x)\, \| \,p(z | x )\,\Big].
    \label{eq:kl_objective}
 \end{align}
 
-Minimizing the $\KL$ divergence is equivalent to maximizing the ELBO (evidence lower bound), defined as 
+Minimizing the $\KL$ divergence in~\eqref{eq:kl_objective} is equivalent to maximizing the evidence lower bound ELBO,
 \begin{align}
-    \mathcal{L} = 
+    \mathcal{L}_{elbo}(\eta) = 
     \Expect_{q_\eta(z | x)}\Big[\log p(x, z) - \log q_\eta(z | x)\Big].
     \label{eq:elbo}
 \end{align}
