@@ -1,11 +1,5 @@
 The generative model from Section~\ref{sec:gen_model} requires
 the specification of a PSF and a sky background. Let $\phi = (\pi^b, \beta^b)_{b = 1}^B$ be the concatenation of the PSF and background parameters into a real-valued vector. 
-% \jeff{It's pretty unusual to use $\phi$ for model parameters, rather than $\theta$. Unless there's a reason, better to use $\theta$. It will be easier on the reader, leaving them with more attention to devote to understanding the substantive ideas in the paper.
-% }
-% \bryan{with the changes to the gen. model, I ended up using $\theta$ as latent variables :/}
-% \jeff{It's pretty common in VI papers to make $z$ all the latent random variables rather than $\theta$.
-% That way Greek letters can be used for non-random quantities (model parameters and variational parameters) while Roman letters denote random variables.
-% }
 
 Our likelihood, and therefore posterior, now depend on $\phi$. We denote this dependence with a subscript, $p_\phi$. 
 

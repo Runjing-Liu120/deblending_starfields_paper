@@ -48,7 +48,7 @@
 % Reweighted Wake-Sleep for Deblending Crowded Starfields
 \if1\blind
 {
-  \title{\bf  A Variational Inference Approach to Deblending Crowded Starfields using the Wake-sleep Algorithm}
+  \title{\bf Variational Inference for Deblending Crowded Starfields}
   \author{Runjing Liu\thanks{
     The authors gratefully acknowledge \textit{please remember to list all relevant funding sources in the unblinded version}. NSF graduate research fellowship etc ... }\hspace{.2cm}\\
     Department of Statistics, University of California, Berkeley\\
@@ -75,16 +75,22 @@
 
 \bigskip
 \begin{abstract}
-Catalogs of light sources derived from astronomical surveys are the primary source of information about the universe beyond our solar system. A key step in catalog construction is ``deblending,” the task of identifying and characterizing each imaged light source. As modern telescopes peer deeper into space, images become increasingly crowded with light sources and the challenge of reliably deblending sources becomes critical for scientific analysis. 
-
-In these crowded fields where sources cannot be unambiguously separated, it also becomes important to provide calibrated uncertainty estimates that can be propagated to downstream analyses. Probabilistic cataloging defines a statistical model on the raw telescope images and captures the uncertainties in catalog construction by the Bayesian posterior. However, the computational cost of MCMC is prohibitive for the terabytes of data collected by modern astronomical surveys. In this work, we propose a method, StarNet, which uses amortized variational inference. A neural network is trained to produce an approximate posterior using the wake-sleep algorithm. Like variational EM, this algorithm finds approximate posteriors while estimating model parameters such as the point spread function. However, the ELBO objective in the E-step of variational EM is replaced by an alternative KL divergence. In this application, the wake-sleep algorithm is better able to avoid local minima. 
-
-Our algorithm is scalable to large astronomical surveys. It provides a statistical framework towards producing a pipeline whereby uncertainties are fully propagated from raw image to catalog to downstream analysis. 
+A key step in the construction of astronomical catalogs is deblending, the task of identifying and characterizing each imaged light source.
+In crowded fields, sources often cannot be unambiguously separated. 
+Probabilistic cataloging defines a statistical model
+on the raw telescope images and captures the uncertainties in catalog construction by the Bayesian posterior.
+However, the computational cost of MCMC is prohibitive for the terabytes of data collected by modern astronomical surveys. 
+In this work, we propose a method based on amortized variational inference.
+A neural network is trained to produce an approximate posterior on catalogs using the wake-sleep algorithm. 
+Like variational EM, this algorithm finds approximate posteriors while estimating model parameters such as the point spread function. 
+However, the ELBO objective in the E-step of variational EM is replaced by an alternative KL divergence.
+In this application, the wake-sleep algorithm is better able to avoid local minima. 
+Our algorithm is scalable to large astronomical surveys and provides a statistical framework producing an cataloging pipeline whereby uncertainties are fully propagated from raw image to catalog to downstream analysis. 
 
 \end{abstract}
 
 \noindent%
-{\it Keywords:}  3 to 6 keywords, that do not appear in the title
+{\it Keywords:}  Bayesian methods, approximate inference, astronomical surveys, cataloging. 
 \vfill
 
 \newpage
@@ -101,14 +107,11 @@ Our algorithm is scalable to large astronomical surveys. It provides a statistic
 \label{sec:var_inference}
 \input{3-var_inference}
 
-\subsection{Estimating the model parameters}
-\label{sec:model_params}
-\input{3b-model_params}
-
-\subsection{Wake-sleep training}
+\section{The wake-sleep algorithm}
 \label{sec:wake_sleep}
-\input{3c-wake_sleep}
-
+\input{3b-wake_sleep}
+\input{3c-variational_em}
+\input{3d-sleep_details}
 % NO LONGER NEEDED
 % \section{Related work}
 % \label{sec:related_work}
@@ -130,87 +133,8 @@ TODO fix issues in references.
 
 \appendix
 \section{Reparameterized and REINFORCE gradients}
-
-The E-step objective~\eqref{eq:e_step} is of the form 
-\begin{align}
-    \mathcal{L}(\eta) = \Expect_{q_\eta(z)}[f_\eta(z)]
-\end{align}
-where $\eta$ is the parameter to be optimized and $z$ is the latent variable. The integrating distribution $q$ and the function $f$ depend on $\eta$. 
-
-The REINFORCE~\cite{Williams1992reinforce}, or score function estimator, is a general-purpose unbiased estimate for the gradient $\nabla_\eta \mathcal{L}(\eta)$. It is given by 
-\begin{align}
-    g_{\textrm{rf}}(z) = \nabla_\eta f_\eta(z) + 
-            f_\eta(z)  \nabla_\eta \log q_\eta(z)
-    \quad \text{for } 
-    z\sim q_\eta(z). 
-\end{align}
-The REINFORCE estimate is unbiased for the true gradient, \begin{align}
-    \Expect_{q_\eta(z)}[g_{\textrm{rf}}(z)] &= 
-    \int q_\eta(z) \nabla_\eta f_\eta(z) \; dz+ 
-    \int q_\eta(z) f_\eta(z)  \nabla_\eta \log q_\eta(z)\; dz \\
-    &= \int q_\eta(z) \nabla_\eta f_\eta(z) \; dz+ 
-    \int f_\eta(z) \nabla_\eta q_\eta(z)  \; dz \\
-    &= \int \nabla_\eta[q_\eta(z) f_\eta(z)] \; dz \\
-    &= \nabla_\eta \int q_\eta(z) f_\eta(z) \; dz 
-    = \nabla_\eta \Expect_{q_\eta(z)}[f_\eta(z)],
-\end{align}
-assuming that $f$ is well-behaved so that integration and differentiation can be interchanged. 
-
-Alternatively, the reparameterized gradient~\cite{rezende2014stochastic, kingma2013autoencoding} can be used when there exists some distribution $F$ independent of $\eta$, and a differentiable mapping $h_\eta$ such that 
-\begin{align}
-    w \sim F \implies h_\eta(w) \stackrel{d}{=} z,
-\end{align}
-with $z\sim q_\eta$. 
-
-For example, if $q_{\eta}(z) = \mathcal{N}(z; \eta, 1)$ that is, a Gaussian with unit variance and mean $\eta$, one possibility is to let $F$ be the standard Gaussian and $h_\eta(w) = w + \eta$. 
-
-The gradient of $\mathcal{L}(\eta)$ can be written as 
-\begin{align}
-    \nabla_\eta \Expect_{q_\eta(z)}[f_\eta(z)] &= 
-        \nabla_\eta \Expect_{w\sim F}[f_\eta(h_\eta(w)] = \Expect_{w\sim F}[\nabla_\eta f_\eta(h_\eta(w)], 
-\end{align}
-again assuming the interchangability of integrals and derivatives. 
-
-Unbiased gradients are computed as 
-\begin{align}
-    g_{\textrm{rp}} 
-    = \nabla_\eta f_\eta(h_\eta(w)
-    = \nabla_z f_\eta(z)\Big|_{z = h_\eta(w)}
-    \nabla_\eta h_\eta(w) \quad \text{for } w\sim F. 
-\end{align}
-
-The reparameterized gradient includes gradient information $\nabla_z f_\eta(z)$ while the REINFORCE gradient does not. Taking into account the structure of $f$ through its gradient lowers the variance of reparameterized gradient in comparison to the REINFORCE gradient. 
-
-However, if $z$ contains discrete components, there cannot not a differentiable mapping $h_\eta$, and the reparameterization trick will not apply. 
-
-In our case (Section~\ref{sec:estep_sleep_compare}), we used a combination of reparameterized and REINFORCE gradients. Let $N$ be the discrete component of $z$ (the number of stars) and $y$ be the continuous components (the locations and fluxes). Our variational distribution factorizes, so we write the expectation as 
-\begin{align}
- \Expect_{q_\eta(N)}\Expect_{q_\eta(y)}[f_\eta(N, y)]. 
-\end{align}
-We use the REINFORCE estimator for the outer expectation and the reparameterization trick for the inner expectation. We first apply the REINFORCE to the outer expectation: 
-\begin{align}
-    \nabla_\eta  \Expect_{q_\eta(N)}&\Expect_{q_\eta(y)}\Big[f_\eta(N, y)\Big] \\
-    &=  \Expect_{q_\eta(N)}\Big[ \nabla_\eta \log q_\eta(N) \Expect_{q_\eta(y)}[f_\eta(N, y)] + 
-    \nabla_\eta \Expect_{q_\eta(y)}[f_\eta(N, y)] \Big]\\
-    &\approx \nabla_\eta \log q_\eta(N) \Expect_{q_\eta(y)}[f_\eta(N, y)] + 
-    \nabla_\eta \Expect_{q_\eta(y)}[f_\eta(N, y)] \quad \text{for } N \sim q_\eta(N). 
-    \label{eq:reinforce_partial}
-\end{align}
-Then we use the reparameterization trick for $y$, so 
-\begin{align}
-    \Expect_{q_\eta(y)}[f_\eta(N, y)] &\approx f_\eta(N, h_\eta(w))\\
-    \nabla_\eta \Expect_{q_\eta(y)}[f_\eta(N, y)] &\approx  \nabla_y f_\eta(N, y)\Big|_{y = h_\eta(w)}
-    \nabla_\eta h_\eta(w) 
-    \label{eq:reparam_partial}
-\end{align}
-for $w \sim F$, where $h_\eta$ and $F$ are chosen appropriately. Combining~\eqref{eq:reinforce_partial} and~\eqref{eq:reparam_partial}, our gradient estimator is 
-\begin{align}
-    g(z) = \nabla_\eta \log q_\eta(N) 
-    f_\eta(N, h_\eta(w)) + 
-    \nabla_y f_\eta(N, y)\Big|_{y = h_\eta(w)}
-    \nabla_\eta h_\eta(w) 
-\end{align}
-for $N\sim q_\eta(N)$ and $w\sim F$. Because the variational distribution on locations and fluxes are transformation of Gaussians (recall locations are logit-normal and fluxes log-normal), we take $F$ to be the standard Gaussian, while $h(\cdot ; \eta)$ shifts and scales the standard Gaussian according the the parameters returned by the neural network and applies the appropriate transformation. 
+\label{sec:reparam_details}
+\input{A1-reparam_details}
 
 \section{Results on Stripe-82}
 \input{A2-results-sparse_field}
@@ -218,9 +142,10 @@ for $N\sim q_\eta(N)$ and $w\sim F$. Because the variational distribution on loc
 \section{Sensitivity to prior parameters}
 \input{A3-prior_sensitivity}
 
-\section{Results on a test M2 image}
-\input{A4-m2_test_image}
+% probably won't include these sections anymore
+% \section{Results on a test M2 image}
+% \input{A4-m2_test_image}
 
-\input{comparison_w_is}
+% \input{comparison_w_is}
 
 \end{document}
