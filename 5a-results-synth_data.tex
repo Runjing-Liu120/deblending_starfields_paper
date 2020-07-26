@@ -34,15 +34,15 @@ With these these prior parameters, we compare directly optimizing the ELBO,
 \end{align}
 against optimizing the sleep objective $\mathcal{L}_{sleep}(\eta)$ in~\eqref{eq:sleep_obj}. Note that optimizing the sleep objective does not depend on $x_{test}$: the sleep phase only requires sampling catalogs from the aforementioned prior and the simulated images given the catalog. 
 
-Figure~\ref{fig:optim_path} (top row) charts the ELBO~\eqref{eq:elbo_on_test} as the optimization proceeds.
-The left-most plot in the top row shows the ELBO optimized with stochastic gradient descent and the REINFORCE estimator.
+Figure~\ref{fig:optim_path} charts the ELBO~\eqref{eq:elbo_on_test} as the optimization proceeds.
+The Figure~\ref{fig:optim_path}a shows the ELBO optimized with stochastic gradient descent and the REINFORCE estimator.
 This optimization did not converge, likely due to the high variance of the REINFORCE estimator. 
-In the middle plot, we analytically integrated the ELBO with respect to the variational distribution on the number of stars $N$ before computing stochastic gradients using the reparameterization trick.
+In Figure~\ref{fig:optim_path}b, we analytically integrated the ELBO with respect to the variational distribution on the number of stars $N$ before computing stochastic gradients using the reparameterization trick.
 See Appendix~\ref{sec:reparam_details} for details about the gradient estimators. 
 The reparameterized gradients exhibited lower variance, and the optimization converged to stationary points. 
 However, depending on the initialization, the variational distribution converged to points where the ELBO is non-optimal (e.g. restarts 3 and 6). 
 
-In contrast, the right-most plot in the top row of Figure~\ref{fig:optim_path} shows the ELBO as the sleep phase proceeds. 
+In contrast, Figure~\ref{fig:optim_path}c shows the ELBO as the sleep phase proceeds. 
 Optimizing the sleep objective consistently converged to a similar ELBO across all restarts. 
 While the sleep phase does not directly optimizes the ELBO, the ELBO increases nonetheless, as the variational posterior approaches the true posterior in $\textrm{KL}$. 
 This example demonstrates that optimizing the sleep objective avoids the shallow local optima exhibited by the ELBO. 
