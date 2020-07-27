@@ -61,9 +61,9 @@ error bars nominally representing marginal uncertainties.
 In the context of probabilistic cataloging (StarNet and PCAT), the posterior 
 defines a distribution over catalogs.
 Each sample from the posterior returns a catalog, and each 
-sampled catalog may be of different cardinally. 
+sampled catalog may have different cardinally. 
 
-A catalog was evaluated using three metrics: the true positive rate (TPR), the positive predicted value (PPV), and the F1 score. Using the HST catalog as ground truth, the TPR is the proportion of true stars matched with a star in the estimated catalog;
+Catalogs are evaluated on three metrics: the true positive rate (TPR), the positive predicted value (PPV), and the F1 score. Using the HST catalog as ground truth, the TPR is the proportion of true stars matched with an estimated star;
 the PPV is the proportion of stars in the estimated catalog that matched a true star. Like \cite{Portillo_2017, Feder_2019}, we considered a match to be when the estimated location and the HST location were within 0.5 pixels,
 and the estimated $r$-band flux and the HST F606W band flux were within half a
 magnitude. 
@@ -71,7 +71,7 @@ The matching criterion in magnitude allows for some discrepancy between the SDSS
 The Hubble F606W band absorption range is broader than the SDSS $r$-band, though they centered at roughly the same wavelength. Finally, the F1 score is the geometric average between the PPV and the TPR. 
 
 We filtered the Hubble catalog, leaving just stars brighter than 22.5~mag in the F606W band, corresponding to the detection limit of point sources in SDSS images. 
-In our generative model, all stars dimmer were absorbed into the sky intensity, and $f_{min}$ in Equation~\eqref{eq:flux_prior} was set to the 22.5th magnitude. 
+In our generative model, all dimmer stars were absorbed into the sky intensity, and $f_{min}$ in Equation~\eqref{eq:flux_prior} was set to the 22.5th magnitude. 
 
 Table~\ref{tab:summary_stats} reports the PPV and TPR for the considered cataloging methods.
 For StarNet, the TPR and PPV were computed at the catalog corresponding to the mode of the variational distribution. 
@@ -82,33 +82,22 @@ including more bands did not improve the quality of our detections.
 % \jeff{A lot of sentences that have ``we'' as the subject can be rewritten in way that doesn't mention us (without switching to passive voice, which often doesn't sound good). It makes the writing easier to understand because typically ``we'' are not really central to the idea we're trying to convey. 
 % So you might say thing like ``Our method performed better than PCAT in terms of TPR and PPV'' rather than all four of the follow sentences: ``We compute the the TPR and PPV for our method. We compared it to PCAT. We found that our method performed better than PCAT. Note that we used the MAP estimate to compute TPR.''
 % }
-Fitting StarNet using only the sleep phase, that is optimizing~\eqref{eq:sleep_obj} at the SDSS estimates of the model parameters, returned 
-a catalog with a TPR of 0.52 and PPV of 0.45. Two further cycles of wake-sleep training improved the PPV to 0.62; the TPR decreased slightly to 0.49. The catalog did not noticeably improve after the second iteration of wake-sleep. The wake-sleep PPV was also better than PCAT by 0.26. Further, the TPR of PCAT
-only improved by 0.02 over wake-sleep, even though PCAT predicted roughly 50\% more stars than wake-sleep. 
-% , and ran 
-% a first sleep phase (optimizing equation~\ref{eq:sleep_obj}). We compare the 
-% catalog obtained under the MAP estimate under the variational distribution trained using only this sleep phase against the 
-% variational distribution obtained after two further cycles of wake-sleep. 
-% We define the ``wake-sleep" catalog 
+Fitting StarNet using only the sleep phase (StarNet-S) returned 
+a catalog with a TPR of 0.52 and PPV of 0.45. Two further cycles of wake-sleep training (StarNet-WS) improved the PPV to 0.62; the TPR decreased slightly to 0.49.
+The catalog did not noticeably improve after the second iteration of wake-sleep. 
+The biggest improvement of StarNet-WS over PCAT is in the PPV: 
+the detections by StarNet-WS are more likely to correspond to 
+true stars. 
+While PCAT predicted roughly 50\% more stars than StarNet-WS, 
+its TPR only increases by 0.02 over StarNet-WS. 
+Conversely, the DAOPHOT catalog detected the fewest number of stars, and it had less than half the TPR of StarNet-WS.
 
-% Our  MAP  estimate  under  the  variational  distribution  trained  using  wake-sleep
-% (which we will call our “wake-sleep catalog”) had similar TPR to the 
-
-
-% (which we will call our ``wake-sleep catalog")
-
-
-Conversely, the DAOPHOT catalog detected the fewest number of stars, and it had the lowest TPR of all the methods.
-Further, while wake-sleep predicted nearly three times as many stars as DAOPHOT, wake-sleep only suffered a decrease in PPV of 0.04. 
-
-% We combined TPR and PPV into one statistic using the F1 score,
-% defined as the geometric average between TPR and PPV, and found that both sleep-only and wake-sleep outperform PCAT and DAOPHOT.
 
 \input{tables/summary_stats_m2.txt}
 
 Figure~\ref{fig:summary_stats} shows the TPR and PPV for various magnitudes.
-Wake-sleep and PCAT showed similar TPR across all magnitudes; both were
-uniformly better than DAOPHOT. Wake-sleep had a PPV higher than PCAT for all magnitudes. 
+StarNet-WS and PCAT showed similar TPR across all magnitudes; both were
+uniformly better than DAOPHOT. StarNet-WS had a PPV higher than PCAT for all magnitudes. 
 \begin{figure}[ht]
     \centering
     \includegraphics[width=0.99\textwidth]{figures/summary_statistics_m2.png}
@@ -132,7 +121,7 @@ than PCAT.
     \includegraphics[width=0.49\textwidth]{figures/example_subimages_pcat.png}
     \caption{Estimated catalogs on four 10$\times$10 subimages from
     M2. Blue dots are Hubble stars with magnitude greater than the 22.
-    Wake-sleep, PCAT, and DAOPHOT estimated stars are in
+    Starnet-WS, PCAT, and DAOPHOT estimated stars are in
     red, cyan, and orange x's, respectively. }
     \label{fig:example_subimages}
 \end{figure}
@@ -143,8 +132,7 @@ than PCAT.
     \rulesep
     \includegraphics[width=0.49\textwidth]{figures/example_subimages_samples_pcat.png}
     \caption{Four 10$\times$10 subimages from
-    M2. Blue dots are Hubble stars brighter than the 22nd magnitude. (Left) Posterior samples from the wake-sleep variational
-    posterior and (right) posterior samples from the MCMC chain of PCAT. }
+    M2. Blue dots are Hubble stars brighter than the 22nd magnitude. (Left) Posterior samples from StarNet-WS and (right) posterior samples from the MCMC chain of PCAT. }
     \label{fig:example_subimages_sampled}
 \end{figure}
 
@@ -207,7 +195,14 @@ $- \log p_\phi(x | N_{H}, \ell_{H}, f_{H})$ for $\phi$ directly.
 The results suggest that the primary source of model misfit is the background. A significant increase in log-likelihood occurred by switching from the SDSS background to the Hubble-estimated background. 
 But even using the Hubble-estimated background, switching from the SDSS PSF to our wake-sleep PSF still improved the log-likelihood. 
 
-\input{tables/chi_sq_stats.txt}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/loglik_table.png}
+    \caption{Log likelihoods. }
+    \label{fig:loglik_table}
+\end{figure}
+
+% \input{tables/chi_sq_stats.txt}
 % \caption{
 % Negative log-likelihood for SDSS, wake-sleep, and Hubble estimated model parameters. In the right column, we fix the background to the Hubble estimate, and examine negative log-likelihood as the PSF varies.}
 
