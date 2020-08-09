@@ -8,7 +8,7 @@ posits a family of distributions $\mathcal{Q}$ and seeks
 the distribution $q^*\in \mathcal{Q}$ that is closest to the posterior
 in $\KL$ divergence. We select a family of distributions $\mathcal{Q}$ indexed by a real-valued vector $\eta$. We seek $\eta^*$ satisfying
 \begin{align}
-   \eta^* &= \argmin_{\eta} \mathrm{KL}\Big[\,q_\eta(z | x)\, \| \,p(z | x )\,\Big].
+   \eta^* &= \argmin_{\eta} \mathrm{KL}\Big[\,q_\eta(z | x)\, \| \,p(z | x)\,\Big].
    \label{eq:kl_objective}
 \end{align}
 
@@ -26,7 +26,7 @@ require computing the posterior distribution $p(z | x)$.
 % We now describe our family of distributions $\mathcal{Q}$. 
 Traditionally in variational inference, the posterior approximation 
 $q_\eta$ depends on data $x$ implicitly, 
-in that $\eta^*$ is chosen according to~\eqref{eq:kl_objective}. In this case, $q_\eta(z | x)$ is usually written $q_\eta(z)$. For a new observation $\tilde x$, the optimization problem~\eqref{eq:kl_objective} must be solved again for $\tilde x$ to find an 
+in that $\eta^*$ is chosen according to~\eqref{eq:kl_objective}. In this case, $q_\eta(z | x)$ is usually written $q_\eta(z)$, suppressing the dependence on $x$. For a new observation $\tilde x$, the optimization problem~\eqref{eq:kl_objective} must be solved again for $\tilde x$ to find an 
 approximation to the posterior $p(z | \tilde x)$. 
 
 In {\itshape amortized} variational
@@ -38,32 +38,34 @@ After the neural network is trained using
 objective~\eqref{eq:kl_objective}, the 
 approximate posterior $q_\eta(z | \tilde x)$ for a new data point 
 $\tilde x$ can be evaluated with a single forward pass through the neural network. 
-Re-optimization is not needed for every new data point $\tilde x$. 
+No additional run of an iterative optimization routine is needed for a new data point $\tilde x$. 
 \bryan{mention NN also good for nonconvex optimization?}
 % \jeff{A reader probably won't understand what you mean by  ``an amortized approach'' here.}
 
-In the ensuing subsections, we detail the construction of our variational distribution. 
+The following subsections detail the construction of our variational distribution. 
 % \jeff{You probably want to cite Kingma and Welling 2014 somewhere around here}
 
 \subsubsection{The factorization}
 \label{sec:factorization}
-To make the objective in \eqref{eq:kl_objective} tractable in most 
-applications, the family $\mathcal{Q}$ is restricted to probability distributions 
-that limit conditional dependencies between latent variables. In the most extreme case, called mean-field variational inference, the variational distribution factorizes across all latent variables. 
+To make the objective in \eqref{eq:kl_objective} tractable, the family $\mathcal{Q}$ may be restricted to probability distributions 
+without conditional dependencies between some latent variables. In the most extreme case, called mean-field variational inference, the variational distribution factorizes across all latent variables. 
 
-Our factorization has a spatial structure. We decompose the full $H \times W$ image into disjoint $R \times R$ tiles that cover the image. Each tile $\tilde x_{st}$ is composed of pixels:
+Our factorization instead has a spatial structure. We partition the full $H \times W$ image into disjoint $R \times R$ tiles. 
+Let $S = \sfrac{H}{R}$ and $T = \sfrac{W}{R}$ and assume without loss of generality that $H$ and $W$ are multiples of $R$.
+For $s = 1, ..., S$ and $t = 1, ..., T$,
+the tile $\tilde x_{st}$ is composed of the following pixels:
 \begin{align}
     \tilde x_{st} = \{x_{hw} : Rs \leq h \leq R(s+1) \text{ and } Rt \leq w \leq R(t+1)\}.
     \label{eq:tiles}
 \end{align}
-Let $S = \frac{H}{R}$ and $T = \frac{W}{R}$ and assume that $H$ and $W$ are multiples of $R$. The tiles cover the image, so $s$ and $t$ range over $s = 1, ..., S$ and $t = 1, ..., T$. See Figure~\ref{fig:ex_tiles} for a schematic.
+Figure~\ref{fig:ex_tiles} gives an example.
 % \jeff{Also, we should define what tiles are.}
 % \jeff{The dimension of the tiles maybe better in uppercase: the other ``structural constants'' are uppercase (e.g., $H$, $W$).}
 \begin{figure}[!ht]
     \centering
     \includegraphics[width = 0.5\textwidth]{figures/example_tiled.png}
     \vspace{-1cm}
-    \caption{Tiling a 10 x 10 image into 2 x 2 tiles.}
+    \caption{Tiling a $10 \times 10$ image into $2 \times 2$ tiles.}
     \label{fig:ex_tiles}
 \end{figure}
 % \jeff{Would you want to introduce a term like ``padded tiles'' somewhere to refer to the tile plus some of the nearby pixels around it? Tiles are disjoint from each other but padded tiles overlap some with each other.}
@@ -313,7 +315,10 @@ The architecture consisting of several convolutional layers followed by a series
     % \includegraphics[width=0.4\textwidth]{figures/starnet_archetecture2.png}
     \includegraphics[width=\textwidth]{figures/starnet_archetecture3.png}
     \vspace{-0.5cm}
-    \caption{The neural network returning parameters for the variational distribution on each 2 x 2 image tile. For cataloging M2, the input image is an $8\times 8$ padded tile, and the network is responsible for returning variational parameters for the cetner $2\times 2$ tile. }
+    \caption{The neural network returning parameters for the variational distribution on each $2 \times 2$ image tile. For cataloging M2, the input image is an $8\times 8$ padded tile, and the network is responsible for returning variational parameters for the center $2\times 2$ tile.\\
+    \color{red}{Maybe you could rotate the vertical words 45 degrees so they are more readable?}\\
+    \color{red}{$\omega$ etc aren't variational parameters}
+    }
     \label{fig:starnet_arch}
 \end{figure}
 
@@ -331,4 +336,4 @@ there are $2 \times (B + 2)$ parameters for its variational distribution. In tot
 Thus, factorizing the variational distribution spatially controls the output dimension of the neural network. On a crowded starfield with $H = W = 100$, the number of imaged stars is on the order of $10^3$. If the neural network were to return a variational distribution on the full $100\times 100$ image, the output dimension would be on the order of $10^6$. 
 On the $2\times 2$ tile, we set $N_{max} = 3$, and the output dimension of the neural network with two bands is 53. 
 
-We emphasize that while the variational distribution factorizes over $2 \times 2$ tiles, our method does not break the inference problem on the full image into embarrassingly parallel subproblems. The evaluation of the likelihood (example, when computing the ELBO in~\eqref{eq:elbo}) is always on the full image. Light from a star within a 2 x 2 tile spills over into neighboring tiles, so the likelihood does not decouple across image tiles. 
+We emphasize that while the variational distribution factorizes over $2 \times 2$ tiles, our method does not break the inference problem on the full image into embarrassingly parallel subproblems. The evaluation of the likelihood (example, when computing the ELBO in~\eqref{eq:elbo}) is always on the full image. Light from a star within a $2 \times 2$ tile spills over into neighboring tiles, so the likelihood does not decouple across image tiles. 
