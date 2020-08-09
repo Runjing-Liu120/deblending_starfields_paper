@@ -1,17 +1,16 @@
 
-First, Section~\ref{sec:estep_sleep_compare} motivates the wake-sleep approach by comparing variational posteriors obtained by optimizing the ELBO against those obtained by optimizing the sleep objective. 
+Section~\ref{sec:estep_sleep_compare} motivates the wake-sleep approach by comparing variational posteriors obtained by optimizing the ELBO against those obtained by optimizing the sleep objective. 
 Then, StarNet is tested on blended simulated stars in Section~\ref{sec:deblending_test}. 
-Finally, in Section~\ref{sec:results_on_m2} we employ StarNet to catalog the SDSS image of the M2 globular cluster and show that StarNet produces higher quality detections compared with prior work on probabilistic cataloging. 
-
+Finally, in Section~\ref{sec:results_on_m2}, StarNet is employed to catalog the SDSS image of the M2 globular cluster. The StarNet catalog is compared with existing cataloging methods. 
 
 \subsection{ELBO versus sleep objective}
 \label{sec:estep_sleep_compare}
 
-In this subsection, we compare the resulting variational posteriors obtained by optimizing the sleep objective~\eqref{eq:sleep_obj} 
+This subsection compares the resulting variational posteriors obtained by optimizing the sleep objective~\eqref{eq:sleep_obj} 
 against those obtained by optimizing the ELBO~\eqref{eq:elbo}.
-This simple example demonstrates that there exist shallow optima in the ELBO where the variational posterior on locations does not concentrate around the true locations.
+A simple example demonstrates that there exist shallow optima in the ELBO where the variational posterior on locations does not concentrate around the true locations.
 On this example, fitting the variational posterior using the sleep phase is able to avoid shallow optima. 
-Because the data were simulated with known PSF and background, the wake-phase is not needed. 
+Because the data were simulated with known PSF and background, the wake phase is not needed. 
 
 The simulated $20\times20$ single-band image $x_{test}$ is shown in Figure~\ref{fig:toy_example}.
 The image has four stars, each with the same flux. It is partitioned into four $10\times 10$ tiles, which are the inputs to the neural network. 
@@ -26,13 +25,13 @@ The image was fixed for this experiment.
     \label{fig:toy_example}
 \end{figure}
 
-In our generative model, we set the prior on the number of stars $N$ to have mean $\mu = 4$ and the prior on flux to have power law slope $\alpha = 0.5$. 
+The generative model is set with the prior on the number of stars $N$ to have mean $\mu = 4$ and the prior on flux to have power law slope $\alpha = 0.5$. 
 With these prior parameters, we compare directly optimizing the ELBO on the test image, 
 \begin{align}
 \mathcal{L}_{elbo}(\eta; x_{test}) = \Expect_{q_{\eta}(z | x_{test})}\Big[\log p(x_{test}, z) - \log q_{\eta}(z | x_{test})\Big],
 \label{eq:elbo_on_test}
 \end{align}
-against optimizing the sleep objective $\mathcal{L}_{sleep}(\eta)$ in~\eqref{eq:sleep_obj}. Note that optimizing the sleep objective does not depend on $x_{test}$: the sleep phase only requires sampling catalogs from the aforementioned prior and the simulating images given the catalog. 
+against optimizing the sleep objective $\mathcal{L}_{sleep}(\eta)$ in~\eqref{eq:sleep_obj}. Note that optimizing the sleep objective does not depend on $x_{test}$: the sleep phase only requires sampling catalogs from the aforementioned prior and simulated images conditional on each catalog. 
 
 Figure~\ref{fig:optim_path} charts the ELBO~\eqref{eq:elbo_on_test} as the optimization proceeds.
 In the first approach (Figure~\ref{fig:optim_path}a), the ELBO was optimized with stochastic gradient descent and the REINFORCE estimator.
@@ -43,8 +42,8 @@ The lower variance of the reparameterized gradients allowed the optimization to 
 However, depending on the initialization, the variational distribution converged to points where the ELBO is non-optimal (e.g. restarts 3 and 6). 
 
 In contrast, Figure~\ref{fig:optim_path}c shows the ELBO as the sleep phase proceeds. 
-While the sleep phase does not directly optimize the ELBO, the ELBO increases nonetheless as the variational posterior approaches the true posterior in $\textrm{KL}$. 
-Optimizing the sleep objective consistently converged to a similar ELBO across all restarts, and appeared to avoid the shallow local optimum found in Figure~\ref{fig:optim_path}b.
+While the sleep phase does not directly optimize the ELBO, the ELBO increases nonetheless as the variational posterior better approximates the true posterior. 
+Optimizing the sleep objective consistently converged to a similar ELBO across all restarts and appeared to avoid the shallow local optimum found in Figure~\ref{fig:optim_path}b.
 
 The bottom row of Figure~\ref{fig:optim_path} displays the estimated locations, given by the mode of the fitted variational distribution. 
 The bottom left shows these locations after getting stuck in a local minimum. 
@@ -75,21 +74,27 @@ An example of correct detections after sleep phase optimization is shown in the 
     \label{fig:optim_path}
 \end{figure}
 
-Figure~\ref{fig:gradzero_cartoon} shows schematic of this general phenomenon. When the estimated location is far from the true location, the gradient of the ELBO with respect to location vanishes. Because the PSF is nearly zero everywhere except for a few pixels around each location, a small shift in location does not significantly change the likelihood unless the estimated location is within a ``PSF radius" of the true location. On the other hand, the sleep phase objective is quadratic in the estimated location -- see~\eqref{eq:gaussian_sleep_loss}. Thus, the further the estimated location from the true location, the larger the gradient. The gradient does not vanish in the sleep objective. 
+Figure~\ref{fig:gradzero_cartoon} shows schematic of this general phenomenon. When the mean location under the variational posterior is far from the true location, the gradient of the ELBO with respect to location mean vanishes. 
+Because the PSF is nearly zero everywhere except for a few pixels around each location, a small shift in location does not significantly change the likelihood unless the location mean is within a ``PSF radius" of the true location.
+On the other hand, the sleep phase objective is quadratic in the location mean -- see~\eqref{eq:gaussian_sleep_loss}. Thus, the further the location mean from the true location, the larger the gradient. The gradient does not vanish in the sleep objective. 
 
 \begin{figure}[!htb]
     \centering
-    \begin{subfigure}[t]{0.8\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{figures/gradzero_cartoon.png}
-    \end{subfigure}
-    \begin{subfigure}[t]{\textwidth}
-    \centering
-    \includegraphics[width=0.55\textwidth]{figures/gradzero_cartoon2.png}
-    \end{subfigure}
-    \vspace{-3em}
-    \caption{An illustration of vanishing gradients. Because the estimated star is far from the true star, the log-likelihood (and relatedly the ELBO) does not change for any location in an $\epsilon$-ball of the estimated location. 
-    For large delta, the gradient of the ELBO with respect to locations is zero. In contrast, the sleep objective is quadratic in the estimated location, and the gradient does not vanish. }
+    \includegraphics[width=\textwidth]{figures/gradzero_cartoon3.png}
+    % \centering
+    % \begin{subfigure}[t]{0.8\textwidth}
+    % \centering
+    % \includegraphics[width=\textwidth]{figures/gradzero_cartoon.png}
+    % \end{subfigure}
+    % \begin{subfigure}[t]{\textwidth}
+    % \centering
+    % \includegraphics[width=0.55\textwidth]{figures/gradzero_cartoon2.png}
+    % \end{subfigure}
+    % \vspace{-3em}
+    \caption{An illustration of vanishing gradients when the location mean under the variational distribution (red) is far from the true location(blue). 
+    For large delta, the the ELBO objective is flat, 
+    and hence gradients with respect to location is nearly zero. 
+    In contrast, the sleep objective is quadratic in the location mean, and the gradient does not vanish. }
     \label{fig:gradzero_cartoon}
 \end{figure}
 
