@@ -1,0 +1,28 @@
+- what are astronomical images and why are they important?
+- what is deblending? aka light source separation. it's the essence of cataloging.
+- why is deblending challenging? Four reasons: 1) N=1 / sources overlap 2) unsupervised, 3) dataset scale, 4) Many dim sources — need UQ, 
+- a problem that is becoming more important: challenges 1, 3, & 4 are becoming even more with LSST / next gen surveys
+- why crowded starfields — what scientific questions; starfields are also a test bed for general deblending
+
+### Limitations of traditional deblending methods
+- traditional = software pipeline; uncertainty isn't propagated between stages
+- don't model marginal uncertainty (some parts may be probabilistic but all aren't)
+- cannot handle crowded fields—too much ambiguity
+- not data efficient—especially important with low SNR
+
+### Limitations of existing probabilistic deblending methods
+- Brewer and PCAT limitations — slow, uncertain mixing (can get stuck in local high probability regions)
+- Celeste limitations — no uncertainty on number of sources, other modeling compromises (GMM color prior)
+
+### Our Contributions
+- This paper: StarNet solves these problems: UQ on all latent properties, fast, no mixing problems, 
+- A model without compromises to facilitate tractability (Section 2)
+- Section 3 & 4
+    * key contribution: tractability for arbitrary models, enabled by stochastic optimization, GPU, and amortization. A first for statistics literature using VAEs.
+    * key contribution: interpretable latent space, new among VAEs. Enabled by wake-sleep, which is new for scientific applications. Wake-sleep is a probabilistic framework for inference based on simulations. Others have used simulations but without an overall probabilistic model
+    * key contribution: good non-convex optimization through amortization/nn/wake-sleep (and analysis of ELBO vs wake-sleep).
+- Section 5: results on M2
+- Section 6: discussion
+    * probabilistic cataloging
+    * interpretable deep learning
+    * wake-sleep — combining synthetic data with real

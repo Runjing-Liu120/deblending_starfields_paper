@@ -49,7 +49,7 @@ the inference will be even faster by batching the image tiles to run in parallel
 
 
 \subsubsection{Inference}
-\label{sec:m2_results}
+\label{sec:results_on_m2_inference}
 We compared StarNet with PCAT and DAOPHOT~\cite{stetson2987daophot}. 
 DAOPHOT is an algorithmic routine for detecting stars in crowded starfields and does not use a generative model. 
 It convolves the observed image with a Gaussian kernel and scans for peaks above a given threshold. 
@@ -64,12 +64,14 @@ Each sample from the posterior returns a catalog, and each
 sampled catalog may have different cardinally. 
 
 Catalogs are evaluated on three metrics: the true positive rate (TPR), the positive predicted value (PPV), and the F1 score. Using the HST catalog as ground truth, the TPR is the proportion of true stars matched with a star in the catalog;
-the PPV is the proportion of stars in the catalog that matched a true star. Like \cite{Portillo_2017, Feder_2019}, we considered a match to be when the estimated location and the HST location were within 0.5 pixels,
+the PPV is the proportion of stars in the catalog that matched a true star. The F1 score summarizes the two metrics as the geometric average between the PPV and the TPR.
+
+Like \cite{Portillo_2017, Feder_2019}, we considered a match to be when the estimated location and the HST location were within 0.5 pixels,
 and the estimated $r$-band flux and the HST F606W band flux were within half a
 magnitude. 
 The matching criterion in magnitude allows for some discrepancy between the SDSS $r$-band and the Hubble F606W band. 
 The Hubble F606W band absorption range is centered at roughly the same wavelength but broader than the SDSS $r$-band. 
-Finally, the F1 score is the geometric average between the PPV and the TPR. 
+
 
 We filtered the Hubble catalog, leaving just stars with magnitude smaller than 22.5 in the F606W band, corresponding to the detection limit of point sources in SDSS images. 
 In our generative model, all dimmer stars were modeled as sky intensity, and $f_{min}$ in Equation~\eqref{eq:flux_prior} was set to the 22.5th magnitude. 
@@ -137,7 +139,7 @@ Thus, each star in our estimated catalog was matched with exactly one Hubble sta
 For each star, we computed the z-score $(y - \hat y) / \hat \sigma$, where $y$ is the true log-flux or 
 logit-location; $\hat y$ is the mean of the Gaussian variational distribution, and $\hat\sigma$ the standard deviation.
 If the uncertainties were perfectly calibrated, the distribution of the z-scores would be a standard Gaussian. 
-In Figure~\ref{fig:z-score_calibration}, the tails of the empirical z-score distribution are slightly larger than standard Gaussian, suggesting that our error is somewhat under-estimated. 
+In Figure~\ref{fig:z-score_calibration}, the tails of the empirical z-score distribution are slightly larger than standard Gaussian, suggesting that the error is somewhat under-estimated. 
 
 \begin{figure}[ht]
     \centering
