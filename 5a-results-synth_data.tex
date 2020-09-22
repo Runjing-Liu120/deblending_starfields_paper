@@ -1,37 +1,34 @@
 
-Section~\ref{sec:estep_sleep_compare} motivates the wake-sleep approach by comparing variational posteriors obtained by optimizing the ELBO against those obtained by optimizing the sleep objective. 
-Then, StarNet is tested on blended simulated stars in Section~\ref{sec:deblending_test}. 
-Finally, in Section~\ref{sec:results_on_m2}, StarNet is employed to catalog the SDSS image of the M2 globular cluster. The StarNet catalog is compared with existing cataloging methods. 
+% Section~\ref{sec:estep_sleep_compare} motivates the wake-sleep approach by comparing variational posteriors obtained by optimizing the ELBO against those obtained by optimizing the sleep objective. 
+% Then, StarNet is tested on blended simulated stars in Section~\ref{sec:deblending_test}. 
+% Finally, in Section~\ref{sec:results_on_m2}, StarNet is employed to catalog the SDSS image of the M2 globular cluster. The StarNet catalog is compared with existing cataloging methods. 
 
-\subsection{ELBO versus sleep objective}
-\label{sec:estep_sleep_compare}
+\label{sec:elbo_sleep_compare}
 
-This subsection compares the resulting variational posteriors obtained by optimizing the sleep objective~\eqref{eq:sleep_obj} 
-against those obtained by optimizing the ELBO~\eqref{eq:elbo}.
-A simple example demonstrates that there exist shallow optima in the ELBO where the variational posterior on locations does not concentrate around the true locations.
-On this example, fitting the variational posterior using the sleep phase is able to avoid shallow optima. 
+A simple example demonstrates that there exist shallow optima in the ELBO~\eqref{eq:elbo}. These optima are shallow because the variational posterior on locations does not concentrate around the correct locations.
+For this example, fitting the variational posterior using the sleep objective~\eqref{eq:sleep_obj} is able to avoid shallow optima. 
 Because the data were simulated with known PSF and background, the wake phase is not needed. 
 
 The simulated $20\times20$ single-band image $x_{test}$ is shown in Figure~\ref{fig:toy_example}.
-The image has four stars, each with the same flux. It is partitioned into four $10\times 10$ tiles, which are the inputs to the neural network. 
-The image was fixed for this experiment. 
+The image has four stars, each with the same flux. 
 
 \begin{figure}[!h]
     \centering
     \vspace{-1em}
     \includegraphics[width = 0.3\textwidth]{figures/vi_sleep_ex_figure.png}
     \vspace{-1.7em}
-    \caption{Our $20\times 20$ pixel test image with four stars, partitioned into $10\times 10$ tiles. }
+    \caption{The $20\times 20$ pixel synthetic image that we use for testing. It contains four stars and is partitioned into $10\times 10$ tiles. }
     \label{fig:toy_example}
 \end{figure}
 
 The generative model is set with the prior on the number of stars $N$ to have mean $\mu = 4$ and the prior on flux to have power law slope $\alpha = 0.5$. 
-With these prior parameters, we compare directly optimizing the ELBO on the test image, 
+With these prior parameters, we compare optimizing two objective functions: the ELBO, 
 \begin{align}
 \mathcal{L}_{elbo}(\eta; x_{test}) = \Expect_{q_{\eta}(z | x_{test})}\Big[\log p(x_{test}, z) - \log q_{\eta}(z | x_{test})\Big],
 \label{eq:elbo_on_test}
 \end{align}
-against optimizing the sleep objective $\mathcal{L}_{sleep}(\eta)$ in~\eqref{eq:sleep_obj}. Note that optimizing the sleep objective does not depend on $x_{test}$: the sleep phase only requires sampling catalogs from the aforementioned prior and simulated images conditional on each catalog. 
+and the sleep objective~\eqref{eq:sleep_obj}. 
+Note that the ELBO depends on $x_{test}$ while the sleep objective does not. The sleep phase only requires sampling catalogs from the aforementioned prior and simulated images conditional on each catalog. 
 
 Figure~\ref{fig:optim_path} charts the ELBO~\eqref{eq:elbo_on_test} as the optimization proceeds.
 In the first approach (Figure~\ref{fig:optim_path}a), the ELBO was optimized with stochastic gradient descent and the REINFORCE estimator.
@@ -65,18 +62,20 @@ An example of correct detections after sleep phase optimization is shown in the 
     \includegraphics[width=0.55\textwidth]{figures/optim_path_detect_compare.png}
     \end{subfigure}
     \vspace{-3em}
-    \caption{(Top row) The ELBO as the optimization progresses 
-    for six random restarts. 
-    The bold pink line in all plots is the sleep phase ELBO path, averaged over six restarts. 
-    (Bottom row) Estimated locations from two variational posteriors shown in red. On the left, an instance where optimizing the ELBO using the reparameterized gradient landed in a local optimum.
-    On the right, an example of detections under 
-    sleep-optimized variational posterior. }
+    \caption{(Top row) The ELBO as the optimization progresses for six random restarts. 
+    (Bottom row) Estimated locations (red) from two variational posteriors shown in red. 
+    Correct locations shown in blue. 
+    On the left, a run (randomly initialized) where optimizing the ELBO with the reparameterized gradient resulted in a local optimum.
+    On the right, the variational posterior 
+    was optimized using the sleep phase. }
     \label{fig:optim_path}
 \end{figure}
 
-Figure~\ref{fig:gradzero_cartoon} shows schematic of this general phenomenon. When the mean location under the variational posterior is far from the true location, the gradient of the ELBO with respect to location mean vanishes. 
+Figure~\ref{fig:gradzero_cartoon} shows schematic of the optimization landscape as a function of locations.
+When the mean location under the variational posterior is far from the true location, the gradient of the ELBO with respect to the location mean vanishes. 
 Because the PSF is nearly zero everywhere except for a few pixels around each location, a small shift in location does not significantly change the likelihood unless the location mean is within a ``PSF radius" of the true location.
-On the other hand, the sleep phase objective is quadratic in the location mean -- see~\eqref{eq:gaussian_sleep_loss}. Thus, the further the location mean from the true location, the larger the gradient. The gradient does not vanish in the sleep objective. 
+On the other hand, the sleep objective is quadratic in the location mean (see Equation~\ref{eq:gaussian_sleep_loss}).
+Thus, the further the location mean from the true location, the larger the gradient. The gradient does not vanish in the sleep objective. 
 
 \begin{figure}[!htb]
     \centering
@@ -91,19 +90,23 @@ On the other hand, the sleep phase objective is quadratic in the location mean -
     % \includegraphics[width=0.55\textwidth]{figures/gradzero_cartoon2.png}
     % \end{subfigure}
     % \vspace{-3em}
-    \caption{An illustration of vanishing gradients when the location mean under the variational distribution (red) is far from the true location(blue). 
-    For large delta, the the ELBO objective is flat, 
+    \caption{An illustration of vanishing gradients when the location mean under the variational distribution (red) is far from the true location (blue). 
+    For large $\delta$, the ELBO objective is flat in the location mean,
     and hence gradients with respect to location is nearly zero. 
     In contrast, the sleep objective is quadratic in the location mean, and the gradient does not vanish. }
     \label{fig:gradzero_cartoon}
 \end{figure}
 
-Also note that low-variance gradients of the ELBO were constructed by analytically integrating $N$ in the objective, so the reparameterization trick could be applied. 
-In this example, $N_{max} = 2$ so the neural network infers either 0, 1, or 2 stars on each tile. 
+Also, note that low-variance gradients of the ELBO for this simple example were constructed by analytically integrating $N$ in the objective. Only then could the reparameterization trick could be applied as the remaining latent variables are continuous. 
+In this example, the variational distribution has support over only 0, 1, or 2 stars for each tile. 
 Since the variational distribution factorizes over the four tiles, integrating $N$ is a summation of $3^4 = 81$ terms.
-On larger images with more tiles, analytically integrating $N$ would be computationally infeasible, and REINFORCE gradients would be required. 
+On larger images with more tiles, analytically integrating $N$ would be computationally infeasible, 
+and the simple reparameterization trick would not apply. 
 
-To illustrate on a larger example, Figure~\ref{fig:sim_data100x100} displays our results on a simulated $100\times 100$ image with fifty stars. The tiles again consisted of $10\times 10$ pixels. Optimizing the sleep phase objective resulted in near perfect in estimation of locations; optimizing the ELBO appears to be hindered by regions with little gradient information and is slow to converge. 
+Figure~\ref{fig:sim_data100x100} displays our results on a larger example: a $100\times 100$ image with fifty stars. 
+The tiles again consisted of $10\times 10$ pixel regions. 
+Optimizing the sleep phase objective produced nearly perfect location estimates; 
+optimizing the ELBO appears to be hindered by regions with little gradient information and do not accurately produce accurate location estimates. 
 
 \begin{figure}[!htb]
     \centering

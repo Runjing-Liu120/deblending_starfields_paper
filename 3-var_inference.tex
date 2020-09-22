@@ -40,11 +40,8 @@ objective~\eqref{eq:kl_objective}, the
 approximate posterior $q_\eta(z | \tilde x)$ for a new data point 
 $\tilde x$ can be evaluated with a single forward pass through the neural network. 
 No additional run of an iterative optimization routine is needed for a new data point $\tilde x$. 
-\bryan{mention NN also good for nonconvex optimization?}
-% \jeff{A reader probably won't understand what you mean by  ``an amortized approach'' here.}
 
 The following subsections detail the construction of our variational distribution. 
-% \jeff{You probably want to cite Kingma and Welling 2014 somewhere around here}
 
 \subsubsection{The factorization}
 \label{sec:factorization}
@@ -60,8 +57,6 @@ the tile $\tilde x_{st}$ is composed of the following pixels:
     \label{eq:tiles}
 \end{align}
 Figure~\ref{fig:ex_tiles} gives an example.
-% \jeff{Also, we should define what tiles are.}
-% \jeff{The dimension of the tiles maybe better in uppercase: the other ``structural constants'' are uppercase (e.g., $H$, $W$).}
 \begin{figure}[!ht]
     \centering
     \includegraphics[width = 0.5\textwidth]{figures/example_tiled.png}
@@ -69,7 +64,6 @@ Figure~\ref{fig:ex_tiles} gives an example.
     \caption{Tiling a $10 \times 10$ image into $2 \times 2$ tiles.}
     \label{fig:ex_tiles}
 \end{figure}
-% \jeff{Would you want to introduce a term like ``padded tiles'' somewhere to refer to the tile plus some of the nearby pixels around it? Tiles are disjoint from each other but padded tiles overlap some with each other.}
 
 Let $\tilde N^{(s, t)}$ be the number of stars in tile 
 $(s,t)$.
@@ -84,8 +78,6 @@ on each tile:
     \tilde f^{(s, t)} &= (\tilde f_{N, i}^{(s, t)} : i = 1, ..., N; N = 1, 2, ...),
 \end{align}
 where $\tilde\ell_{N, i}^{(s, t)}$ and $\tilde f_{N, i}^{(s, t)}$ are the elements of the triangular array corresponding to location and fluxes, respectively. 
-% \jeff{Where is $\tilde\ell_{N, i}^{(s, t)}$ defined?
-% }
 
 While locations on the full image are parameterized to be
 $\ell_i \in [0, H]\times[0, W]$, locations on tiles are parameterized to be $\tilde\ell_{N, i}^{(s, t)} \in [0, R]\times[0, R]$. The fluxes $\tilde f_{N, i}^{(s, t)}$ are vectors in $\mathbb{R}^B$ (one flux for each band) where each entry is positive. 
@@ -180,14 +172,11 @@ Here, $\tau^{-1}(z)$ is a {\itshape set} of tile latent variables because the ma
 Locations in the catalog $\{\ell_i\}_{i=1}^N$
 determine the number of stars on tile $(s,t)$. 
 The number of stars $\tilde N^{(s,t)}$ is simply the count of the locations that reside within that tile:
-\jeff{What does it mean to ``fall within a tile''?}
-\bryan{Is reside better?}
 \begin{align}
 \tilde N^{(s,t)} = \sum_{i=1}^N 
 \mathbf 1 \Big\{\ell_i\in [Rs, R(s+1)] \times [Rt, R(t+1)]\Big\},
 \end{align}
 where $\mathbf{1}\{\cdot\}$ is the indicator function, equal to one if true and zero if false.
-% \jeff{I more often see $\mathbf 1$ used as the indicator function}
 
 Now, consider $\tilde\ell^{(s, t)}$ and $\tilde f^{(s, t)}$, the triangular array of locations and fluxes on tile $(s,t)$. 
 For each $(s,t)$, the $\tilde N^{(s,t)}$-th row 
@@ -199,7 +188,6 @@ the catalog $z$, and are free to take any value in their domain. Therefore, the 
 Thus, evaluate the probability of $\tau^{-1}(z)$ under $\tilde q_\eta$, requires marginalizing over the rows of the triangular arrays $\ell^{(s, t)}$ and $\tilde f^{(s, t)}$ that are not determined by $z$. However, 
 because $\tilde q_\eta$ fully factorizes, the terms 
 in~\eqref{eq:factorize_within_patch} where $n \not= \tilde N^{(s,t)}$ do not enter the
-% \jeff{What does ``drop out'' mean?}
 product
 after marginalization.
 Applying this observation and combining~\eqref{eq:factorize_within_patch} and ~\eqref{eq:factorize_patches}, $\tilde q(\tau^{-1}(z) | x)$ becomes
@@ -251,42 +239,7 @@ $(s,t)$ in this subsection,
 	\tilde \ell_{\tilde N, i} / R &\sim \text{LogitNormal}(\mu_{\ell_{\tilde N, i}}, \text{diag}(\nu_{\ell_{\tilde N, i}}) )\label{eq:var_distr_loc}; \\
 	\tilde f^b_{\tilde N, i} &\sim \text{LogNormal}(\mu_{f^b_{\tilde N, i}}, \sigma^2_{f^b_{\tilde N, i}}), \label{eq:var_distr_f}
 \end{align}
-\jeff{I suggest writing the parameters of these distributions as functions of the padded tile. For example, I'd write
-\[
-    \tilde N_{rt} \sim \text{Categorical}\left(h_\eta(\tilde{x}_{rt})\right).
-\]
-Here $h_\eta$ is a neural network. ($\eta$ are variational parameters).
-I didn't drop the $rt$ subscript above because I wanted to make the point that the same $h_\eta$ is applied to all tiles.
-}
-\bryan{
-I like this idea. I can introduce {\itshape padded} tiles,  
-\[
-\hat x^{(s,t)} = 
-    \{x_{hw} : R(s+1) + P \geq h > Rs - P \text{ and } 
-    R(t+1) + P\geq w > Rt - P\}.
-\]
-That is, we took the tiles from~\eqref{eq:tiles}
-and padded each tile with $P$ pixels. Note
-that tiles are disjoint, while padded tiles are not. 
-
-I want to say that a neural network 
-$h_\eta(\hat x^{(r,s)})$ that maps 
-to a common concatenated vector of 
-parameters describing the distributions. 
-
-We index into this giant vector to get individual distributional parameters. 
-I'm not sure how quite to denote this though ... for example to get the mean 
-parameter for the $(N,i)$-th location, we'd have $\mu_{\ell_{N, i}}(h_\eta(\hat x^{(r,t)}))$, which seems like too many indices.
-This is the problem with this section in general tbh ... more work will be needed on my part to figure out how to describe this. 
-}
-\jeff{I see your point, the notation is tricky. The main issue with $\mu_{\ell_{N, i}}(h_\eta(\hat x^{(r,t)}))$ is the double subscript. Also, it's not great have $\ell$ as a subscript of $\mu$ because $\ell$ is a random variable.
-}
-\jeff{
-Maybe  $\left[g_\eta(\tilde x_{rt})\right]_{N,i}$ could denote the location mean and variance for the $(N,i)$-th location?
-And $\left[h_\eta(\tilde x_{rt})\right]_{N,i}$ could denote the flux mean and variation?
-}
 for $i = 1, ..., \tilde N$; $\tilde N = 1, ..., N_{max}$. The latent variables also fully factorize within each tile. Note that in the exact posterior, $\tilde N$ has support on the nonnegative integers; in the variational distribution, we truncate at some large $N_{max}$. 
-% \jeff{Do we? I thought it was just the variational distribution that doesn't have support past $N_{max}$. The posterior has support over all natural numbers.}
 
 
 These distributions were taken for convenience: fluxes are positive and right skewed, so we place a normal distribution on log-fluxes; locations are between zero and $R$, so 
@@ -295,17 +248,11 @@ we place a normal distribution on the logit of the location scaled by $1 / R$.
 \subsubsection{Neural network architecture}
 \label{sec:nn_archetecture}
 On each tile, the distributional parameters 
-in \eqref{eq:var_distr_n}, \eqref{eq:var_distr_loc}, and \eqref{eq:var_distr_f} are the output of a neural network.
-\jeff{The parameters of the variational distribution are the weights of the neural network, not the outputs.}
-\bryan{How do you recommend that I call the 
-parameters in \eqref{eq:var_distr_n}-\eqref{eq:var_distr_f}?
-The $\omega$, $\mu$'s, etc?}
-\jeff{See comment above.}
+in \eqref{eq:var_distr_n}, \eqref{eq:var_distr_loc}, and \eqref{eq:var_distr_f} are the output of a neural network. 
 The input to the neural network is a $S \times S$ tile, padded with surrounding pixels.
-For cataloging the crowded starfield M2 (Section~\ref{sec:m2_results}),
+For cataloging the crowded starfield M2 (Section~\ref{sec:results_on_m2}),
 we set $S = 2$ and padded the tile with three pixels.
-\jeff{You may need to explain what padding is; e.g., what did you pad it with?}
-% For our test on a sparse field (Section~\ref{sec:sparse_field}), we set $S = 50$ with no padding. 
+
 
 Let $\hat x^{(s,t)}$ denote the padded tile (which includes all $B$ bands) and $h_\eta$ be the neural network, which returns the collection of distributional parameters
 \begin{align}
@@ -313,7 +260,7 @@ Let $\hat x^{(s,t)}$ denote the padded tile (which includes all $B$ bands) and $
     \label{eq:nn_output}
 \end{align}
 The same neural network is evaluated for all tiles $(s,t)$. Our variational parameters are neural network weights, here denoted $\eta$. 
-The architecture consisting of several convolutional layers followed by a series of fully connected layers (Figure~\ref{fig:starnet_arch}). Convolutional layers are useful for localizing stars as they make the network invariant to shifts in stellar location. The convolutional kernel in the first layer is $3\times3$ pixels, roughly the full width at half maximum (FWHM) of the PSF. The optimization of the architecture is left for future work; our primary contribution in this paper is the application of neural networks to provide a variational posterior for cataloging starfields, not the network archetecture per se. 
+The architecture consisted of several convolutional layers followed by a series of fully connected layers (Figure~\ref{fig:starnet_arch}). Convolutional layers are useful for localizing stars as they make the network invariant to shifts in stellar location. The convolutional kernel in the first layer is $3\times3$ pixels, roughly the full width at half maximum (FWHM) of the PSF. The optimization of the architecture is left for future work; our primary contribution in this paper is the application of neural networks to provide a variational posterior for cataloging starfields, not the network archetecture per se. 
 
 \begin{figure}[!tb]
     \centering
@@ -335,7 +282,6 @@ there are $2 \times (B + 2)$ parameters for its variational distribution. In tot
 % On the tiles, locations $\ell^{(k)}_{N, i}$ are parameterized to be in
 % $[0, s] \times [0, s]$. 
 
-% \jeff{What does it mean to decompose an inference problem from full images into tiles?}
 Because the output dimension is quadratic with $N_{max}$, factorizing the variational distribution spatially keeps the output dimension of the neural network manageable.
 On a crowded starfield with $H = W = 100$, the number of imaged stars is on the order of $10^3$.
 If the neural network were to return a variational distribution on the full $100\times 100$ image, the output dimension would be on the order of $(10^3)^2$. 
