@@ -137,3 +137,39 @@ The same principle applies to the Poisson prior parameter, $\mu$.
 % One difference is that \cite{Portillo_2017, Feder_2019} use an exponential prior on $N$. We use a Poisson prior and set $\mu = 0.15$, slightly denser than the $0.1$ stars per pixel 
 % brighter than 22mag found in the Hubble catalog of M2. Appendix TODO shows that our model is insensitive to the choice of Poisson mean. 
 
+
+
+\jeff{I suggest writing the parameters of these distributions as functions of the padded tile. For example, I'd write
+\[
+    \tilde N_{rt} \sim \text{Categorical}\left(h_\eta(\tilde{x}_{rt})\right).
+\]
+Here $h_\eta$ is a neural network. ($\eta$ are variational parameters).
+I didn't drop the $rt$ subscript above because I wanted to make the point that the same $h_\eta$ is applied to all tiles.
+}
+\bryan{
+I like this idea. I can introduce {\itshape padded} tiles,  
+\[
+\hat x^{(s,t)} = 
+    \{x_{hw} : R(s+1) + P \geq h > Rs - P \text{ and } 
+    R(t+1) + P\geq w > Rt - P\}.
+\]
+That is, we took the tiles from~\eqref{eq:tiles}
+and padded each tile with $P$ pixels. Note
+that tiles are disjoint, while padded tiles are not. 
+
+I want to say that a neural network 
+$h_\eta(\hat x^{(r,s)})$ that maps 
+to a common concatenated vector of 
+parameters describing the distributions. 
+
+We index into this giant vector to get individual distributional parameters. 
+I'm not sure how quite to denote this though ... for example to get the mean 
+parameter for the $(N,i)$-th location, we'd have $\mu_{\ell_{N, i}}(h_\eta(\hat x^{(r,t)}))$, which seems like too many indices.
+This is the problem with this section in general tbh ... more work will be needed on my part to figure out how to describe this. 
+}
+\jeff{I see your point, the notation is tricky. The main issue with $\mu_{\ell_{N, i}}(h_\eta(\hat x^{(r,t)}))$ is the double subscript. Also, it's not great have $\ell$ as a subscript of $\mu$ because $\ell$ is a random variable.
+}
+\jeff{
+Maybe  $\left[g_\eta(\tilde x_{rt})\right]_{N,i}$ could denote the location mean and variance for the $(N,i)$-th location?
+And $\left[h_\eta(\tilde x_{rt})\right]_{N,i}$ could denote the flux mean and variation?
+}

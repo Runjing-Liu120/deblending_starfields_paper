@@ -50,7 +50,7 @@ The reparameterized gradient includes gradient information $\nabla_z f_\eta(z)$ 
 
 However, if $z$ contains discrete components, there cannot not a differentiable mapping $h_\eta$, and the reparameterization trick will not apply. 
 
-In our case (Section~\ref{sec:estep_sleep_compare}), we used a combination of reparameterized and REINFORCE gradients. Let $N$ be the discrete component of $z$ (the number of stars) and $y$ be the continuous components (the locations and fluxes). Our variational distribution factorizes, so we write the expectation as 
+In our case (Section~\ref{sec:elbo_sleep_compare}), we used a combination of reparameterized and REINFORCE gradients. Let $N$ be the discrete component of $z$ (the number of stars) and $y$ be the continuous components (the locations and fluxes). Our variational distribution factorizes, so we write the expectation as 
 \begin{align}
  \Expect_{q_\eta(N)}\Expect_{q_\eta(y)}[f_\eta(N, y)]. 
 \end{align}
