@@ -12,7 +12,7 @@ for the gradient of the KL; the optimization is done with stochastic gradient de
 
 However, the reparameterization trick does not apply when a latent variable is discrete -- in our case, the number of stars $N$. The REINFORCE estimator~\cite{Williams1992reinforce}, which BBVI adapts, produces an unbiased stochastic gradient for both continuous and discrete latent variables. However, these gradients often suffer from high variance in practice, and so the resulting stochastic optimization is slow. See Appendix~\ref{sec:reparam_details} for details concerning both the reparameterization and REINFORCE estimators. 
 
-Stochastic gradients of the ELBO are difficult to compute because the integrating distribution depends on the optimization parameter, $\eta$. 
+They key difficulty in constructing stochastic gradients of the ELBO is that the integrating distribution depends on the optimization parameter $\eta$. 
 {\itshape The wake-sleep algorithm}, originally proposed by~\cite{Hinton1995wake_sleep}, replaces the 
 ELBO objective with 
 \begin{align}
@@ -20,8 +20,7 @@ ELBO objective with
     - \Expect_{x \sim p(x)}\Big[\KL(p(z | x) \| q_\eta(z | x)\Big]
     \label{eq:sleep_obj},
 \end{align}
-known as the {\itshape sleep objective}. 
-Section~\ref{sec:sleep_details} details a simple gradient estimator for the $\mathcal{L}_{sleep}$, without reparameterization or REINFORCE. 
+known as the {\itshape sleep objective}.  Section~\ref{sec:sleep_details} details a simple gradient estimator that does not require reparameterization or REINFORCE. 
 
 There are two key differences between the sleep objective~\eqref{eq:sleep_obj} and the ELBO~\eqref{eq:elbo}. 
 Recall maximizing the ELBO is equivalent to minimizing
@@ -33,7 +32,7 @@ As will be detailed in Section~\ref{sec:sleep_details}, the outer expectation ov
 The expectation over the data also gives different meaning to the sleep objective. The ELBO objective seeks $\eta$ to minimize the $\KL$ between $q_\eta(z | x)$ and $p(z | x)$ {\itshape for fixed, observed data $x$},
 in this case the $H\times W$ image. In contrast, the sleep objective seeks to minimize the $\KL$ {\itshape averaged over all possible data. } In other words, the target is no longer an approximate posterior for observed data, but rather an approximate posterior that is ``good on average" over all possible data.
 
-Moreover, ``possible data" is defined under the generative model from Section~\ref{sec:gen_model}. Therefore, it is imperative that the generative model $p(x)$ well-approximates the true underlying data-generating mechanism. 
+Moreover, ``possible data" is defined under the generative model from Section~\ref{sec:gen_model}. Therefore, it is imperative that the generative model $p(x)$ approximates the true underlying data-generating mechanism well. 
 
 Thus, in addition to the sleep phase, the wake-sleep algorithm also incorporates a ``wake-phase" to estimate model parameters.
 In our application, these model parameters include the PSF parameters $\pi$ and background parameters $\beta$. Let 
@@ -57,7 +56,7 @@ Putting the pieces together, the {\itshape wake-sleep} algorithm alternates betw
 \end{align} 
 for iterations $t = 1, ..., T$. 
 
-Stochastic gradients of the expectation in the wake-phase are are simple to compute. Because the integrating distribution does not depend on the optimization parameter $\phi$ in the wake phase, unbiased stochastic gradients are computed simply as 
+Stochastic gradients of the expectation in the wake-phase are are simple to compute. Because the integrating distribution does not depend on the optimization parameter $\phi$ in the wake phase, unbiased stochastic gradients are simply computed as 
 \begin{align}
     \nabla_\phi \log p_\phi(x, z) \quad \text{ for } z\sim q_\eta. 
     \label{eq:mstep_grad}

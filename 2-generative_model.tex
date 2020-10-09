@@ -1,4 +1,5 @@
-The majority of light sources can be classified as either stars or galaxies. Our focus is on applications where all sources are well-modeled as stars (examples include images of globular clusters and images of our own Milky Way). 
+Most astronomical light sources can be classified as either stars or galaxies. We focus on applications where all sources are well-modeled as stars (examples include images of globular clusters and images of our own Milky Way). 
+
 Stars radiate photons. 
 A telescope image records the number of photons that arrive at each pixel. Telescope images also consist of multiple filter bands, each absorbing photons within a specified range of wavelengths. 
 
@@ -15,11 +16,11 @@ $\mathcal{Z}$ is the collection of all possible catalogs of the form
     \label{eq:cat_formulation}
 \end{align}
 where the number of stars in the catalog
-is $N\in\mathbb{N}$;
-the location of the $i$th star is $\ell_i \in \Reals^2$; and 
+is $N\in\mathbb{N}$,
+the location of the $i$th star is $\ell_i \in \Reals^2$, and 
 the flux of the $i$th star in the $b$th band is $f_{i, b}\in\Reals^+$. 
 
-A Bayesian approach requires specification of a prior over catalog space $\mathcal{Z}$ and a likelihood for the observed images. Our generative model detailed below is similar to previous approaches in~\cite{Brewer_2013, Portillo_2017, Feder_2019, regier2019_celeste}. 
+A Bayesian approach requires specification of a prior over catalog space $\mathcal{Z}$ and a likelihood for the observed images. Our generative model, detailed below, is similar to previous approaches in~\cite{Brewer_2013, Portillo_2017, Feder_2019, regier2019_celeste}. 
 
 \subsection{The prior}
 The prior over $\mathcal{Z}$ is marked spatial Poisson process. First, draw the number of stars contained in the $H\times W$ image as
@@ -48,7 +49,7 @@ Given the flux in the first band $f_{i,1}$ and color $c_{i,b}$,
 the flux in band $b$ is  $f_{i,b} = f_{i,1} \times 10^{c_{i,b} / 2.5}$.
 
 \subsection{The likelihood}
-Let $x_{hw}^b$ denote the observed number of photoelectrons at pixel $(h,w)$ and band $b$. For each band, at every pixel, the expected number of photoelection arrivals is $\lambda^b_{hw}(z)$, a deterministic function of the catalog $z$. Motivated by the Poissonian nature of photon arrivals, the observations are drawn
+Let $x_{hw}^b$ denote the observed number of photoelectrons at pixel $(h,w)$ and band $b$. For each band, at every pixel, the expected number of photoelectron arrivals is $\lambda^b_{hw}(z)$, a deterministic function of the catalog $z$. Motivated by the Poissonian nature of photon arrivals, the observations are drawn
 \begin{align}
   x_{hw}^b | z \overset{ind}{\sim} \mathcal{N}(\lambda^b_{hw}, \lambda^b_{hw}),
   \quad 
@@ -83,5 +84,5 @@ The background parameters are specific to the band.
 The model parameters $\pi$ and $\beta$ are estimated by the SDSS software pipeline and reported along with the release of each SDSS image.
 Prior work on probabilistic cataloging relied 
 on these SDSS estimates and found the PSF estimates to be suboptimal in crowded starfields~\cite{Feder_2019}. 
-Alternatively, StarNet estimates these parameters jointly with the approximate posterior (Section~\ref{sec:wake_sleep}). 
+In contrast, StarNet estimates these parameters jointly with the approximate posterior (Section~\ref{sec:wake_sleep}). 
 
