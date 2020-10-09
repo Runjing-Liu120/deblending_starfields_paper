@@ -1,37 +1,44 @@
-Probabilistic modeling provides a framework to 
-produce catalogs with statistically principled uncertainties.
-We defined a statistical model, and uncertainties are captured by a Bayesian posterior over the space of all catalogs.
-In previous work on probabilistic cataloging, samples from the posterior were obtained using MCMC. 
-While samples eventually converge to the exact posterior in theory, the computational cost of MCMC prohibits its application to large-scale astronomical surveys. 
+StarNet is a cataloger that employs variational inference and outperforms both an MCMC-based probabilistic cataloger and a non-model-based approach. 
+Under the framework of probabilistic modeling, 
+StarNet produces catalogs where uncertainties are captured by a Bayesian posterior over the set of all catalogs.
+Importantly, unlike MCMC, StarNet is also able to scale probabilistic cataloging to process large astronomical surveys. 
 
-Our method instead produces an approximate Bayesian posterior using amortized variational inference, which has potential to scale Bayesian inference to large astronomical surveys.
-After a one time cost of training, the network efficiently returns approximate posteriors for batches of images.
-The neural network is trained using the wake-sleep algorithm which optimizes an objective different than the ELBO used in traditional variational inference. 
-In this problem of localizing stars, 
-the ELBO suffers from shallow optimum. 
-The wake-sleep algorithm produced approximate posteriors that were more reliably concentrated around the true catalogs. 
-\jeff{This paper reads a lot like a narrative still. The term ``we'' shows up several hundred times, often unnecessarily, for example. (Perhaps one third of these occurrences could be safely eliminated by reworking sentences.) It's preferable to focus the reader on the model/results rather than on our experiences.
-}
+The quality of StarNet detections are the result of optimizing the forward KL, a different objective than the one traditionally used in variational inference. 
+Optimizing the forward KL allowed the variational posterior to be fit on large amounts of {\itshape complete} data -- the image along with its latent catalog -- generated from the statistical model. 
+While labeled data from simulators have been used in other astronomy applications to train deep neural networks (see for example~\cite{Lanusse_2017_cmudeeplens, huang2019finding}), StarNet is the first training procedure to employ simulated data in a statistical framework: the neural network output has a clear interpretation as an approximate Bayesian posterior. 
+
+% Our method instead produces an approximate Bayesian posterior using amortized variational inference, which has potential to scale Bayesian inference to large astronomical surveys.
+% After a one time cost of training, the network efficiently returns approximate posteriors for batches of images.
+% The neural network is trained using the wake-sleep algorithm which optimizes an objective different than the ELBO used in traditional variational inference. 
+% In this problem of localizing stars, 
+% the ELBO suffers from shallow optimum. 
+% The wake-sleep algorithm produced approximate posteriors that were more reliably concentrated around the true catalogs. 
+% \jeff{This paper reads a lot like a narrative still. The term ``we'' shows up several hundred times, often unnecessarily, for example. (Perhaps one third of these occurrences could be safely eliminated by reworking sentences.) It's preferable to focus the reader on the model/results rather than on our experiences.
+% }
 % \jeff{Wake-sleep didn't really avoid the minima---it optimized a different objective entirely.}
 
-In addition to scalability, a key advantage our approach has over MCMC is the ability to estimate model parameters such as the PSF and sky background.
-While the current work focuses on PSF models, our method can be extended to more general sources such as galaxies.
-Each source would have an additional latent variable specifying whether it is a star or galaxy. If the source is a galaxy, it would have latent variables describing its shape in addition to its location, flux, and color variables. The statistical model would need to include likelihoods for galaxy sources in addition to the PSF model.
+The variational approach, unlike the MCMC approach, enables StarNet to estimate model parameters such as the PSF and sky background.
+While the current work focuses on PSF models, our methodology can be extended to more general sources such as galaxies.
+One promising direction is to use a neural network for the generative model and fit a deep generative model for galaxies~\cite{Regier2015ADG}. 
+Here, a neural network encodes a conditional likelihood of galaxy images given a low dimensional galaxy representation. 
+Using a neural network to encode a likelihood extends the flexibility of galaxy models beyond the simple models used here. 
 
-One promising direction is to also use neural networks in the wake phase and fit a deep generative model for galaxies~\cite{Regier2015ADG}. Here, a neural network encodes a conditional likelihood of galaxy images given source latent variables. Thus, neural networks would be trained in both the sleep and wake phase -- the sleep phase trains the approximate posterior while the wake phase trains the galaxy model. Using a neural network to encode a likelihood extends the flexibility of galaxy models beyond simple parametric forms. 
-
-Going even further, models for artifacts such as cosmic rays and bleed trails~\cite{Desai_2016} could be estimated in this framework.
+% Going even further, models for artifacts such as cosmic rays and bleed trails~\cite{Desai_2016} could be estimated in this framework.
 % \jeff{Readers likely won't know what cosmic rays and bleed trails are. Maybe cite something here that explains them, for the curious reader.}
-These artifacts produce artificial bright spots in an image which do not correspond to celestial objects.
-Currently, pixels corresponding to these objects need to be masked by a preprocessing routine before a catalog can be produced. 
-However, including these artifacts in a statistical model allows for the quantification of uncertainties in their detection. 
-Moreover, credible intervals for latent variables of interest can be computed by marginalizing out the uncertainties in artifact detection. 
-In this way, the uncertainties in artifact detection can be propagated to uncertainties for variables of interest. 
+% These artifacts produce artificial bright spots in an image which do not correspond to celestial objects.
+% Currently, pixels corresponding to these objects need to be masked by a preprocessing routine before a catalog can be produced. 
+% However, including these artifacts in a statistical model allows for the quantification of uncertainties in their detection. 
+% Moreover, credible intervals for latent variables of interest can be computed by marginalizing out the uncertainties in artifact detection. 
+% In this way, the uncertainties in artifact detection can be propagated to uncertainties for variables of interest. 
 
-Our ultimate goal is to provide a pipeline from raw images to catalogs to downstream analyses, where errors are appropriately quantified in each step. 
-The size of the data in upcoming surveys is immense by any standard. 
-Our method holds promise for scaling inference to meet the challenges of these future surveys. 
-Our statistical framework lays the foundation for future work in building flexible models to incorporate the cataloging of all celestial objects. 
+% Our ultimate goal is to provide a pipeline from raw images to catalogs to downstream analyses, where errors are appropriately quantified in each step. 
+
+The statistical framework in this work lays the foundation for building flexible models to incorporate the cataloging of all celestial objects. 
+Future astronomical surveys will only increase the size of the data. 
+As telescopes peer deeper into space, fields reveal more sources and images will become more crowded. 
+The uncertainties in crowded fields necessitate a probabilistic approach. 
+Our method holds the promise of providing  a scalable inference too that can meet the challenges of these future surveys. 
+
 
 % provides a statistical framework for 
 

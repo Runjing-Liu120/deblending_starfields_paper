@@ -173,3 +173,33 @@ This is the problem with this section in general tbh ... more work will be neede
 Maybe  $\left[g_\eta(\tilde x_{rt})\right]_{N,i}$ could denote the location mean and variance for the $(N,i)$-th location?
 And $\left[h_\eta(\tilde x_{rt})\right]_{N,i}$ could denote the flux mean and variation?
 }
+
+% Traditionally in variational inference, the posterior approximation 
+% $q_\eta$ depends on the data, the observed image $x$, implicitly, 
+% in that $\eta^*$ is chosen according to~\eqref{eq:kl_objective}.
+% In this case, $q_\eta(z | x)$ is usually written $q_\eta(z)$, suppressing the dependence on $x$
+
+% Astronomical surveys consist of many images $x_1, ..., x_n$. 
+% Assume $x_1, ..., x_n$ are drawn i.i.d.~from the same model 
+% (e.g.~the images were taken from a field with homogeneous source density). 
+% The optimization problem~\eqref{eq:kl_objective} must be solved for each $x_i$ to find an approximation to the posterior $p(z_i | x_i)$. 
+
+% Conversely, in {\itshape amortized} variational
+% inference~\cite{kingma2013autoencoding, rezende2014stochastic}, $q_\eta$ explicitly depends on the observed image $x$. A flexible, parameterized function, typically a neural network, maps the input image $x$ to
+% the parameters of a distribution on $z$. 
+% The variational parameters $\eta$ in~\eqref{eq:kl_objective} 
+% are the neural network weights. 
+% After the neural network is fitted using~\eqref{eq:kl_objective} with $x = x_1$,
+% each approximate posterior $q_\eta(z_i | x_i)$, $i = 2, ..., n$ 
+% can be evaluated with a single forward pass through the neural network. 
+% No additional run of an iterative optimization routine is needed. 
+
+
+
+Section~\ref{sec:sleep_details} shows that \eqref{eq:sleep_obj} is 
+equivalent to minimizing 
+\begin{align}
+\mathcal{L}_{sleep}(\eta) = \mathbb E_{p(x, z)}\Big[- \log q_\eta(z | x) \Big] + C
+\end{align}
+where $C$ is a constant independent of $\eta$. 
+The integrating distribution does not depend on $\eta$, and Section~\ref{sec:sleep_details} details a simple gradient estimator that does not require reparameterization or REINFORCE. 
