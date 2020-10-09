@@ -4,16 +4,15 @@ an image with light source density more typical of SDSS images.
 After ten minutes of sleep training, StarNet produced a catalog on the full $1489\times 2048$ image in $\approx2$ seconds. 
 For comparison, the projected runtime of PCAT on an image of this size is six days.  
 
-Since this region of the sky is more sparse, we tile the image into $50\times 50$ tiles; $N_{max}$ on the tiles is three. 
-Because this region of the sky also contains galaxies, only only the sleep phase was employed to fit StarNet; 
-otherwise the wake phase would optimize the PSF to explain both stars and galaxies. 
+Since this region of the sky is more sparse, we tile the image into $50\times 50$ tiles; $N_{max}$ on tiles is three. 
+Because this region of the sky also contains galaxies, only the sleep phase was employed to fit StarNet; 
+the wake phase would optimize the PSF to explain both stars and galaxies. 
 
 This image is contained in Stripe 82, a region of the sky repeatedly imaged by SDSS. Averaging images from different runs boosts the signal to noise ratio, resulting in a ``co-added" image. 
 The co-added image was analyzed with PHOTO to obtain a ground truth catalog. 
 
-The TPR of StarNet is comparable with the TPR of the PHOTO catalog on the original (non co-added) image (Figure~\ref{fig:sparse_field_tpr}). 
-We have false defections, namely galaxies, and thus 
-do not report the PPV. 
+The TPR of StarNet is comparable with the TPR of the PHOTO catalog on the original (non co-added) image (Figure~\ref{fig:sparse_field}). 
+StarNet accrues false defections, namely galaxies, and thus we cannot compare the PPV. 
 On some tiles, missed detections occur when a large galaxy within a tile causes all $N_{max}$ detections to be placed around the galaxy -- the remaining stars in the image go undetected. 
 Incorporating a galaxy model would boost our performance. 
 
@@ -23,15 +22,14 @@ Incorporating a galaxy model would boost our performance.
     \begin{subfigure}{0.45\textwidth}
         \includegraphics[width=\textwidth]{figures/sparse_field_detections.png}
         \subcaption{}
-        \label{fig:sparse_field_detect}
     \end{subfigure}
     \begin{subfigure}{0.54\textwidth}
         \includegraphics[width=\textwidth]{figures/sparse_field_tpr.png}
         \subcaption{}
-        \label{fig:sparse_field_tpr}
     \end{subfigure}
-    \caption{(a) Example detections on a sparse field. StarNet correctly identifies the star (blue). 
+    \caption{(Left) Example detections on a sparse field. StarNet correctly identifies the star (blue). 
     Without a galaxy model, StarNet also classifies galaxies (green) as one or multiple stars.
-    (b) The true positive rate of StarNet and PHOTO as a function of true magnitude. }
+    (Right) The true positive rate of StarNet and PHOTO as a function of true magnitude.
+    X-axis ticks correspond to true magnitude deciles, so each bin contains roughly the same number of stars.}
     \label{fig:sparse_field}
 \end{figure}
