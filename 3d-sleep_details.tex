@@ -1,9 +1,9 @@
 \subsection{Decomposing the sleep objective}
 \label{sec:sleep_details}
 In this section, we decompose the sleep objective in~\eqref{eq:sleep_obj} for closer study. 
-We take $\phi$ as fixed in this section, and drop the explicit dependence of $p$ on $\phi$.
+We take $\phi$ as fixed in this section and drop the explicit dependence of $p$ on $\phi$.
 
-First, observe that the optimizing the sleep objective does not require computing the intractable term $p(x)$:
+First, observe that optimizing the sleep objective does not require computing the intractable term $p(x)$:
 \begin{align}
 \argmax_\eta\; \mathcal{L}_{sleep}(\eta)
     & = \argmin_{\eta} \; \mathbb{E}_{x \sim p(x)}\Big[ \mathrm{KL}(p(z | x) \| q_\eta(z | x)\Big] \\
@@ -23,7 +23,7 @@ Here, ``complete data" refers to the image along with its catalog.
 This loss encourages the neural network to map images $x$ to a distribution $q_{\eta}(\cdot | x)$ that places large mass on the catalog $z$.
 
 Furthermore, recall that $q_\eta$ factorizes over image tiles. Having sampled the catalog $z$ 
-and the $H\times W$ image $x$ from $p(x,z)$, convert $z$ to its tile parameterization $(\tilde N^{(s,t)}, \tilde \ell^{(s,t)}, \tilde f^{(s,t)})_{s=1,t=1}^{(S,T)}$ as detailed in Section~\ref{sec:factorization}.
+and the $H\times W$ image $x$ from $p(x,z)$, convert $z$ to its tile parameterization $(\tilde N^{(s,t)}, \tilde \ell^{(s,t)}, \tilde f^{(s,t)})_{s=1,t=1}^{(S,T)}$, as detailed in Section~\ref{sec:factorization}.
 
 For a given image tile, the latent variables $\tilde N^{(s,t)}$, $\tilde \ell^{(s,t)}$, and $\tilde f^{(s,t)}$ also factorize in $q$, so 
 \begin{align}
@@ -42,7 +42,7 @@ Each term can be interpreted separately. On tile $(s,t)$, the number of stars $\
 the usual cross-entropy loss for a multi-class classification problem. 
 
 Recall that location coordinates are logit-normal and fluxes are log-normal in the last two terms in~\eqref{eq:sleep_loss_decomp}. 
-For a given index $(n,i)$ let $y_{n,i}$ generically denote either the 
+For a given index $(n,i)$, let $y_{n,i}$ generically denote either the 
 logit-location or log-flux for that star, 
 and let $\mu_{n,i}$ and $\sigma_{n,i}$ generically denote the mean and standard deviation of its Gaussian variational distribution. Thus,
 \begin{align}

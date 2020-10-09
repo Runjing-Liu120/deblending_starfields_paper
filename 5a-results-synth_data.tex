@@ -42,17 +42,17 @@ However, for two of the six randomly initialized restarts,
 the optimization found local optima where the ELBO is lower than other restarts. 
 
 In contrast, optimizing the sleep objective consistently converged to a similar ELBO across all restarts and appeared to avoid shallow local optima (Figure~\ref{fig:optim_path}c).
-Recall that sleep phase optimization does not directly optimize the test ELBO. However, the test ELBO increases nonetheless as the variational posterior better approximates the true posterior as the optimization proceeds. 
+Recall that sleep phase optimization does not directly optimize the test ELBO. However, the test ELBO increases nonetheless because the variational posterior better approximates the true posterior as the optimization proceeds. 
 
-Shallow local optima in the ELBO results in unreliable catalogs. 
+Shallow local optima in the ELBO result in unreliable catalogs. 
 The bottom row of Figure~\ref{fig:optim_path} displays the estimated locations, defined by the mode of the fitted variational distribution. 
-The bottom left shows these locations after getting stuck in a shallow optimum. 
-In this local optimum, the upper left tile was estimated to have two stars; however, both estimated stars were placed on the same star. 
+The bottom left shows these locations after converging to a shallow local optimum. 
+In this local optimum, the upper left tile was estimated to have two stars; however, both estimated stars were placed at the same location.
 For correct detections, one of the locations should be placed on the second star.
-However, to move one estimated location to the second star, the optimization path must traverse a region where the log-likelihood is lower than the current configuration. 
+However, in order to move one of the estimated locations to the second star, the optimization path must traverse a region where the log-likelihood is lower than the current configuration. 
 The displayed configuration is a local optima where the gradient with respect to its locations is approximately zero.
-In contrast, the sleep phase optimization consistently placed its mode around the four true stars. 
-An example of correct detections after sleep phase optimization is shown in the bottom right of~Figure~\ref{fig:optim_path}.
+In contrast, the sleep-phase variational distribution consistently placed its mode around the four true stars. 
+An example of correct detection after sleep-phase optimization is shown in the bottom right image of~Figure~\ref{fig:optim_path}.
 
 \begin{figure}[!htb]
     \centering
@@ -78,7 +78,7 @@ Recall that locations are parameterized between 0 and 1, and the neural network 
 When $\mu_\ell$ is far from the correct location (in logit space), the gradient of the ELBO with respect to $\mu_\ell$ vanishes. 
 To see this, observe that the PSF is nearly zero everywhere except for a few pixels around its center. Therefore, a small shift in estimated location $\mu_\ell$ does not significantly change the likelihood unless the estimated location is within a ``PSF radius" of the correct location.
 On the other hand, the sleep objective is quadratic in the logit-location estimate $\mu_\ell$ (see Equation~\ref{eq:gaussian_sleep_loss}).
-Thus, the further the estimated location from the correct location (in logit space), the larger the gradient. The gradient does not vanish in the sleep objective. 
+Thus, the further the estimated location is from the correct location (in logit space), the larger the gradient. The gradient does not vanish in the sleep objective. 
 
 \begin{figure}[!htb]
     \centering
@@ -95,12 +95,12 @@ Thus, the further the estimated location from the correct location (in logit spa
     % \vspace{-3em}
     \caption{An illustration of vanishing gradients when the estimated under the variational distribution (red) is far from the correct location (blue). 
     $\delta$ denotes the difference in logit-locations. 
-    For large $\delta$, the ELBO objective is flat in the estimated location, and hence gradients with respect to location is nearly zero.
+    For large $\delta$, the ELBO objective is flat in the estimated location, hence the gradients with respect to location are nearly zero.
     In contrast, the sleep objective is quadratic in the estimated location, and the gradient does not vanish. }
     \label{fig:gradzero_cartoon}
 \end{figure}
 
-Also, note that low-variance gradients of the ELBO for this simple example were constructed by analytically integrating out $N$. Only then could the reparameterization trick could be applied to the ELBO as the remaining latent variables are continuous. 
+Also, note that low-variance gradients of the ELBO for this simple example were constructed by analytically integrating out $N$. Only then could the reparameterization trick be applied to the ELBO as the remaining latent variables are continuous. 
 In this example, the variational distribution has support over only 0, 1, or 2 stars for each tile. 
 Since the variational distribution factorizes over the four tiles, integrating $N$ is a summation of $3^4 = 81$ terms.
 On larger images with more tiles, analytically integrating $N$ would be computationally infeasible, 
@@ -109,7 +109,7 @@ and the simple reparameterization trick would not apply.
 Figure~\ref{fig:sim_data100x100} displays our results on a larger example: a simulated $100\times 100$ image with fifty stars. 
 The tiles again consisted of $10\times 10$ pixel regions. 
 Optimizing the sleep objective produced nearly perfect location estimates; 
-optimizing the ELBO appears to be hindered by regions with little gradient information and does not accurately produce accurate location estimates. 
+optimizing the ELBO appears to be hindered by regions with little gradient information and does not produce accurate location estimates. 
 
 \begin{figure}[!htb]
     \centering

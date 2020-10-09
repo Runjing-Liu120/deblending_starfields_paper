@@ -79,22 +79,26 @@
 
 \bigskip
 \begin{abstract}
-A key step in the construction of astronomical catalogs is deblending, the task of identifying and characterizing each imaged light source.
-In crowded fields, sources often cannot be unambiguously separated. 
-Probabilistic cataloging defines a statistical model
-on the raw telescope images and captures the uncertainties in catalog construction by the Bayesian posterior.
-However, the computational cost of MCMC is prohibitive for the terabytes of data collected by modern astronomical surveys. 
-In this work, we propose a method based on amortized variational inference.
-A neural network is trained to produce an approximate posterior on catalogs using the wake-sleep algorithm. 
-Like variational EM, this algorithm finds approximate posteriors while estimating model parameters such as the point spread function. 
-However, the ELBO objective in the E-step of variational EM is replaced by an alternative KL divergence.
-In this application, the wake-sleep algorithm is better able to avoid local minima. 
-Our algorithm is scalable to large astronomical surveys and provides a statistical framework producing an cataloging pipeline whereby uncertainties are fully propagated from raw image to catalog to downstream analysis. 
+A key step in constructing catalogs from astronomical surveys is deblending, the task of identifying and characterizing each imaged light source.
+In crowded star fields, light sources often cannot be unambiguously separated. 
+Probabilistic cataloging defines a joint distribution on raw telescope images and their catalogs; ambiguities in catalog construction 
+are captured by the Bayesian posterior.
+However, current probabilistic cataloging methods typically employ MCMC (Markov chain Monte Carlo),
+whose computational cost is prohibitive for the terabytes of data collected by modern astronomical surveys. 
+As an alternative, we propose StarNet, a method employing amortized variational inference.
+StarNet fits an approximate posterior using the wake-sleep algorithm. 
+Similar to variational EM (expectation maximization), the wake-sleep algorithm alternates between fitting approximate posteriors and estimating model parameters, such as the point spread function. 
+However, the wake-sleep algorithm 
+fits the approximate posterior by optimizing the  forward KL (Kullback-Leibler) divergence instead of the traditionally used reverse KL divergence.
+We find that the the wake-sleep algorithm produces more reliable catalogs by avoiding shallow local minima in the reverse KL. 
+StarNet outperforms existing cataloging routines on the crowded starfield M2. In addition, StarNet is $10^5$ times faster than MCMC and exhibits the scaling characteristics necessary for inference on large astronomical surveys. 
+
+% and provides a statistical framework producing a cataloging pipeline whereby uncertainties are fully propagated from raw image to catalog to downstream analysis. 
 
 \end{abstract}
 
 \noindent%
-{\it Keywords:}  Bayesian methods, deep generative model, reweighted wake-sleep, approximate inference, astronomical surveys, cataloging. 
+{\it Keywords:}  Bayesian methods, amortized inference, wake-sleep algorithm, approximate inference, astronomical surveys, cataloging. 
 \vfill
 
 \newpage
@@ -128,11 +132,10 @@ Our algorithm is scalable to large astronomical surveys and provides a statistic
 \section{Results on M2}
 \input{5c-results-m2}
 
-\section{Discussion}
+\section{Conclusion}
 \label{sec:discussion}
 \input{6-discussion}
 
-TODO fix issues in references. 
 \bibliographystyle{unsrt}
 \bibliography{bibliography}
 
