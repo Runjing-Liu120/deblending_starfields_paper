@@ -52,8 +52,9 @@
 \if1\blind
 {
   \title{\bf Variational Inference for Deblending Crowded Starfields}
-  \author{Runjing Liu\thanks{
-    The authors gratefully acknowledge \textit{please remember to list all relevant funding sources in the unblinded version}. NSF graduate research fellowship etc ... }\hspace{.2cm}\\
+  \author{Runjing Liu
+  %\thanks{The authors gratefully acknowledge \textit{please remember to list all relevant funding sources in the unblinded version}. NSF graduate research fellowship etc ... }
+  \hspace{.2cm}\\
     Department of Statistics, University of California, Berkeley\\
     \\
     Jon D. McAuliffe \\
@@ -79,20 +80,21 @@
 
 \bigskip
 \begin{abstract}
-A key step in constructing catalogs from astronomical surveys is deblending, the task of identifying and characterizing each imaged light source.
-In crowded star fields, light sources often cannot be unambiguously separated. 
-Probabilistic cataloging defines a joint distribution on raw telescope images and their catalogs; ambiguities in catalog construction 
-are captured by the Bayesian posterior.
-However, current probabilistic cataloging methods typically employ MCMC (Markov chain Monte Carlo),
-whose computational cost is prohibitive for the terabytes of data collected by modern astronomical surveys. 
-As an alternative, we propose StarNet, a method employing amortized variational inference.
-StarNet fits an approximate posterior using the wake-sleep algorithm. 
-Similar to variational EM (expectation maximization), the wake-sleep algorithm alternates between fitting approximate posteriors and estimating model parameters, such as the point spread function. 
-However, the wake-sleep algorithm 
-fits the approximate posterior by optimizing the  forward KL (Kullback-Leibler) divergence instead of the traditionally used reverse KL divergence.
-We find that the the wake-sleep algorithm produces more reliable catalogs by avoiding shallow local minima in the reverse KL. 
-StarNet outperforms existing cataloging routines on the crowded starfield M2. In addition, StarNet is $10^5$ times faster than MCMC and exhibits the scaling characteristics necessary for inference on large astronomical surveys. 
+In the image data collected by astronomical surveys, stars and galaxies often overlap.
+Deblending is the task of distinguishing and characterizing individual light sources.
+We propose a new, fully Bayesian method to deblend astronomical images of crowded star fields called StarNet.
+StarNet leverages recent advances in variational inference, including amortized variational distributions and the Wake-Sleep algorithm.
+We illustrate that Wake-Sleep, an algorithm which minimizes forward KL divergence, has significant benefits compared to traditional variational inference, which minimizes a reverse KL divergence.
+In our experiments with SDSS images of the M2 globular cluster, StarNet is substantially more accurate than two competing methods: Probablistic Cataloging (PCAT), a method that uses MCMC for inference, and a second method based on the traditional software pipeline used in deblending (DAOPHOT).
+In addition, StarNet is as much as $100,000$ times faster than PCAT, exhibiting the scaling characteristics necessary to perform fully Bayesian inference on modern astronomical surveys.
 
+%Probabilistic cataloging defines a joint distribution on raw telescope images and their catalogs; ambiguities in catalog construction are captured by the Bayesian posterior.
+% However, current probabilistic cataloging methods typically employ MCMC (Markov chain Monte Carlo), whose computational cost is prohibitive for the terabytes of data collected by modern astronomical surveys. 
+%As an alternative, we propose StarNet, a method employing amortized variational inference.
+%StarNet fits an approximate posterior using the wake-sleep algorithm. 
+%Similar to variational EM (expectation maximization), the wake-sleep algorithm alternates between fitting approximate posteriors and estimating model parameters, such as the point spread function. 
+%However, the wake-sleep algorithm  fits the approximate posterior by optimizing the  forward KL (Kullback-Leibler) divergence instead of the traditionally used reverse KL divergence.
+% We find that the the wake-sleep algorithm produces more reliable catalogs by avoiding shallow local minima in the reverse KL. StarNet outperforms existing cataloging routines on the crowded starfield M2. In addition,  
 % and provides a statistical framework producing a cataloging pipeline whereby uncertainties are fully propagated from raw image to catalog to downstream analysis. 
 
 \end{abstract}
@@ -117,24 +119,24 @@ StarNet outperforms existing cataloging routines on the crowded starfield M2. In
 
 \section{The wake-sleep algorithm}
 \label{sec:wake_sleep}
-\input{3b-wake_sleep}
-\input{3c-variational_em}
-\input{3d-sleep_details}
+\input{4a-wake_sleep}
+\input{4b-variational_em}
+\input{4c-sleep_details}
 % NO LONGER NEEDED
 % \section{Related work}
 % \label{sec:related_work}
 % \input{4-related_work}
 
 \section{Empirical comparison of ELBO optimization and sleep optimization}
-\input{5a-results-synth_data}
+\input{5-results-synth_data}
 % \input{5b-results-deblending}
 
-\section{Results on M2}
-\input{5c-results-m2}
+\section{Results on the M2 globular cluster}
+\input{6-results-m2}
 
 \section{Conclusion}
 \label{sec:discussion}
-\input{6-discussion}
+\input{7-discussion}
 
 \bibliographystyle{unsrt}
 \bibliography{bibliography}

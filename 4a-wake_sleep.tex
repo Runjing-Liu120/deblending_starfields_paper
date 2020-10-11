@@ -45,7 +45,7 @@ The ELBO is a lower bound
 $\log p_\phi(x)$; it is equal to $\log p_\phi(x)$ when $q_\eta(z | x)$ 
 = $p_\phi(z | x)$. 
 
-Putting the pieces together, the {\itshape wake-sleep} algorithm alternates between the two objectives: 
+The {\itshape wake-sleep} algorithm alternates between the two objectives: 
 \begin{align}
     \text{{\bf Sleep phase: }} & 
     \eta_{t} = \argmax_{\eta} -\Expect_{x \sim p_\phi(x)}\Big[\KL(p_{\phi_{t-1}}(z | x) \| q_\eta(z | x)\Big]
@@ -56,7 +56,7 @@ Putting the pieces together, the {\itshape wake-sleep} algorithm alternates betw
 \end{align} 
 for iterations $t = 1, ..., T$. 
 
-Stochastic gradients of the expectation in the wake-phase are are simple to compute. Because the integrating distribution does not depend on the optimization parameter $\phi$ in the wake phase, unbiased stochastic gradients are simply computed as 
+Stochastic gradients of the expectation in the wake-phase are simple to compute. Because the integrating distribution does not depend on the optimization parameter $\phi$ in the wake phase, unbiased stochastic gradients are simply computed as 
 \begin{align}
     \nabla_\phi \log p_\phi(x, z) \quad \text{ for } z\sim q_\eta. 
     \label{eq:mstep_grad}

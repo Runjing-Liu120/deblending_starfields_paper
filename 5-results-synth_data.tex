@@ -5,9 +5,11 @@
 
 \label{sec:elbo_sleep_compare}
 
-A simple example demonstrates that there exist shallow local optima in the ELBO~\eqref{eq:elbo} which result in unreliable catalogs. 
-For this example, fitting the variational posterior using the sleep objective~\eqref{eq:sleep_obj} avoids shallow optima. 
-Because the data were simulated with known PSF and background, the wake phase is not needed. 
+A simple example demonstrates that there exist shallow local optima in the ELBO
+where the fitted approximate posterior is far in KL divergence from the true posterior. 
+These local optima result in unreliable catalogs. 
+The sleep objective, by taking advantage of  complete data, appears to better avoid these local optima. 
+For this example, the data were simulated with known PSF and background, and the wake phase is not needed. 
 
 The simulated $20\times20$ single-band image $x_{test}$ is shown in Figure~\ref{fig:toy_example}.
 The image has four stars, each with the same flux. 
@@ -21,7 +23,7 @@ The image has four stars, each with the same flux.
     \label{fig:toy_example}
 \end{figure}
 
-We compare three approaches. The first two approaches directly optimize the test ELBO, 
+We compare three approaches to deblending. The first two approaches directly optimize the test ELBO, 
 \begin{align}
 \mathcal{L}_{elbo}(\eta; x_{test}) = \Expect_{q_{\eta}(z | x_{test})}\Big[\log p(x_{test}, z) - \log q_{\eta}(z | x_{test})\Big],
 \label{eq:elbo_on_test}

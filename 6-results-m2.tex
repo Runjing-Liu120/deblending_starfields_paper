@@ -1,5 +1,5 @@
 \label{sec:results_on_m2}
-We tested StarNet on an SDSS image of the M2 globular cluster, a crowded starfield found in field 136 of camera column 2 in run 2583.
+We validated StarNet using an SDSS image of the Messier 2 (M2) globular cluster, a crowded starfield found in field 136 of camera column 2 in run 2583.
 M2 was also imaged in the ACS Globular Cluster Survey~\cite{Sarajedini_2007}
 using the Hubble Space telescope (HST),
 which has approximately 20 times the angular resolution and 30 times the exposure of the Sloan telescope. The reported catalog from this Hubble survey serves as the ground truth for validating our results.
@@ -33,7 +33,8 @@ The speed at inference time (which excludes training time) gives StarNet the sca
 A single SDSS image is $1489 \times 2048$ pixels. 
 Based on the reported 30-minute runtime of PCAT for a $100\times100$ subimage, we project that
 the runtime to process the full image would be $30\text{ min} \times 14 \times 20 = 8400$ minutes, or almost six days. 
-The SDSS survey consists of nearly one million images. Scaling MCMC to the entire survey would be infeasible. 
+The SDSS survey consists of nearly one million images. Scaling MCMC to the entire SDSS survey would be infeasible.
+The upcoming LSST survey will be 300 times larger than SDSS.
 
 In contrast, if we assume the PSF and background are homogeneous 
 across the full SDSS image (which PCAT also assumes), we can 

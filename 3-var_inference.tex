@@ -2,7 +2,7 @@ The central quantity in Bayesian statistics is the posterior distribution $p(z|x
 However, in most
 nontrivial probabilistic models, including our own, the posterior distribution is intractable to calculate.
 The calculation of the posterior requires computing the marginal likelihood, $p(x)$, which involves integrating over latent variable $z$. 
-In our model, the latent variable space is high-dimensional: it is the set of all catalogs. Therefore, approximate methods such as MCMC~\cite{Portillo_2017} or variational inference~\cite{Blei_2017_vi_review, Jordan_intro_vi, Wainwrite_graph_models_vi} are required. 
+In our model, the latent variable space is high dimensional: it is the set of all catalogs. Approximate methods such as MCMC~\cite{Portillo_2017} and variational inference~\cite{Blei_2017_vi_review, Jordan_intro_vi, Wainwrite_graph_models_vi} are required. 
 
 Variational inference posits a family of distributions $\mathcal{Q}$ and seeks
 the distribution $q^*\in \mathcal{Q}$ that is closest to the posterior
@@ -14,7 +14,7 @@ We index the distributions in $\mathcal{Q}$ by a real-valued vector $\eta$, then
    \label{eq:kl_objective}
 \end{align}
 
-Minimizing the $\KL$ divergence in~\eqref{eq:kl_objective} is equivalent to maximizing the evidence lower bound, or ELBO~\cite{Blei_2017_vi_review},
+Minimizing the $\KL$ divergence in~\eqref{eq:kl_objective} is equivalent to maximizing the evidence lower bound (ELBO)~\cite{Blei_2017_vi_review}:
 \begin{align}
     \mathcal{L}_{elbo}(\eta) = 
     \Expect_{q_\eta(z | x)}\Big[\log p(x, z) - \log q_\eta(z | x)\Big].
@@ -30,14 +30,14 @@ $q_\eta$ depends on the data $x$ implicitly,
 in that $\eta^*$ is chosen according to~\eqref{eq:kl_objective}.
 In this case, $q_\eta(z | x)$ is usually written $q_\eta(z)$, suppressing the dependence on $x$.
 
-Note that the generative model in Section~\ref{sec:gen_model} does not assume any hierarchical structure over replicated  images. Therefore, given a new image $x^{new}$, the posterior factorizes; in other words,
+The generative model in Section~\ref{sec:gen_model} does not assume any hierarchical structure over replicated  images. Therefore, given a new image $x^{new}$, the posterior factorizes; in other words,
 $p(z^{new}, z | x^{new}, x) = p(z^{new} | x^{new}) p(z | x)$. 
 To find a variational  approximation to the posterior $p(z^{new} | x^{new})$, the optimization problem~\eqref{eq:kl_objective} must be solved again with $x = x^{new}$.
 Even in models with hierarchical structure, the variational distribution will generally need to be updated via optimization for every new observed data point. 
 
 On the other hand, 
 in {\itshape amortized} variational
-inference~\cite{kingma2013autoencoding, rezende2014stochastic} $q_\eta$ explicitly depends on data. 
+inference~\cite{kingma2013autoencoding, rezende2014stochastic}, $q_\eta$ explicitly depends on data. 
 A flexible, parameterized function maps data, in this case an observed image $x$, to the parameters of a variational distribution on the latent variable $z$. 
 Typically, the function is a neural network, in which case the variational parameters $\eta$ are the neural network weights. 
 After the neural network is fitted with~\eqref{eq:kl_objective} using observed data $x$, the approximate posterior $q_\eta(z^{new} | x^{new})$ for a new data point 

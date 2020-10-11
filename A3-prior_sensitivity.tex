@@ -1,4 +1,9 @@
-we look at sensitivity to the Poisson mean $\mu$ and the power-law slope $\alpha$. 
+We examine the sensitivity of StarNet to the Poisson mean $\mu$ and the power-law slope $\alpha$ on the image M2. 
+The model appears reasonably robust. 
+As expected, the TPR increases as $\mu$ increases while the PPV decreases  -- the prior encourages more detections (Figure~\ref{fig:mu_sensitivity}). 
+
+As $\alpha$ increases, StarNet estimates more dim sources. While the TPR is similar across $\alpha$ values, the PPV suffers at $\alpha = 0.75$ (Figure~\ref{figalpha_sensitivity}).
+The stronger prior on dimmer stars also manifests in the flux distribution of the resulting StarNet catalog (Figure~\ref{fig:cdf_sensitivity}). 
 
 \begin{figure}[ht]
 \begin{subfigure}{\textwidth}
@@ -20,6 +25,7 @@ we look at sensitivity to the Poisson mean $\mu$ and the power-law slope $\alpha
 \end{center}
 \end{subfigure}\hfill
 \caption{Sensitivity of summary statistics to Poisson mean parameter on number of stars. }
+\label{fig:mu_sensitivity}
 \end{figure}
 
 \begin{figure}[ht]
@@ -42,6 +48,7 @@ we look at sensitivity to the Poisson mean $\mu$ and the power-law slope $\alpha
 \end{center}
 \end{subfigure}\hfill
 \caption{Sensitivity of summary statistics to flux prior parameter $\alpha$. }
+\label{fig:alpha_sensitivity}
 \end{figure}
 
 \begin{figure}

@@ -1,11 +1,11 @@
-StarNet is a cataloger that employs variational inference and outperforms both an MCMC-based probabilistic cataloger and a non-model-based approach. 
+StarNet employs variational inference and outperforms both an MCMC-based probabilistic cataloger and a non-model-based approach in terms accuracy and runtime. 
 Under the framework of probabilistic modeling, 
 StarNet produces catalogs where uncertainties are captured by a Bayesian posterior over the set of all catalogs.
 Importantly, unlike MCMC, StarNet is also able to scale probabilistic cataloging to process large astronomical surveys. 
 
 The quality of StarNet detections are the result of optimizing the forward KL, a different objective than the one traditionally used in variational inference. 
 Optimizing the forward KL allowed the variational posterior to be fit on large amounts of {\itshape complete} data -- the image along with its latent catalog -- generated from the statistical model. 
-While labeled data from simulators have been used in other astronomy applications to train deep neural networks (see for example~\cite{Lanusse_2017_cmudeeplens, huang2019finding}), StarNet is the first training procedure to employ simulated data in a statistical framework: the neural network output has a clear interpretation as an approximate Bayesian posterior. 
+While labeled data from simulators have been used in other astronomy applications to train deep neural networks (see for example~\cite{Lanusse_2017_cmudeeplens, huang2019finding}), StarNet is the first training procedure to employ simulated data in a statistical framework: the neural network specifies an approximate Bayesian posterior. 
 
 % Our method instead produces an approximate Bayesian posterior using amortized variational inference, which has potential to scale Bayesian inference to large astronomical surveys.
 % After a one time cost of training, the network efficiently returns approximate posteriors for batches of images.
@@ -17,7 +17,7 @@ While labeled data from simulators have been used in other astronomy application
 % }
 % \jeff{Wake-sleep didn't really avoid the minima---it optimized a different objective entirely.}
 
-The variational approach, unlike the MCMC approach, enables StarNet to estimate model parameters such as the PSF and sky background.
+This variational approach, unlike previous MCMC approaches, enables StarNet to estimate model parameters such as the PSF and sky background.
 While the current work focuses on PSF models, our methodology can be extended to more general sources such as galaxies.
 One promising direction is to use a neural network for the generative model and fit a deep generative model for galaxies~\cite{Regier2015ADG}. 
 Here, a neural network encodes a conditional likelihood of galaxy images given a low dimensional galaxy representation. 
@@ -33,11 +33,11 @@ Using a neural network to encode a likelihood extends the flexibility of galaxy 
 
 % Our ultimate goal is to provide a pipeline from raw images to catalogs to downstream analyses, where errors are appropriately quantified in each step. 
 
-The statistical framework in this work lays the foundation for building flexible models to incorporate the cataloging of all celestial objects. 
-Future astronomical surveys will only increase the size of the data. 
+The statistical framework in this research lays the foundation for building flexible models to incorporate the cataloging of all celestial objects. 
+Future astronomical surveys will only expand in terms of the data volume they are able to amass. 
 As telescopes peer deeper into space, fields reveal more sources and images will become more crowded. 
 The uncertainties in crowded fields necessitate a probabilistic approach. 
-Our method holds the promise of providing  a scalable inference too that can meet the challenges of these future surveys. 
+Our method holds the promise of providing  a scalable inference tool that can meet the challenges of these future surveys. 
 
 
 % provides a statistical framework for 

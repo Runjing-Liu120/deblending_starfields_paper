@@ -59,19 +59,14 @@ array of latent variables $\tilde \ell^{(s,t)}$ and $\tilde f^{(s,t)}$ needs to 
     -\log q_\eta(y | x) = -\sum_{i = 1}^{\tilde N^{(s,t)}} \log q_\eta(y_{\tilde N^{(s,t)},i} | x). 
 \end{align}
 
-We also give an interpretation of~\eqref{eq:gaussian_sleep_loss}: 
-$y_{n,i}$ is the true (simulated) latent variable in the catalog; 
+To interpret~\eqref{eq:gaussian_sleep_loss}, observe that
+$y_{n,i}$ is the true (simulated) latent variable in the catalog and
 $\mu_{n,i}$ is the predicted value for that latent variable from the neural network. 
 $\sigma_{n,i}$ is also outputted by the neural network, representing uncertainty -- the second term encourages small uncertainties, but this is 
 balanced by the scaling of the error $(y_{n,i} - \mu_{n,i})^2$ in the first term. 
 
-This decomposition shows that the sleep objective results in a supervised learning problem on complete data simulated from our generative model: the objective function for number of stars is the usual cross-entropy loss for classification while the objective function for log-fluxes and logit-locations are L2 losses in the mean parameters. 
+The losses in~\eqref{eq:cross_entropy_loss} and~\eqref{eq:gaussian_sleep_loss} show that the sleep objective results in a supervised learning problem on complete data simulated from our generative model: the objective function for number of stars is the usual cross-entropy loss for classification while the objective function for log-fluxes and logit-locations are $L_2$ losses in the mean parameters. 
 
-In Section~\ref{sec:elbo_sleep_compare}, 
-we compare the variational distributions $q_\eta$ 
-obtained by optimizing the ELBO against the $q_\eta$ obtained by optimizing the sleep objective.
-In the problem of localizing stars,
-the ELBO objective suffers from poor local optima where the variational distribution is far from the true posterior in KL divergence; the sleep objective, by taking advantage complete data, appears to better avoid these local optima. 
 
 % In Section~\ref{sec:estep_sleep_compare}, we will see the benefits of using complete data and optimizing $q_\eta$ using the losses~\eqref{eq:cross_entropy_loss} and \eqref{eq:gaussian_sleep_loss}  rather than the traditional ELBO. 
 
