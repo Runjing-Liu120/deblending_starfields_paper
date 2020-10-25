@@ -38,6 +38,7 @@
 \newcommand{\jeff}[2][]{\todo[inline,color=blue!30, #1]{#2 \mbox{--Jeff}}}
 \newcommand{\bryan}[2][]{\todo[inline,color=green!30, #1]{#2 \mbox{--Bryan}}}
  
+\date{\vspace{-10px}}
 
 \begin{document}
 
@@ -51,7 +52,8 @@
 % Reweighted Wake-Sleep for Deblending Crowded Starfields
 \if1\blind
 {
-  \title{\bf Variational Inference for Deblending Crowded Starfields}
+  \title{  \vspace{-30px}
+\bf Variational Inference for Deblending Crowded Starfields}
   \author{Runjing Liu
   %\thanks{The authors gratefully acknowledge \textit{please remember to list all relevant funding sources in the unblinded version}. NSF graduate research fellowship etc ... }
   \hspace{.2cm}\\
@@ -81,10 +83,10 @@
 \bigskip
 \begin{abstract}
 In the image data collected by astronomical surveys, stars and galaxies often overlap.
-Deblending is the task of distinguishing and characterizing individual light sources.
+Deblending is the task of distinguishing and characterizing individual light sources from survey images.
 We propose a new, fully Bayesian method to deblend astronomical images of crowded star fields called StarNet.
 StarNet leverages recent advances in variational inference, including amortized variational distributions and the Wake-Sleep algorithm.
-We illustrate that Wake-Sleep, an algorithm which minimizes forward KL divergence, has significant benefits compared to traditional variational inference, which minimizes a reverse KL divergence.
+Wake-Sleep, which minimizes forward KL divergence, has significant benefits compared to traditional variational inference, which minimizes a reverse KL divergence.
 In our experiments with SDSS images of the M2 globular cluster, StarNet is substantially more accurate than two competing methods: Probablistic Cataloging (PCAT), a method that uses MCMC for inference, and a second method based on the traditional software pipeline used in deblending (DAOPHOT).
 In addition, StarNet is as much as $100,000$ times faster than PCAT, exhibiting the scaling characteristics necessary to perform fully Bayesian inference on modern astronomical surveys.
 

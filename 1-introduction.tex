@@ -4,7 +4,7 @@ Typically, astronomical catalogs are constructed from this image data.
 Catalogs label light sources as stars, galaxies, or other objects; 
 they also list the physical characteristics of light sources such as flux, color, and morphology. 
 These catalogs are the starting point for many downstream analyses.
-For example, the Argonaut map used a catalog of stellar fluxes and colors to construct the 3D distribution of interstellar dust~\cite{Green_2019_argonaut}. 
+For example, Bayestar used a catalog of stellar fluxes and colors to construct the 3D distribution of interstellar dust~\cite{Green_2019_argonaut}. 
 Catalogs of galaxy morphologies have been used to validate theoretical models of dark matter and dark energy~\cite{Eisenstein_2005_darkmatter}. 
 
 Catalog construction is straightforward when light sources are well separated. Each light source produces a single peak intensity on the image, and characteristics of the light source such as flux can be estimated by analyzing photon counts in the surrounding pixels. 
@@ -63,9 +63,9 @@ or the ``death" of existing sources in the Markov chain.
 The computational cost of MCMC for this model is prohibitive for large-scale astronomical surveys. 
 Early implementations of PCAT required a day to process a $100\times 100$ pixel image of the M2 globular cluster imaged by SDSS~\cite{Portillo_2017}. 
 More recent implementations running inexact MCMC brought the runtime down to 30  minutes~\cite{Feder_2019}.  
-In any case, a $100\times 100$ image covers only a $0.3\times0.3$ arcsecond patch of the sky.
-For comparison, in one night, SDSS scans a region on the order of $10 \times 1000$ arcminutes. 
-Extrapolating the 30 minute runtime, PCAT would take about two months to process the same amount of data.
+In any case, a $100\times 100$ image covers only a $0.66 \times 0.66$ arcminute patch of the sky.
+For comparison, in one night, SDSS scans a region on the order of $100 \times 1000$ arcminutes. 
+Extrapolating the 30 minute runtime, PCAT would take about three months to process the same amount of data.
 
 As an alternative to MCMC, \cite{regier2019_celeste} produced an approximate posterior using variational inference.
 Variational inference (VI) considers a constrained family of distributions and employs numerical optimization to find the distribution in the family closest
@@ -105,9 +105,9 @@ In particular, by taking advantage of complete data---the sampled images and the
 
 The wake-sleep algorithm has been used in previous research to train deep generative models~\cite{Hinton1995wake_sleep, bornschein2014reweighted, le2020revisiting}.
 However, to the best of our knowledge, this is the first application of wake-sleep for scientific purposes. 
-Specifically, we use wake-sleep for inference to find a latent space that is interpretable, as it is is the set of all possible astronomical catalogs.
+Specifically, we use wake-sleep for inference to find a latent space that is interpretable, as it is the set of all possible astronomical catalogs.
 
-We validated StarNet on the M2 globular cluster, a region of the sky densely populated by stars. StarNet was more accurate than the MCMC-based cataloger PCAT and traditional cataloging approaches while requiring $10^5$ less runtime than the former (Section~\ref{sec:results_on_m2}).
+We validated StarNet on the M2 globular cluster, a region of the sky densely populated by stars. StarNet was more accurate than the MCMC-based cataloger PCAT and traditional cataloging approaches while running $100,000$ times faster than the former (Section~\ref{sec:results_on_m2}).
 While the MCMC posterior approximation converges to the exact posterior asymptotically, over finite horizons an MCMC sampler may not mix well. The sleep-phase objective from the Wake-Sleep algorithm allows StarNet to circumvent many of the challenges of nonconvex optimization.
 (Section~\ref{sec:discussion}).
 

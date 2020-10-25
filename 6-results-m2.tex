@@ -37,7 +37,7 @@ The SDSS survey consists of nearly one million images. Scaling MCMC to the entir
 The upcoming LSST survey will be 300 times larger than SDSS.
 
 In contrast, if we assume the PSF and background are homogeneous 
-across the full SDSS image (which PCAT also assumes), we can 
+across the full SDSS image (which is also assumed in PCAT), we can 
 fit StarNet using wake-sleep 
 on a small $100 \times 100$ subimage
 (while simultaneously obtaining estimates of the PSF and background),
@@ -117,7 +117,9 @@ In contrast, DAOPHOT failed to find dim stars; its flux distribution assigned ze
     \caption{Source magnitude histograms for the $r$-band of M2. 
     The magnitude distribution of the Hubble catalog in grey. 
     Magnitude distributions for the DAOPHOT, PCAT, and StarNet-WS catalogs overlaid.
-    For PCAT, the distribution comes from a single catalog sampled by MCMC. }
+    For PCAT, the distribution comes from a single catalog sampled by MCMC. 
+    PCAT overestimates the number of dim sources, 
+    while DAOPHOT fails to detect dim sources. }
     \label{fig:luminosity_fun_m2}
 \end{figure}
 

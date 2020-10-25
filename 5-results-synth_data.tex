@@ -32,7 +32,7 @@ while the third approach optimizes the sleep objective~\eqref{eq:sleep_obj}.
 Note that the sleep objective does not depend on $x_{test}$. 
 Optimizing the sleep objective only requires sampling catalogs from the prior
 and simulating images conditional on each catalog. 
-The prior on the number of stars was set to be Poisson with mean $\mu = 4$. 
+The prior on the number of stars was set to Poisson with mean $\mu = 4$. 
 
 Figure~\ref{fig:optim_path}~(top row) charts the test ELBO~\eqref{eq:elbo_on_test} as the optimization proceeds in our three approaches.
 The first approach optimizes the ELBO with stochastic gradient descent and the REINFORCE gradient estimator.
@@ -49,11 +49,12 @@ Recall that sleep phase optimization does not directly optimize the test ELBO. H
 Shallow local optima in the ELBO result in unreliable catalogs. 
 The bottom row of Figure~\ref{fig:optim_path} displays the estimated locations, defined by the mode of the fitted variational distribution. 
 The bottom left shows these locations after converging to a shallow local optimum. 
-In this local optimum, the upper left tile was estimated to have two stars; however, both estimated stars were placed at the same location.
+In this local optimum, the upper left tile was correctly estimated to have two stars; however, both estimated stars were placed at the same location.
 For correct detections, one of the locations should be placed on the second star.
-However, in order to move one of the estimated locations to the second star, the optimization path must traverse a region where the log-likelihood is lower than the current configuration. 
+However, in order to move one of the estimated locations to the second star, the optimization path must traverse a region where the log-likelihood is lower than the current configuration (Figure~\ref{fig:local_optima_cartoon}). 
 The displayed configuration is a local optima where the gradient with respect to its locations is approximately zero.
 In contrast, the sleep-phase variational distribution consistently placed its mode around the four true stars. 
+The sleep objective is quadratic in the logit-location estimate $\mu_\ell$ (Equation~\ref{eq:gaussian_sleep_loss}), and the gradient does not vanish in the sleep objective. 
 An example of correct detection after sleep-phase optimization is shown in the bottom right image of~Figure~\ref{fig:optim_path}.
 
 \begin{figure}[!htb]
@@ -75,31 +76,21 @@ An example of correct detection after sleep-phase optimization is shown in the b
     \label{fig:optim_path}
 \end{figure}
 
-Figure~\ref{fig:gradzero_cartoon} shows a schematic of the optimization landscape as a function of locations.
-Recall that locations are parameterized between 0 and 1, and the neural network returns a variational mean parameter $\mu_\ell$ for the logit-location. 
-When $\mu_\ell$ is far from the correct location (in logit space), the gradient of the ELBO with respect to $\mu_\ell$ vanishes. 
-To see this, observe that the PSF is nearly zero everywhere except for a few pixels around its center. Therefore, a small shift in estimated location $\mu_\ell$ does not significantly change the likelihood unless the estimated location is within a ``PSF radius" of the correct location.
-On the other hand, the sleep objective is quadratic in the logit-location estimate $\mu_\ell$ (see Equation~\ref{eq:gaussian_sleep_loss}).
-Thus, the further the estimated location is from the correct location (in logit space), the larger the gradient. The gradient does not vanish in the sleep objective. 
+% Figure~\ref{fig:gradzero_cartoon} shows a schematic of the optimization landscape as a function of locations.
+% Recall that locations are parameterized between 0 and 1, and the neural network returns a variational mean parameter $\mu_\ell$ for the logit-location. 
+% When $\mu_\ell$ is far from the correct location (in logit space), the gradient of the ELBO with respect to $\mu_\ell$ vanishes. 
+% To see this, observe that the PSF is nearly zero everywhere except for a few pixels around its center. Therefore, a small shift in estimated location $\mu_\ell$ does not significantly change the likelihood unless the estimated location is within a ``PSF radius" of the correct location.
+% On the other hand, the sleep objective is quadratic in the logit-location estimate $\mu_\ell$ (see Equation~\ref{eq:gaussian_sleep_loss}).
+% Thus, the further the estimated location is from the correct location (in logit space), the larger the gradient. The gradient does not vanish in the sleep objective. 
 
 \begin{figure}[!htb]
     \centering
-    \includegraphics[width=\textwidth]{figures/gradzero_cartoon3.png}
-    % \centering
-    % \begin{subfigure}[t]{0.8\textwidth}
-    % \centering
-    % \includegraphics[width=\textwidth]{figures/gradzero_cartoon.png}
-    % \end{subfigure}
-    % \begin{subfigure}[t]{\textwidth}
-    % \centering
-    % \includegraphics[width=0.55\textwidth]{figures/gradzero_cartoon2.png}
-    % \end{subfigure}
-    % \vspace{-3em}
-    \caption{An illustration of vanishing gradients when the estimated under the variational distribution (red) is far from the correct location (blue). 
-    $\delta$ denotes the difference in logit-locations. 
-    For large $\delta$, the ELBO objective is flat in the estimated location, hence the gradients with respect to location are nearly zero.
+    \includegraphics[width=\textwidth]{figures/local_minima_cartoon.png}
+    \caption{An illustration of local optima in the ELBO objective. 
+    To move an estimated location to a correct location, 
+    the optimization path must traverse a region where the negative ELBO is larger than the current configuration. 
     In contrast, the sleep objective is quadratic in the estimated location, and the gradient does not vanish. }
-    \label{fig:gradzero_cartoon}
+    \label{fig:local_optima_cartoon}
 \end{figure}
 
 Also, note that low-variance gradients of the ELBO for this simple example were constructed by analytically integrating out $N$. Only then could the reparameterization trick be applied to the ELBO as the remaining latent variables are continuous. 

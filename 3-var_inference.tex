@@ -83,11 +83,11 @@ on each tile:
 \end{align}
 where $\tilde\ell_{N, i}^{(s, t)}$ and $\tilde f_{N, i}^{(s, t)}$ are the elements of the triangular array corresponding to location and fluxes, respectively. 
 
-Tile locations $\tilde\ell_{N, i}^{(s, t)} \in [0, R]\times[0, R]$ give the location of stars within a tile. The fluxes $\tilde f_{N, i}^{(s, t)}$ are vectors in $\mathbb{R}^B$ (one flux for each band) where each entry is positive. 
+Tile locations $\tilde\ell_{N, i}^{(s, t)} \in [0, R]\times[0, R]$ give the location of stars within a tile. The fluxes $\tilde f_{N, i}^{(s, t)}$ are vectors in $\mathbb{R}^B$ (one flux for each band), where each entry is positive. 
 
 Call $(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)})_{s=1,t=1}^{S,T}$ the {\itshape tile latent variables}; 
-succinctly, denote tile latent variables as $\tilde z$. 
-The full latent variable of interest is $z = \{N, (\ell_i, f_{i,1}, ..., f_{i,B})_{i = 1}^N\}$, the catalog on the full image. 
+succinctly denote tile latent variables as $\tilde z$. 
+The full latent variable of interest is $z = \{N, (\ell_i, f_{i,1}, ..., f_{i,B})_{i = 1}^N\}$, the catalog for the full image. 
 A distribution on $z$ is obtained by first constructing a mapping from $\tilde z$ to $z$. We then define a distribution 
 on the tile latent variables $\tilde z$, which in turn  induces 
 a distribution on $z$.  
@@ -294,4 +294,4 @@ On a crowded starfield with $H = W = 100$, the number of imaged stars is on the 
 If the neural network were to return a variational distribution on the full $100\times 100$ image, the output dimension would be on the order of $(10^3)^2$. 
 On the $2\times 2$ tile, we set $N_{max} = 3$, and the output dimension of the neural network with two bands is 53. 
 
-We emphasize that while the variational distribution factorizes over $2 \times 2$ tiles, our method does not break the inference problem for the full image into isolated subproblems. The evaluation of the likelihood, e.g. when computing the ELBO in~\eqref{eq:elbo}, is always on the full image. Light from a star within a $2 \times 2$ tile spills over into neighboring tiles, so the likelihood should not and does not decouple across image tiles. 
+We emphasize that while the variational distribution factorizes over $2 \times 2$ tiles, our method does not break the inference problem for the full image into isolated subproblems. The evaluation of the likelihood, e.g., when computing the ELBO in~\eqref{eq:elbo}, is always on the full image. Light from a star within a $2 \times 2$ tile spills over into neighboring tiles, so the likelihood should not and does not decouple across image tiles. 
