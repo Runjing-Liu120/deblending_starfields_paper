@@ -60,7 +60,7 @@ the tile $\tilde x_{st}$ is composed of the following pixels:
     \tilde x_{st} = \{x_{hw} : Rs \leq h \leq R(s+1) \text{ and } Rt \leq w \leq R(t+1)\}.
     \label{eq:tiles}
 \end{align}
-Figure~\ref{fig:ex_tiles} gives an example.
+Figure~\ref{fig:ex_tiles} gives an example with $R = 2$. 
 \begin{figure}[!ht]
     \centering
     \includegraphics[width = 0.5\textwidth]{figures/example_tiled.png}
@@ -83,7 +83,7 @@ on each tile:
 \end{align}
 where $\tilde\ell_{N, i}^{(s, t)}$ and $\tilde f_{N, i}^{(s, t)}$ are the elements of the triangular array corresponding to location and fluxes, respectively. 
 
-Tile locations $\tilde\ell_{N, i}^{(s, t)} \in [0, R]\times[0, R]$ give the location of stars within a tile. The fluxes $\tilde f_{N, i}^{(s, t)}$ are vectors in $\mathbb{R}^B$ (one flux for each band), where each entry is positive. 
+Tile locations $\tilde\ell_{N, i}^{(s, t)} \in [0, R]\times[0, R]$ give the location of stars within a tile. The fluxes $\tilde f_{N, i}^{(s, t)}$ are vectors in $\mathbb{R}^B_+$ (one flux for each band). 
 
 Call $(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)})_{s=1,t=1}^{S,T}$ the {\itshape tile latent variables}; 
 succinctly denote tile latent variables as $\tilde z$. 
@@ -146,7 +146,7 @@ If $\tau$ is the mapping in~\eqref{eq:patch_to_full_map}, then the variational d
     q_\eta(z | x) := \tilde q_\eta(\tau^{-1}(z) | x),
     \label{eq:pull_back_of_q}
 \end{align}
-where $\tau^{-1}(z)$ is the pre-image of $z$.
+where $\tau^{-1}(z)$ is the pre-image of $z$ under $\tau$.
 
 \noindent{\bf Evaluating the variational distribution}
 
@@ -184,7 +184,7 @@ where $\mathbf{1}\{\cdot\}$ is the indicator function, equal to one if true and 
 Now, consider $\tilde\ell^{(s, t)}$ and $\tilde f^{(s, t)}$, the triangular array of locations and fluxes on tile $(s,t)$. 
 For each $(s,t)$, the $\tilde N^{(s,t)}$-th row 
 of the triangular array of fluxes and locations is
-determined by the locations and fluxes of stars imaged in tile $(s,t)$. However, the other rows 
+determined by the locations and fluxes of stars imaged in tile $(s,t)$; they are determined by the catalog $z$. However, the other rows 
 of the triangular arrays are not determined by 
 the catalog $z$; they are free to take any value in their domain. Therefore, the mapping $\tau$ is not injective. 
 
@@ -263,7 +263,12 @@ Let $\hat x^{(s,t)}$ denote the padded tile (which includes all $B$ bands) and $
     \label{eq:nn_output}
 \end{align}
 The same neural network is evaluated for all tiles $(s,t)$. Our variational parameters are neural network weights, here denoted $\eta$. 
-The architecture consists of several convolutional layers followed by a series of fully connected layers (Figure~\ref{fig:starnet_arch}). Convolutional layers are useful for localizing stars, as they make the network invariant to shifts in stellar location. The convolutional kernel in the first layer is $3\times3$ pixels, roughly the full width at half maximum (FWHM) of the PSF. The optimization of the architecture is left for future work; our focus in this paper is the application of neural networks to provide a variational posterior for cataloging starfields, not the network architecture per se. 
+The architecture consists of several convolutional layers followed by a series of fully connected layers (Figure~\ref{fig:starnet_arch}). 
+This combination of convolutions followed by fully connected layers has been successful on image classification challenges such as ImageNet~\cite{imagenet2015}. 
+The optimization of the architecture is left for future work; our focus in this paper is the application of neural networks to provide a variational posterior for cataloging starfields, not the network architecture per se. 
+
+
+% Convolutional layers are useful for localizing stars, as they make the network invariant to shifts in stellar location. The convolutional kernel in the first layer is $3\times3$ pixels, roughly the full width at half maximum (FWHM) of the PSF. 
 
 \begin{figure}[!tb]
     \centering

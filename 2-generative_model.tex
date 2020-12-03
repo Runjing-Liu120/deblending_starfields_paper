@@ -1,6 +1,6 @@
 In crowded starfields, such as globular clusters and the Milky Way, the vast majority of light sources are stars.
 These stars radiate photons. 
-An astronomical image records the number of these photons that have traveled through a telescope and arrived at each pixel. Typically, photons must pass through one of several filters, each absorbing energy within a specified band of wavelengths, before being recorded.
+An astronomical image records the number of these photons that reached a telescope and arrived at each pixel. Typically, photons must pass through one of several filters, each absorbing energy within a specified band of wavelengths, before being recorded.
 
 For a given $H \times W$ pixel image with $B$ filter bands, our goal is to infer a catalog of 
 stars. 
@@ -25,15 +25,15 @@ we do not simplify these models to make variational inference easier.
 \subsection{The prior}
 The prior over $\mathcal{Z}$ is a marked spatial Poisson process. First, draw the number of stars contained in the $H\times W$ image as
 \begin{align}
-	N &\sim \text{Poisson}(\mu HW).
+	N &\sim \text{Poisson}(\mu HW),
 	\label{eq:n_prior}
 \end{align}
-% \jeff{Better to talk about the marked point process later (or earlier, in the introduction). Just describe the model as simply as possible here.}
+where $\mu$ is the average number of sources per pixel.
 Next, draw locations
 \begin{align}
   \ell_1, ..., \ell_N | N &\stackrel{iid}{\sim} \text{Uniform}([0, H] \times [0, W]). 
  \end{align}
-The fluxes in the first band are from a power law distribution:
+The fluxes in the first band are from a power law distribution with slope $\alpha$:
 \begin{align}
     f_{1, 1}, ..., f_{N,1} | N & 
     \stackrel{iid}{\sim} \text{Pareto}(f_{min}, \alpha) 
@@ -46,6 +46,10 @@ Fluxes in other bands are described relative to the first band. Like~\cite{Feder
 \end{align}
 Given the flux in the first band $f_{i,1}$ and color $c_{i,b}$,
 the flux in band $b$ is  $f_{i,b} = f_{i,1} \times 10^{c_{i,b} / 2.5}$.
+
+Like~\cite{Feder_2019}, we set the power law slope $\alpha = 0.5$, and use a standard Gaussian for the color prior ($\mu_c = 0$, $\sigma^2_c = 1$). 
+Appendix~\ref{sec:prior_sensitivity} evaluates the 
+sensitivity of the resulting catalog to choices of the prior parameters. 
 
 \subsection{The likelihood}
 Let $x_{hw}^b$ denote the observed number of photoelectrons at pixel $(h,w)$ and band $b$. For each band, at every pixel, the expected number of photoelectron arrivals is $\lambda^b_{hw}(z)$, a deterministic function of the catalog $z$. Motivated by the Poissonian nature of photon arrivals, the observations are drawn

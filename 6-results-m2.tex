@@ -17,8 +17,8 @@ The variational distribution factorizes into $2\times2$ tiles.
 The neural network inputs were $8\times8$ pixel padded tiles: 
 $2\times 2$ tiles along with three surrounding pixels of padding (see Figure~\ref{fig:starnet_arch}). 
 The SDSS estimates for the PSF and background were used in the first sleep phase. 
-This phase ran for 200 epochs with 200 images per epoch with  
-the Adam optimization routine~\cite{kingma2014adam}. 
+This phase ran for 200 epochs; at each epoch, 200 images were sampled from the generative model. 
+Optimization was done with Adam~\cite{kingma2014adam}. 
 On a single NVIDIA GeForce RTX 2080 Ti GPU, 
 the initial sleep phase took 15.2 minutes.
 
@@ -93,6 +93,12 @@ PCAT estimated the most stars of all methods, and it therefore had a large TPR b
 On the other hand, DAOPHOT estimated less than half the number of stars when compared to the other methods. It therefore had a large PPV but a small TPR. 
 The StarNet-WS catalog had the same PPV as DAOPHOT while having nearly the same TPR as PCAT. 
 
+Table~\ref{tab:summary_stats} also prints the number of stars inferred by each method. 
+For probabilistic methods (StarNet and PCAT), we display the mean number of stars under the approximate posterior, along with the 5-th and 95-th quantiles. 
+Neither PCAT nor StarNet captured the true number of stars in their 90\% credible interval, though StarNet-WS came the closest. 
+The StarNet credible intervals were three times wider than the PCAT intervals.
+The small PCAT credible intervals may be indicative of a MCMC sampler that failed to mix well. 
+
 \input{tables/summary_stats_m2.txt}
 
 The improvement of StarNet-WS in PPV was most pronounced for dim stars (Figure~\ref{fig:summary_stats}). The TPR for StarNet-WS was uniformly better than DAOPHOT for stars of all magnitudes. 
@@ -104,10 +110,9 @@ In contrast, DAOPHOT failed to find dim stars; its flux distribution assigned ze
     \centering
     \includegraphics[width=0.99\textwidth]{figures/summary_statistics_m2.png}
     \caption{True positive rate and positive predicted value of various cataloging
-    procedures on M2, plotted against magnitude.
-    Smaller magnitudes correspond to brighter stars. 
-    X-axis ticks correspond to Hubble magnitude deciles, so
-    each bin contains roughly the same number of stars.  }
+    procedures on M2, plotted against $r$-band magnitude.
+    Smaller magnitudes correspond to brighter stars.
+    }
     \label{fig:summary_stats}
 \end{figure}
 

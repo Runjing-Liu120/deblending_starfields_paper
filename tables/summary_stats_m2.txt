@@ -1,16 +1,19 @@
 \begin{table}[ht]
 \centering
-\caption{Summary statistics on M2. ``Hubble" refers to the catalog which we use as ground-truth. }
+\caption{Summary statistics on M2. 
+In the bottom row, ``Hubble" refers to the catalog which we use as ground-truth. 
+For probabilistic methods (StarNet and PCAT)
+the ``\#stars" column refers to the mean number of stars under the (approximate) posterior, while the right-most column displays the 5-th and 95-th percentiles under the posterior. }
 \label{tab:summary_stats}
-\begin{tabular}{lrrrr}
+\begin{tabular}{l|ccc|cc}
 \toprule
-     Method &   TPR &   PPV &  F1 score &  \#stars \\
+     Method &   TPR &   PPV &  F1 score &  \#stars & (q-5\%, q-95\%)\\
 \midrule
-    DAOPHOT &  0.20 &  0.63 &      0.30 &     295 \\
-       PCAT &  0.56 &  0.40 &      0.47 &    1672 \\
- Sleep-only &  0.50 &  0.46 &      0.48 &    1058 \\
- Wake-sleep &  0.51 &  0.61 &      0.55 &     796 \\
-     Hubble &  1.00 &  1.00 &      1.00 &     931 \\
+    DAOPHOT &  0.20 &  0.63 &      0.30 &     295 & -- \\
+       PCAT &  0.56 &  0.40 &      0.47 &    1672 & (1664, 1680)\\
+ Sleep-only &  0.50 &  0.46 &      0.48 &    1292 & (1262, 1326)\\
+ Wake-sleep &  0.51 &  0.61 &      0.55 &     1013 & (984, 1041)\\
+     Hubble &  1.00 &  1.00 &      1.00 &     931 & -- \\
 \bottomrule
 \end{tabular}
 \end{table}

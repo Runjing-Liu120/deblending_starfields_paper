@@ -8,8 +8,10 @@ Since this region of the sky is more sparse, we tile the image into $50\times 50
 Because this region of the sky also contains galaxies, only the sleep phase was employed to fit StarNet; 
 the wake phase would optimize the PSF to explain both stars and galaxies. 
 
-This image is contained in Stripe 82, a region of the sky repeatedly imaged by SDSS. Averaging images from different runs boosts the signal to noise ratio, resulting in a ``co-added" image. 
-The co-added image was analyzed with PHOTO to obtain a ground truth catalog. 
+This image is contained in Stripe 82, a region of the sky repeatedly imaged by SDSS.
+Averaging images from different runs boosts the signal to noise ratio, resulting in a ``co-added" image. 
+We compare the performance of StarNet and PHOTO on the {\itshape non} co-added image. 
+The PHOTO catalog of the co-added image was used as ground truth. 
 
 The TPR of StarNet is comparable with the TPR of the PHOTO catalog on the original (non co-added) image (Figure~\ref{fig:sparse_field}). 
 StarNet accrues false defections, namely galaxies, and thus we cannot compare the PPV. 

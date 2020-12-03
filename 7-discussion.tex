@@ -18,10 +18,13 @@ While labeled data from simulators have been used in other astronomy application
 % \jeff{Wake-sleep didn't really avoid the minima---it optimized a different objective entirely.}
 
 This variational approach, unlike previous MCMC approaches, enables StarNet to estimate model parameters such as the PSF and sky background.
-While the current work focuses on PSF models, our methodology can be extended to more general sources such as galaxies.
-One promising direction is to use a neural network for the generative model and fit a deep generative model for galaxies~\cite{Regier2015ADG}. 
+While the current work focuses on PSF models, our methodology can be extended to more general sources such as galaxies. 
+Unsurprisingly, the current performance of StarNet is sub-optimal for cataloging regions of the sky that contains both stars and galaxies due to model misfit (Appedix~\ref{sec:results_sparse_field}).  
+
+One promising direction is to use a neural network for the generative model and fit a deep generative model for galaxies~\cite{Arcelin_2020, lanusse2020deep, Reiman_2019_gans_deblend, Regier2015ADG}. 
 Here, a neural network encodes a conditional likelihood of galaxy images given a low dimensional galaxy representation. 
 Using a neural network to encode a likelihood extends the flexibility of galaxy models beyond the simple models used here. 
+
 
 % Going even further, models for artifacts such as cosmic rays and bleed trails~\cite{Desai_2016} could be estimated in this framework.
 % \jeff{Readers likely won't know what cosmic rays and bleed trails are. Maybe cite something here that explains them, for the curious reader.}
