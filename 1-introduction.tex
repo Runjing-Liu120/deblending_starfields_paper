@@ -1,15 +1,15 @@
 Astronomical images record the arrival of photons from distant light sources. 
-These images are one of the few sources of information about the universe beyond our solar system.
-Typically, astronomical catalogs are constructed from this image data.
+Astronomical catalogs are constructed from these images.
 Catalogs label light sources as stars, galaxies, or other objects; they also list the physical characteristics of light sources such as flux, color, and morphology. 
 These catalogs are the starting point for many downstream analyses.
 For example, Bayestar used a catalog of stellar fluxes and colors to construct the 3D distribution of interstellar dust~\cite{Green_2019_argonaut}. 
 Catalogs of galaxy morphologies have been used to validate theoretical models of dark matter and dark energy~\cite{Abbott2018}. 
 
-Catalog construction is straightforward when light sources are well separated. Each light source produces a single peak intensity on the image, and characteristics of the light source such as flux can be estimated by analyzing photon counts on the peak and the surrounding pixels. 
-However, in images crowded with light sources, peak intensities may be the result of the combined light from multiple sources.
-Light source separation, or {\itshape deblending}, is the task of characterizing each individual light source from an overlapping peak intensity on an image. 
-A key challenge in deblending is inferring whether a peak intensity is in fact blended, that is, whether the peak is comprised of a single bright source or multiple dimmer sources. 
+A light source, either star or galaxy, produces a peak intensity of brightness in an image. 
+When light sources are well separated, catalog construction is straightforward: characteristics of each light source such as flux can be estimated by analyzing intensities at the peak and surrounding pixels. 
+However, in images crowded with many light sources, observed intensities may be the result of the combined light from multiple sources.
+Source separation, or {\itshape deblending}, is the task of characterizing each individual light source from a mixture of intensities on an image. 
+A key challenge in deblending is inferring whether any observed intensity is in fact blended, that is, whether it is comprised of a single bright source or multiple dimmer sources. 
 
 % In such settings, a key step in catalog construction is light source separation, or {\itshape deblending}, the process of 
 % Deblending first involves distinguishing whether a peak intensity corresponds to a single light source or multiple light sources. 
@@ -18,13 +18,14 @@ A key challenge in deblending is inferring whether a peak intensity is in fact b
 Deblending is challenging for several reasons.
 First, it is an unsupervised problem without ground truth labeled data. 
 Secondly, it is a problem with a sample size of one: there is only one night sky, which is imaged many times, and the collected survey images capture overlapping regions of it.
-Third, for blended fields, the properties of light sources are especially ambiguous and therefore, providing calibrated uncertainty quantification is as important as making accurate predictions.
-Finally, the scale of the data is immense by any standard. The upcoming Rubin Observatory Legacy Survey of Space and Time (LSST) survey, scheduled to begin data collection in 2022, is expected to produce 60 petabytes of astronomical images over its lifetime~\cite{LSST_about}.
+Third, for blended fields, the properties of light sources are ambiguous and therefore, providing calibrated uncertainties surrounding catalog construction is as important as making accurate predictions.
+Finally, the scale of the data is immense. 
+The upcoming Rubin Observatory Legacy Survey of Space and Time (LSST) survey, scheduled to begin data collection in 2022, is expected to produce 60 petabytes of astronomical images over its lifetime~\cite{LSST_about}.
 
 As more powerful telescopes are developed and their ability to detect more distant light sources improves, the density of light sources in the images they capture will only increase. 
 For instance, \cite{Bosch_2017_LSST} estimates that 58\% of light sources are blended in images captured by the Subaru Telescope’s Hyper Suprime-Cam, and that percentage is expected to increase for LSST. 
 Therefore, developing a method that reliably characterizes light sources, even in cases of significant light source blending, 
-is critical for astronomical research where conclusions about the physical universe are derived from estimated catalogs. 
+advances any astronomical research where conclusions about the physical universe are derived from estimated catalogs. 
 
 We focus on cataloging applications where all light sources are well-modeled as points without spatial extent. 
 Point-source models are applicable to surveys such as DECam~\cite{Schlafly_2018_DECam}, which imaged the center of our own Milky Way, and WISE~\cite{Wright_2010_WISESurvey}, whose telescope resolution did not allow for differentiation between stars and galaxies.
@@ -32,14 +33,14 @@ In this work, we use the globular cluster M2, a region imaged by the Sloan Digit
 
 \bigbreak
 
-\noindent{\textbf{From algorithmic software pipelines to probabilistic cataloging}}
+\noindent{\textbf{From software pipelines to probabilistic cataloging}}
 
-Traditionally, most cataloging has been performed using algorithmic software pipelines.
-These pipelines involve the following stages: locating the brightest peaks, estimating fluxes, and subtracting the estimated light source.
+Traditionally, most cataloging has been performed using software pipelines.
+These pipelines are algorithms that usually involve the following stages: locating the brightest peaks, estimating fluxes, and subtracting the estimated light source.
 These stages may be performed iteratively.
 These pipelines do not normally produce statistically calibrated error estimates that propagate 
 the uncertainty accumulating in each step of the pipeline. 
-Therefore, most of these pipelines are unreliable for highly blended light sources where ambiguity exists in identifying sources and estimating their characteristics.
+Failure to properly accumulate error at each step results in unreliable catalogs for images with ambiguity in identifying sources and estimating their characteristics.
 For example, PHOTO~\cite{lupton2001sdss}, the default cataloging pipeline used by the Sloan Digital Sky Survey (SDSS), failed to 
 produce a catalog on the globular cluster M2~\cite{Portillo_2017}. 
 
@@ -60,10 +61,10 @@ the latent variable space is transdimensional. PCAT
 used reversible jump MCMC (RJ-MCMC) ~\cite{Green95reversiblejump} to sample transdimensional catalogs. In RJ-MCMC, auxiliary variables are added to encode the ``birth" of new sources 
 or the ``death" of existing sources in the Markov chain.
 
-The computational cost of MCMC for this model is prohibitive for large-scale astronomical surveys. 
+The computational cost of MCMC for this model is problematic for large-scale astronomical surveys. 
 Early implementations of PCAT required a day to process a $100\times 100$ pixel image of the M2 globular cluster imaged by SDSS~\cite{Portillo_2017}. 
 More recent implementations running inexact MCMC brought the runtime down to 30  minutes~\cite{Feder_2019}.  
-In any case, a $100\times 100$ image covers only a $0.66 \times 0.66$ arcminute patch of the sky.
+In any case, a $100\times 100$ pixel image covers only a $0.66 \times 0.66$ arcminute patch of the sky.
 For comparison, in one night, SDSS scans a region on the order of $100 \times 1000$ arcminutes. 
 Extrapolating the 30 minute runtime, PCAT would take about three months to process the same amount of data.
 
@@ -108,7 +109,11 @@ However, to the best of our knowledge, this is the first application of wake-sle
 Specifically, we use wake-sleep for inference to find a latent space that is interpretable, as it is the set of all possible astronomical catalogs.
 
 
-We validated StarNet on the M2 globular cluster. StarNet was more accurate than the MCMC-based cataloger PCAT and traditional cataloging approaches while running $100,000$ times faster than the former (Section~\ref{sec:results_on_m2}).
+We applied StarNet on the M2 globular cluster as imaged by SDSS.
+We used the M2 catalog from the ACS Globular Cluster Survey~\cite{Sarajedini_2007} as a ground truth. 
+The ACS survey used the Hubble Space telescope, 
+which has approximately 20 times the angular resolution and 30 times the exposure of the ground-based Sloan telescope. 
+StarNet was more accurate than the MCMC-based cataloger PCAT and traditional cataloging approaches while running $100,000$ times faster than the former (Section~\ref{sec:results_on_m2}).
 While the MCMC posterior approximation converges to the exact posterior asymptotically, over finite horizons an MCMC sampler may not mix well. The sleep-phase objective from the Wake-Sleep algorithm allows StarNet to circumvent many of the challenges of nonconvex optimization.
 (Section~\ref{sec:discussion}).
 

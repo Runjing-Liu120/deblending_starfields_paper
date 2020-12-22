@@ -1,5 +1,5 @@
 The central quantity in Bayesian statistics is the posterior distribution $p(z|x)$.
-However, in most
+However, in many
 nontrivial probabilistic models, including our own, the posterior distribution is intractable to calculate.
 The calculation of the posterior requires computing the marginal likelihood, $p(x)$, which involves integrating over latent variable $z$. 
 In our model, the latent variable space is high dimensional: it is the set of all catalogs. Approximate methods such as MCMC~\cite{Portillo_2017} and variational inference~\cite{Blei_2017_vi_review, Jordan_intro_vi, Wainwrite_graph_models_vi} are required. 
@@ -26,7 +26,7 @@ Computing the ELBO does not require computing the marginal distribution $p(x)$, 
 \label{sec:var_distr}
 % We now describe our family of distributions $\mathcal{Q}$. 
 Traditionally in variational inference, the posterior approximation 
-$q_\eta$ depends on the data $x$ implicitly, 
+$q_\eta$ implicitly depends on the data $x$, 
 in that $\eta^*$ is chosen according to~\eqref{eq:kl_objective}.
 In this case, $q_\eta(z | x)$ is usually written $q_\eta(z)$, suppressing the dependence on $x$.
 
@@ -52,7 +52,11 @@ The following subsections detail the construction of our variational distributio
 To make the objective in \eqref{eq:kl_objective} tractable, the family $\mathcal{Q}$ may be restricted to probability distributions 
 without conditional dependencies between some latent variables. In the most extreme case, called mean-field variational inference, the variational distribution factorizes across all latent variables. 
 
-Our factorization instead has a spatial structure. First, we partition the full $H \times W$ image into disjoint $R \times R$ tiles. 
+Our factorization instead has a spatial structure. 
+First, we partition the full $H \times W$ image into disjoint $R \times R$ tiles. 
+$R$ will be chosen such that the probability of having three or more stars on an $R \times R$ tile is small. 
+In such a way, the cataloging problem decomposes to inferring only a few stars at a time (Section~\ref{sec:nn_archetecture}). 
+
 Let $S = \sfrac{H}{R}$ and $T = \sfrac{W}{R}$ and assume without loss of generality that $H$ and $W$ are multiples of $R$.
 For $s = 1, ..., S$ and $t = 1, ..., T$,
 the tile $\tilde x_{st}$ is composed of the following pixels:
@@ -250,11 +254,16 @@ we place a normal distribution on the logit of the location scaled by $1 / R$.
 
 \subsubsection{Neural network architecture}
 \label{sec:nn_archetecture}
-On each tile, the distributional parameters 
-in \eqref{eq:var_distr_n}, \eqref{eq:var_distr_loc}, and \eqref{eq:var_distr_f} are the output of a neural network. 
-The input to the neural network is an $S \times S$ tile, padded with surrounding pixels.
+
+On each tile, the distributional parameters in \eqref{eq:var_distr_n},
+\eqref{eq:var_distr_loc}, and \eqref{eq:var_distr_f} are the output of a neural network. 
+The input to the neural network is an $R \times R$ tile, padded with surrounding pixels.
+Padding enables to neural network to produce better predictions inside the tile. 
+For example, a bright source in the vicinity but outside the tile will affect the pixel values inside the tile. 
+Padding the tiles allows the neural network access to this information, and choosing the amount of padding will depend on the PSF width in the analyzed image. 
 To catalog the crowded starfield M2 (Section~\ref{sec:results_on_m2}),
-we set $S = 2$ and padded the tile with three pixels.
+we set $R = 2$ and padded the tile with three pixels.
+Thus, while the distribution on tile latent variables factorize over tiles, the neural network is able to use information from neighboring tiles in producing the distributional parameters. 
 
 
 Let $\hat x^{(s,t)}$ denote the padded tile (which includes all $B$ bands) and $h_\eta$ be the neural network, which returns the collection of distributional parameters

@@ -29,6 +29,8 @@ We compare three approaches to deblending. The first two approaches directly opt
 \label{eq:elbo_on_test}
 \end{align}
 while the third approach optimizes the sleep objective~\eqref{eq:sleep_obj}. 
+In each case, $q_\eta$ is the inference network from Section~\ref{sec:nn_archetecture}; the input to the network are $10\times 10$ tiles with no padding. 
+
 Note that the sleep objective does not depend on $x_{test}$. 
 Optimizing the sleep objective only requires sampling catalogs from the prior
 and simulating images conditional on each catalog. 
