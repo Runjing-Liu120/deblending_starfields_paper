@@ -103,8 +103,8 @@ and the simple reparameterization trick would not apply.
 
 Figure~\ref{fig:sim_data100x100} displays our results on a larger example: a simulated $100\times 100$ image with fifty stars. 
 The tiles again consisted of $10\times 10$ pixel regions. 
-Optimizing the sleep objective produced nearly perfect location estimates; 
-optimizing the ELBO appears to be hindered by regions with little gradient information and does not produce accurate location estimates. 
+Optimizing the ELBO appears does not produce accurate location estimates and appears to be hindered by regions with little gradient information; optimizing the sleep objective produced much improved perfect location estimates.
+
 
 \begin{figure}[!htb]
     \centering

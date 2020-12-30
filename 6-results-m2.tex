@@ -2,7 +2,7 @@
 We validated StarNet using an SDSS image of the Messier 2 (M2) globular cluster, a crowded starfield found in field 136 of camera column 2 in run 2583.
 M2 was also imaged in the ACS Globular Cluster Survey~\cite{Sarajedini_2007}
 using the Hubble Space telescope (HST),
-which has approximately 20 times the angular resolution and 30 times the exposure of the Sloan telescope. The reported catalog from this Hubble survey serves as the ground truth for validating our results.
+which has greater resolution than the Sloan telescope (0.05 arseconds per pixel and 0.4 arcseconds per pixel, respectively)~\cite{hubble_about, sdss_about}. The reported catalog from this Hubble survey serves as the ground truth for validating our results.
 
 We consider the $100 \times 100$ subimage of M2 that \cite{Portillo_2017, Feder_2019} analyzed with PCAT.
 This subimage is located approximately two arcseconds from the heavily saturated core of the cluster;
@@ -22,7 +22,8 @@ Optimization was done with Adam~\cite{kingma2014adam}.
 On a single NVIDIA GeForce RTX 2080 Ti GPU, 
 the initial sleep phase took 15.2 minutes.
 
-Two additional wake-sleep cycles followed the first sleep phase. 
+Two additional wake-sleep cycles followed the first sleep phase, 
+after which the model parameters and inferred catalog appeared stable.
 The subsequent sleep phases were shorter (10 epochs with 200 images each), and the wake phase employed SGD, with the gradient estimator \eqref{eq:mstep_grad}. In total, two further wake-sleep cycles took three minutes. 
 
 After fitting the model and variational posterior, calculating the approximate posterior (that is, producing the distributional parameters of the variational approximation) for the $100 \times 100$ image of M2 took $29$ milliseconds. 
@@ -76,15 +77,12 @@ We filtered the HST catalog to stars with magnitudes smaller than 22.5 in the Hu
 Estimated catalogs are evaluated on three metrics: the true positive rate (TPR), the positive predicted value (PPV), and the F1 score. The TPR is the proportion of stars in the HST catalog matched with a star in the estimated catalog;
 the PPV is the proportion of stars in the estimated catalog matched with a star in the HST catalog. The F1 score summarizes the two metrics as the harmonic average between the PPV and the TPR.
 
-Like \cite{Portillo_2017, Feder_2019}, a ``match" between an estimated star and an HST star is defined as follows: (1) the estimated location and the HST location are within 0.5 pixels, and (2) the estimated SDSS $r$-band flux and the HST F606W band flux are within half a magnitude. 
+Like \cite{Portillo_2017, Feder_2019}, a ``match" between an estimated star and an HST star is defined as follows: (1) the estimated location and the HST location are within 0.5 SDSS pixels, and (2) the estimated SDSS $r$-band flux and the HST F606W band flux are within half a magnitude. 
 
 In probabilistic cataloging (PCAT and StarNet), the posterior defines a distribution over catalogs. 
 To evaluate the TPR, PPV, and F1 score for PCAT, 300 catalogs were sampled using MCMC; the metrics were computed for each sampled catalog and averaged. 
 For StarNet, the TPR, PPV, and F1 score were computed for the catalog corresponding to the mode of the variational distribution (henceforth, the StarNet catalog). 
 
-% \jeff{A lot of sentences that have ``we'' as the subject can be rewritten in way that doesn't mention us (without switching to passive voice, which often doesn't sound good). It makes the writing easier to understand because typically ``we'' are not really central to the idea we're trying to convey. 
-% So you might say thing like ``Our method performed better than PCAT in terms of TPR and PPV'' rather than all four of the follow sentences: ``We compute the the TPR and PPV for our method. We compared it to PCAT. We found that our method performed better than PCAT. Note that we used the MAP estimate to compute TPR.''
-% }
 
 Fitting StarNet using wake-sleep (StarNet-WS) resulted in a catalog that outperforms DAOPHOT and PCAT in terms of its F1 score (Table~\ref{tab:summary_stats}). 
 Fitting StarNet without the wake phase
@@ -102,7 +100,7 @@ The small PCAT credible intervals may be indicative of a MCMC sampler that faile
 \input{tables/summary_stats_m2.txt}
 
 The improvement of StarNet-WS in PPV was most pronounced for dim stars (Figure~\ref{fig:summary_stats}). The TPR for StarNet-WS was uniformly better than DAOPHOT for stars of all magnitudes. 
-Of all methods, the StarNet-WS catalog best approximated the Hubble flux distribution (Figure~\ref{fig:luminosity_fun_m2}). 
+Of all methods, the StarNet-WS catalog best approximated the Hubble flux distribution (Figures~\ref{fig:luminosity_fun_m2}~\ref{fig:m2_flux_estimation}). 
 PCAT overestimated the number of dim stars with magnitudes less than 21. 
 In contrast, DAOPHOT failed to find dim stars; its flux distribution assigned zero probability to stars with magnitudes greater than $21$.
 
@@ -114,6 +112,14 @@ In contrast, DAOPHOT failed to find dim stars; its flux distribution assigned ze
     Smaller magnitudes correspond to brighter stars.
     }
     \label{fig:summary_stats}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.99\textwidth]{figures/m2_flux_estimation.png}
+    \caption{True versus estimated magnitudes on the $r$-band of M2. 
+    Every estimated star was matched with the nearest Hubble star in L2 distance. The $y$-axis is the magnitude of the matched Hubble star. Red line is the identity, $y=x$. }
+    \label{fig:m2_flux_estimation}
 \end{figure}
 
 \begin{figure}[ht]

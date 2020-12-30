@@ -92,9 +92,11 @@ Tile locations $\tilde\ell_{N, i}^{(s, t)} \in [0, R]\times[0, R]$ give the loca
 Call $(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)})_{s=1,t=1}^{S,T}$ the {\itshape tile latent variables}; 
 succinctly denote tile latent variables as $\tilde z$. 
 The full latent variable of interest is $z = \{N, (\ell_i, f_{i,1}, ..., f_{i,B})_{i = 1}^N\}$, the catalog for the full image. 
-A distribution on $z$ is obtained by first constructing a mapping from $\tilde z$ to $z$. We then define a distribution 
+A distribution on $z$ is obtained by first constructing a mapping from $\tilde z$ to $z$.
+We then define a distribution 
 on the tile latent variables $\tilde z$, which in turn  induces 
 a distribution on $z$.  
+
 
 We detail the mapping $\tilde z\mapsto z$. 
 The number of stars in the catalog is 
@@ -151,6 +153,37 @@ If $\tau$ is the mapping in~\eqref{eq:patch_to_full_map}, then the variational d
     \label{eq:pull_back_of_q}
 \end{align}
 where $\tau^{-1}(z)$ is the pre-image of $z$ under $\tau$.
+
+
+% for the figure
+% {\color{blue} \tilde N^{(1,1)} = 2}
+
+% \\
+
+% \\
+
+% \begin{pmatrix}
+% (\tilde \ell, \tilde f)_{1, 1} & \\
+% \color{blue} (\tilde \ell, \tilde f)_{2, 1} &
+% \color{blue} (\tilde \ell, \tilde f)_{2, 2} &
+% \end{pmatrix}^{(1,1)}
+
+% \{{\color{Blue} N = 4},
+% {\color{red} (\tilde \ell, \tilde f)^{(1,1)}_{2,1},
+% (\tilde \ell, \tilde f)^{(1,1)}_{2,2}},
+% {\color{DarkGreen} (\tilde \ell, \tilde f)^{(1,2)}_{1, 1}},
+% {\color{Orange} (\tilde \ell, \tilde f)^{(2,1)}_{1, 1}}
+% \}
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width = 0.9\textwidth]{figures/tile_to_full_schematic.png}
+    \caption{An example image with four tiles. The upper-left tile has two stars; the upper-right and lower-left has one; the bottom right has none. 
+    On each tile, we index into the triangular array. 
+    Colored variables in the tiles enter the full-image catalog.}
+    \label{fig:tile_to_full_schm}
+\end{figure}
+
 
 \noindent{\bf Evaluating the variational distribution}
 
@@ -246,7 +279,9 @@ $(s,t)$ in this subsection,
 	\tilde \ell_{\tilde N, i} / R &\sim \text{LogitNormal}(\mu_{\ell_{\tilde N, i}}, \text{diag}(\nu_{\ell_{\tilde N, i}}) )\label{eq:var_distr_loc}; \\
 	\tilde f^b_{\tilde N, i} &\sim \text{LogNormal}(\mu_{f^b_{\tilde N, i}}, \sigma^2_{f^b_{\tilde N, i}}), \label{eq:var_distr_f}
 \end{align}
-for $i = 1, ..., \tilde N$; $\tilde N = 1, ..., N_{max}$. The latent variables also fully factorize within each tile. Note that in the exact posterior, $\tilde N$ has support on the nonnegative integers; in the variational distribution, we truncate at some large $N_{max}$. 
+for $i = 1, ..., \tilde N$; $\tilde{N} = 1, ..., N_{max}$. 
+$\omega$ is a $(\tilde N_{max} + 1)$-dimensional vector on the simplex. $\mu_{\ell_{\tilde N, i}}$ and $\nu_{\ell_{\tilde N, }}$ are two-dimensional vectors -- the covariance on locations is diagonal. 
+The latent variables also fully factorize within each tile. Note that in the exact posterior, $\tilde N$ has support on the nonnegative integers; in the variational distribution, we truncate at some large $N_{max}$. 
 
 
 These distributions were taken for convenience: fluxes are positive and right skewed, so we place a normal distribution on log-fluxes; locations are between zero and $R$, so 
@@ -307,5 +342,7 @@ Because the output dimension is quadratic in $N_{max}$, factorizing the variatio
 On a crowded starfield with $H = W = 100$, the number of imaged stars is on the order of $10^3$.
 If the neural network were to return a variational distribution on the full $100\times 100$ image, the output dimension would be on the order of $(10^3)^2$. 
 On the $2\times 2$ tile, we set $N_{max} = 3$, and the output dimension of the neural network with two bands is 53. 
+
+
 
 We emphasize that while the variational distribution factorizes over $2 \times 2$ tiles, our method does not break the inference problem for the full image into isolated subproblems. The evaluation of the likelihood, e.g., when computing the ELBO in~\eqref{eq:elbo}, is always on the full image. Light from a star within a $2 \times 2$ tile spills over into neighboring tiles, so the likelihood should not and does not decouple across image tiles. 
