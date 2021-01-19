@@ -100,7 +100,7 @@ The small PCAT credible intervals may be indicative of a MCMC sampler that faile
 \input{tables/summary_stats_m2.txt}
 
 The improvement of StarNet-WS in PPV was most pronounced for dim stars (Figure~\ref{fig:summary_stats}). The TPR for StarNet-WS was uniformly better than DAOPHOT for stars of all magnitudes. 
-Of all methods, the StarNet-WS catalog best approximated the Hubble flux distribution (Figures~\ref{fig:luminosity_fun_m2}~\ref{fig:m2_flux_estimation}). 
+Of all methods, the StarNet-WS catalog best approximated the Hubble flux distribution (Figures~\ref{fig:m2_flux_estimation} and \ref{fig:luminosity_fun_m2}). 
 PCAT overestimated the number of dim stars with magnitudes less than 21. 
 In contrast, DAOPHOT failed to find dim stars; its flux distribution assigned zero probability to stars with magnitudes greater than $21$.
 
@@ -133,6 +133,11 @@ In contrast, DAOPHOT failed to find dim stars; its flux distribution assigned ze
     while DAOPHOT fails to detect dim sources. }
     \label{fig:luminosity_fun_m2}
 \end{figure}
+
+The difference between the source-magnitude histograms  (Figure~\ref{fig:luminosity_fun_m2}) produced by StarNet-WS and PCAT
+is likely due to the fact that StarNet-WS estimates the background with maximum likelihood, while the background in PCAT is fixed.
+As discussed below, the SDSS estimate of the background (which PCAT uses) is too dim, and PCAT compensates for the model mis-match by estimating more dim stars. 
+The StarNet-WS estimate increases the intensity of the background, and hence does not over-estimate dim stars. 
 
 Figure~\ref{fig:example_subimages} shows the StarNet-WS catalog alongside PCAT, DAOPHOT, and Hubble catalogs. 
 

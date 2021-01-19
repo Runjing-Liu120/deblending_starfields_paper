@@ -98,7 +98,7 @@ on the tile latent variables $\tilde z$, which in turn  induces
 a distribution on $z$.  
 
 
-We detail the mapping $\tilde z\mapsto z$. 
+We detail the mapping $\tilde z\mapsto z$ (see Figure~\ref{fig:tile_to_full_schm} for a schematic).  
 The number of stars in the catalog is 
 \begin{align}
     N = \sum_{s=1}^{S}\sum_{t=1}^T \tilde N^{(s, t)}. 
@@ -178,8 +178,8 @@ where $\tau^{-1}(z)$ is the pre-image of $z$ under $\tau$.
 \begin{figure}[!ht]
     \centering
     \includegraphics[width = 0.9\textwidth]{figures/tile_to_full_schematic.png}
-    \caption{An example image with four tiles. The upper-left tile has two stars; the upper-right and lower-left has one; the bottom right has none. 
-    On each tile, we index into the triangular array. 
+    \caption{An example image with four tiles illustrating the relationship between tile latent variables and the full-image latent variables. The upper-left tile has two stars; the upper-right and lower-left has one; the bottom right has none. 
+    On each tile, we index into the appropriate row of the triangular array. 
     Colored variables in the tiles enter the full-image catalog.}
     \label{fig:tile_to_full_schm}
 \end{figure}
