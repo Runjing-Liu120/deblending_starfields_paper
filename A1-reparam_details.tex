@@ -26,11 +26,10 @@ The REINFORCE estimate is unbiased for the true gradient:
 \end{align}
 assuming that $f$ is well-behaved so that integration and differentiation can be interchanged. 
 
-Alternatively, the reparameterized gradient~\cite{rezende2014stochastic, kingma2013autoencoding} can be used when there exists some distribution $F$ independent of $\eta$ and a differentiable mapping $h_\eta$ such that 
+Alternatively, the reparameterized gradient~\cite{rezende2014stochastic, kingma2013autoencoding} can be used when there exists some distribution $F$ not involving $\eta$ and a differentiable mapping $h_\eta$ such that 
 \begin{align}
-    w \sim F \implies h_\eta(w) \stackrel{d}{=} z,
+    w \sim F \implies h_\eta(w) \sim q_\eta. 
 \end{align}
-where $z\sim q_\eta$. 
 For example, if $q_{\eta}(z) = \mathcal{N}(z; 0, \eta)$ that is, a Gaussian with zero mean and variance $\eta$, one possibility is to let $F$ be the standard Gaussian and $h_\eta(w) = w \sqrt{\eta}$. 
 
 The gradient of $\mathcal{L}(\eta)$ can be written as 
@@ -42,7 +41,7 @@ again assuming the interchangability of integrals and derivatives.
 Unbiased gradients are computed as 
 \begin{align}
     g_{\textrm{rp}} 
-    = \nabla_\eta f_\eta(h_\eta(w)
+    = \nabla_\eta f_\eta(h_\eta(w))
     = \nabla_z f_\eta(z)\Big|_{z = h_\eta(w)}
     \nabla_\eta h_\eta(w) \quad \text{for } w\sim F. 
 \end{align}

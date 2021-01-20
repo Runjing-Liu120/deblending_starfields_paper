@@ -1,14 +1,14 @@
 The central quantity in Bayesian statistics is the posterior distribution $p(z|x)$.
 However, in many
 nontrivial probabilistic models, including our own, the posterior distribution is intractable to calculate.
-The calculation of the posterior requires computing the marginal likelihood, $p(x)$, which involves integrating over latent variable $z$. 
-In our model, the latent variable space is high dimensional: it is the set of all catalogs. Approximate methods such as MCMC~\cite{Portillo_2017} and variational inference~\cite{Blei_2017_vi_review, Jordan_intro_vi, Wainwrite_graph_models_vi} are required. 
+Calculation of the posterior requires us to compute the marginal likelihood, $p(x)$, which involves integrating over the latent variable $z$. 
+In our model, the latent variable space is high dimensional: it is the set of all catalogs. Approximate methods such as MCMC and variational inference are therefore required. 
 
-Variational inference posits a family of distributions $\mathcal{Q}$ and seeks
-the distribution $q^*\in \mathcal{Q}$ that is closest to the posterior
+Variational inference~\cite{Blei_2017_vi_review, Jordan_intro_vi, Wainwrite_graph_models_vi} posits a family of distributions $\mathcal{Q}$ and seeks
+the distribution $q^*\in \mathcal{Q}$ that is closest to the exact posterior
 in $\KL$ divergence. 
 $\mathcal{Q}$ is chosen such that $q^*$ will not be too difficult to find via optimization. 
-We index the distributions in $\mathcal{Q}$ by a real-valued vector $\eta$, then seek $\eta^*$ satisfying
+We index the distributions in $\mathcal{Q}$ using a real-valued vector $\eta$, then seek $\eta^*$ satisfying
 \begin{align}
    \eta^* &= \argmin_{\eta} \mathrm{KL}\Big[\,q_\eta(z | x)\, \| \,p(z | x)\,\Big].
    \label{eq:kl_objective}
@@ -25,22 +25,21 @@ Computing the ELBO does not require computing the marginal distribution $p(x)$, 
 \subsection{The variational distribution}
 \label{sec:var_distr}
 % We now describe our family of distributions $\mathcal{Q}$. 
-Traditionally in variational inference, the posterior approximation 
-$q_\eta$ implicitly depends on the data $x$, 
+Traditionally in variational inference, the posterior approximation $q_\eta$ depends on the data $x$ only implicitly, 
 in that $\eta^*$ is chosen according to~\eqref{eq:kl_objective}.
 In this case, $q_\eta(z | x)$ is usually written $q_\eta(z)$, suppressing the dependence on $x$.
 
 The generative model in Section~\ref{sec:gen_model} does not assume any hierarchical structure over replicated  images. Therefore, given a new image $x^{new}$, the posterior factorizes; in other words,
 $p(z^{new}, z | x^{new}, x) = p(z^{new} | x^{new}) p(z | x)$. 
 To find a variational  approximation to the posterior $p(z^{new} | x^{new})$, the optimization problem~\eqref{eq:kl_objective} must be solved again with $x = x^{new}$.
-Even in models with hierarchical structure, the variational distribution will generally need to be updated via optimization for every new observed data point. 
+Even in models with hierarchical structure, the variational distribution will generally need to be updated via optimization for every newly observed data point. 
 
 On the other hand, 
 in {\itshape amortized} variational
-inference~\cite{kingma2013autoencoding, rezende2014stochastic}, $q_\eta$ explicitly depends on data. 
-A flexible, parameterized function maps data, in this case an observed image $x$, to the parameters of a variational distribution on the latent variable $z$. 
+inference~\cite{kingma2013autoencoding, rezende2014stochastic}, $q_\eta$ explicitly depends on the data. 
+A flexible, parameterized function maps input $x$, in this case an observed image, to the parameters of a variational distribution on the latent space $\mathcal{Z}$. 
 Typically, the function is a neural network, in which case the variational parameters $\eta$ are the neural network weights. 
-After the neural network is fitted with~\eqref{eq:kl_objective} using observed data $x$, the approximate posterior $q_\eta(z^{new} | x^{new})$ for a new data point 
+After the neural network is fitted with~\eqref{eq:kl_objective} using a collection of observed $x$'s, the approximate posterior $q_\eta(z^{new} | x^{new})$ for a new data point 
 $x^{new}$ can be evaluated with a single forward pass through the neural network. 
 No additional run of an iterative optimization routine is needed for a new data point $x^{new}$. 
 
@@ -49,13 +48,13 @@ The following subsections detail the construction of our variational distributio
 
 \subsubsection{The factorization}
 \label{sec:factorization}
-To make the objective in \eqref{eq:kl_objective} tractable, the family $\mathcal{Q}$ may be restricted to probability distributions 
-without conditional dependencies between some latent variables. In the most extreme case, called mean-field variational inference, the variational distribution factorizes across all latent variables. 
+To make the objective in \eqref{eq:kl_objective} tractable, the family $\mathcal{Q}$ is normally restricted to probability distributions 
+without conditional dependencies between some latent variables. In the most extreme case, known as mean-field variational inference, the variational distribution completely factorizes across all latent variables. 
 
 Our factorization instead has a spatial structure. 
 First, we partition the full $H \times W$ image into disjoint $R \times R$ tiles. 
-$R$ will be chosen such that the probability of having three or more stars on an $R \times R$ tile is small. 
-In such a way, the cataloging problem decomposes to inferring only a few stars at a time (Section~\ref{sec:nn_archetecture}). 
+$R$ will be chosen such that the probability of having three or more stars in one tile is small. 
+In this way, the cataloging problem decomposes to inferring only a few stars at a time (Section~\ref{sec:nn_archetecture}). 
 
 Let $S = \sfrac{H}{R}$ and $T = \sfrac{W}{R}$ and assume without loss of generality that $H$ and $W$ are multiples of $R$.
 For $s = 1, ..., S$ and $t = 1, ..., T$,
@@ -75,8 +74,8 @@ Figure~\ref{fig:ex_tiles} gives an example with $R = 2$.
 
 Let $\tilde N^{(s, t)}$ be the number of stars in tile 
 $(s,t)$.
-Because $\tilde N^{(s, t)}$ is random and must be inferred, 
-the cardinality of the set of locations and fluxes on each tile
+Because $\tilde N^{(s, t)}$ is random, 
+the cardinality of the set of locations and fluxes in each tile
 is also random. 
 To handle the trans-dimensional parameter space, 
 we consider a {\itshape triangular array} of latent variables
@@ -91,14 +90,14 @@ Tile locations $\tilde\ell_{N, i}^{(s, t)} \in [0, R]\times[0, R]$ give the loca
 
 Call $(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)})_{s=1,t=1}^{S,T}$ the {\itshape tile latent variables}; 
 succinctly denote tile latent variables as $\tilde z$. 
-The full latent variable of interest is $z = \{N, (\ell_i, f_{i,1}, ..., f_{i,B})_{i = 1}^N\}$, the catalog for the full image. 
+The ultimate latent variable of interest is $z = \{N, (\ell_i, f_{i,1}, ..., f_{i,B})_{i = 1}^N\}$, the catalog for the full image. 
 A distribution on $z$ is obtained by first constructing a mapping from $\tilde z$ to $z$.
 We then define a distribution 
 on the tile latent variables $\tilde z$, which in turn  induces 
 a distribution on $z$.  
 
 
-We detail the mapping $\tilde z\mapsto z$ (see Figure~\ref{fig:tile_to_full_schm} for a schematic).  
+We now detail the mapping $\tilde z\mapsto z$ (see Figure~\ref{fig:tile_to_full_schm} for a schematic).  
 The number of stars in the catalog is 
 \begin{align}
     N = \sum_{s=1}^{S}\sum_{t=1}^T \tilde N^{(s, t)}. 
@@ -177,8 +176,8 @@ where $\tau^{-1}(z)$ is the pre-image of $z$ under $\tau$.
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[width = 0.9\textwidth]{figures/tile_to_full_schematic.png}
-    \caption{An example image with four tiles illustrating the relationship between tile latent variables and the full-image latent variables. The upper-left tile has two stars; the upper-right and lower-left has one; the bottom right has none. 
+    \includegraphics[width = 0.8\textwidth]{figures/tile_to_full_schematic.png}
+    \caption{An example image with four tiles illustrating the relationship between tile latent variables and the full-image latent variables. The upper-left tile has two stars; the upper-right and lower-left have one; the bottom right has none. 
     On each tile, we index into the appropriate row of the triangular array. 
     Colored variables in the tiles enter the full-image catalog.}
     \label{fig:tile_to_full_schm}
@@ -207,7 +206,7 @@ for any given catalog $z = \{N, (\ell_i, f_{i,1}, ..., f_{i,B})_{i = 1}^N\}$.
 By~\eqref{eq:pull_back_of_q}, 
 it suffices to evaluate $\tilde q_\eta(\tau^{-1}(z) | x)$. 
 
-Here, $\tau^{-1}(z)$ is a {\itshape set} of tile latent variables because the mapping from tile latent variables to catalogs $z$ is not injective. We detail this below. 
+Here, $\tau^{-1}(z)$ is a {\itshape set} of tile latent variables because the mapping from tile latent variables to catalogs $z$ is not injective, as we now explain.  
 
 Locations in the catalog $\{\ell_i\}_{i=1}^N$
 determine the number of stars on tile $(s,t)$. 
@@ -240,7 +239,7 @@ Applying this observation and combining~\eqref{eq:factorize_within_patch} and ~\
     \tilde q_\eta\big(\tilde f_{\tilde N^{(s,t)},i}^{(s, t)} | x\big)
     \Big\}.
 \end{align}
-In other words, given a catalog $z$,
+In words, given a catalog $z$,
 first convert $z$ to tile random variables;
 to compute $q_\eta(z | x)$, it suffices to evaluate $\tilde q_\eta$ only at the rows of triangular 
 arrays determined by the number 
@@ -269,8 +268,8 @@ of stars falling in each tile.
 % }
 % \jeff{Is there somewhere you say that in the variational distribution, $N = \sum_{k=1}^K N^{(k)}$ ? That might be a good way to put it.}
 
-\subsubsection{Distributions on image tiles}
-We describe the distribution on each tile,
+\subsubsection{Variational distributions on image tiles}
+We describe the variational distribution on each tile,
 $\tilde q_\eta\big(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)} | x\big)$. Dropping the index 
 $(s,t)$ in this subsection, 
 \begin{align}
@@ -290,25 +289,26 @@ we place a normal distribution on the logit of the location scaled by $1 / R$.
 \subsubsection{Neural network architecture}
 \label{sec:nn_archetecture}
 
-On each tile, the distributional parameters in \eqref{eq:var_distr_n},
+In each tile, the distributional parameters in \eqref{eq:var_distr_n},
 \eqref{eq:var_distr_loc}, and \eqref{eq:var_distr_f} are the output of a neural network. 
 The input to the neural network is an $R \times R$ tile, padded with surrounding pixels.
-Padding enables to neural network to produce better predictions inside the tile. 
-For example, a bright source in the vicinity but outside the tile will affect the pixel values inside the tile. 
-Padding the tiles allows the neural network access to this information, and choosing the amount of padding will depend on the PSF width in the analyzed image. 
+Padding enables the neural network to produce better predictions inside the tile. 
+For example, a bright source in the vicinity of but outside the tile will affect the pixel values inside the tile. 
+Padding the tiles allows the neural network access to this information. 
+The appropriate amount of padding will depend on the PSF width in the analyzed image. 
 To catalog the crowded starfield M2 (Section~\ref{sec:results_on_m2}),
-we set $R = 2$ and padded the tile with three pixels.
+we set $R = 2$ and padded the tile with a three-pixel-wide boundary.
 Thus, while the distribution on tile latent variables factorize over tiles, the neural network is able to use information from neighboring tiles in producing the distributional parameters. 
 
 
-Let $\hat x^{(s,t)}$ denote the padded tile (which includes all $B$ bands) and $h_\eta$ be the neural network, which returns the collection of distributional parameters
+Let $\hat x^{(s,t)}$ denote the padded tile pixel intensities (which includes all $B$ bands) and $h_\eta$ be the neural network, which returns the collection of distributional parameters
 \begin{align}
     h_\eta(\hat x^{(s,t)}) = (\omega^{(s,t)}, \mu_\ell^{(s,t)}, \nu_{\ell}^{(s,t)}, \mu_f^{(s,t)}, \sigma^{(s,t)}_f).
     \label{eq:nn_output}
 \end{align}
 The same neural network is evaluated for all tiles $(s,t)$. Our variational parameters are neural network weights, here denoted $\eta$. 
 The architecture consists of several convolutional layers followed by a series of fully connected layers (Figure~\ref{fig:starnet_arch}). 
-This combination of convolutions followed by fully connected layers has been successful on image classification challenges such as ImageNet~\cite{imagenet2015}. 
+This architecture has been successful on image classification challenges such as ImageNet~\cite{imagenet2015}. 
 The optimization of the architecture is left for future work; our focus in this paper is the application of neural networks to provide a variational posterior for cataloging starfields, not the network architecture per se. 
 
 
@@ -342,7 +342,7 @@ Because the output dimension is quadratic in $N_{max}$, factorizing the variatio
 On a crowded starfield with $H = W = 100$, the number of imaged stars is on the order of $10^3$.
 If the neural network were to return a variational distribution on the full $100\times 100$ image, the output dimension would be on the order of $(10^3)^2$. 
 On the $2\times 2$ tile, we set $N_{max} = 3$, and the output dimension of the neural network with two bands is 53. 
-
+With this factorization, the network can be used for inference on an image of any size. 
 
 
 We emphasize that while the variational distribution factorizes over $2 \times 2$ tiles, our method does not break the inference problem for the full image into isolated subproblems. The evaluation of the likelihood, e.g., when computing the ELBO in~\eqref{eq:elbo}, is always on the full image. Light from a star within a $2 \times 2$ tile spills over into neighboring tiles, so the likelihood should not and does not decouple across image tiles. 

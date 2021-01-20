@@ -5,7 +5,7 @@ Typically, photons must pass through one of several filters, each selecting phot
 For a given $H \times W$ pixel image with $B$ filter bands, our goal is to infer a catalog of 
 stars. 
 The catalog specifies the number of stars 
-in an image; then for each star, the catalog 
+in an image; for each such star, the catalog 
 records its location and its flux, or brightness,
 in each band. 
 The space of latent variables 
@@ -19,10 +19,10 @@ is $N\in\mathbb{N}$,
 the location of the $i$th star is $\ell_i \in \Reals^2$, and 
 the flux of the $i$th star in the $b$th band is $f_{i, b}\in\Reals^+$. 
 
-A Bayesian approach requires specification of a prior over catalog space $\mathcal{Z}$ and a likelihood for the observed images. Our model and priors, detailed below, are similar to previous approaches in~\cite{Portillo_2017, Brewer_2013, Feder_2019, regier2019_celeste}.
+A Bayesian approach requires specification of a prior over catalog space $\mathcal{Z}$ and a likelihood for the observed images. Our likelihood and prior, detailed below, are similar to previous approaches~\cite{Portillo_2017, Brewer_2013, Feder_2019, regier2019_celeste}.
 
 \subsection{The prior}
-The prior over $\mathcal{Z}$ is a marked spatial Poisson process. First, draw the number of stars contained in the $H\times W$ image as
+The prior over $\mathcal{Z}$ is a marked spatial Poisson process. To sample the prior, first draw the number of stars contained in the $H\times W$ image as
 \begin{align}
 	N &\sim \text{Poisson}(\mu HW),
 	\label{eq:n_prior}
@@ -46,14 +46,15 @@ Fluxes in other bands are described relative to the first band. Like~\cite{Feder
 Given the flux in the first band $f_{i,1}$ and color $c_{i,b}$,
 the flux in band $b$ is  $f_{i,b} = f_{i,1} \times 10^{c_{i,b} / 2.5}$.
 
-Like~\cite{Feder_2019}, we set the power law slope $\alpha = 0.5$, and use a standard Gaussian for the color prior ($\mu_c = 0$, $\sigma^2_c = 1$). 
+Also like~\cite{Feder_2019}, we set the power law slope $\alpha = 0.5$ and use a standard Gaussian for the color prior ($\mu_c = 0$, $\sigma^2_c = 1$). 
 Appendix~\ref{sec:prior_sensitivity} evaluates the 
 sensitivity of the resulting catalog to choices of the prior parameters. 
 
 \subsection{The likelihood}
-Let $x_{hw}^b$ denote the observed number of photoelectrons at pixel $(h,w)$ and band $b$. For each band, at every pixel, the expected number of photoelectron arrivals is $\lambda^b_{hw}(z)$, a deterministic function of the catalog $z$. Motivated by the Poissonian nature of photon arrivals and 
+Let $x_{hw}^b$ denote the observed number of photoelectrons at pixel $(h,w)$ in band $b$. 
+For each band, at every pixel, the expected number of photoelectron arrivals is $\lambda^b_{hw}(z)$, a deterministic function of the catalog $z$. Motivated by the Poissonian nature of photon arrivals and 
 the large photon arrival rate in SDSS and LSST images, 
-observations are drawn
+observations are drawn as
 \begin{align}
   x_{hw}^b | z \overset{ind}{\sim} \mathcal{N}(\lambda^b_{hw}, \lambda^b_{hw}),
   \quad 
@@ -70,13 +71,14 @@ Here, $\mathcal{P}^b$ is the point spread function (PSF) for band $b$ and $I^{b}
 \begin{align}
 \mathcal{P}^b : \Reals \times \Reals \mapsto \Reals^+,
 \end{align}
-describing how a stellar point source appears at any 2D position of the image (but ignoring pixelation). 
-Our PSF model is a weighted average between a Gaussian ``core" and a power-law ``wing" as described in~\cite{Xin2018psf}. For each band, the PSF has the form
+describing the appearance of a stellar point source at any 2D position of the image (but ignoring pixelation). 
+Our PSF model is a weighted average between a Gaussian ``core" and a power-law ``wing," as described in~\cite{Xin2018psf}. For each band, the PSF has the form
 \jeff{Better to define the parameters before using them.}
 \begin{align}
-    \mathcal{P}(h, w) = \frac{\exp(\frac{-(h^2 + w^2)}{2\sigma_1^2}) + 
-                            \zeta \exp(\frac{-(h^2 + w^2)}{2\sigma_2^2}) + 
-                            \rho(1 + \frac{h^2 + w^2}{\gamma\sigma^2_P})^{-\gamma/2} }{1 + \zeta + \rho}.
+    \mathcal{P}(u,v) = 
+    \frac{\exp(\frac{-(u^2 + v^2)}{2\sigma_1^2}) + 
+    \zeta \exp(\frac{-(u^2 + v^2)}{2\sigma_2^2}) + 
+    \rho(1 + \frac{v^2 + u^2}{\gamma\sigma^2_P})^{-\gamma/2} }{1 + \zeta + \rho}.
 \end{align}
 The PSF parameters vary by band. Let the collection of PSF parameters across all bands be denoted $\pi := (\sigma_{1}^{(b)}, \sigma_{2}^{(b)}, \sigma_{P}^{(b)}, \gamma^{(b)}, \zeta^{(b)}, \rho^{(b)})_{b=1}^B$.
 

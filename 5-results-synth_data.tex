@@ -6,7 +6,7 @@
 \label{sec:elbo_sleep_compare}
 
 A simple example demonstrates that there exist shallow local optima in the ELBO
-where the fitted approximate posterior is far in KL divergence from the true posterior. 
+where the fitted approximate posterior is far in KL divergence from the exact posterior. 
 These local optima result in unreliable catalogs. 
 The sleep objective, by taking advantage of  complete data, appears to better avoid these local optima. 
 For this example, the data were simulated with known PSF and background, and the wake phase is not needed. 
@@ -29,7 +29,7 @@ We compare three approaches to deblending. The first two approaches directly opt
 \label{eq:elbo_on_test}
 \end{align}
 while the third approach optimizes the sleep objective~\eqref{eq:sleep_obj}. 
-In each case, $q_\eta$ is the inference network from Section~\ref{sec:nn_archetecture}; the input to the network are $10\times 10$ tiles with no padding. 
+In each case, $q_\eta$ is the inference network from Section~\ref{sec:nn_archetecture}; the input to the network is a $10\times 10$ tile with no padding. 
 
 Note that the sleep objective does not depend on $x_{test}$. 
 Optimizing the sleep objective only requires sampling catalogs from the prior
@@ -43,18 +43,18 @@ For a lower variance gradient estimator, the second approach employed the repara
 See Appendix~\ref{sec:reparam_details} for details about the gradient estimators. 
 Using reparameterized gradients instead of REINFORCE gradients enabled the optimization to converge to stationary points (Figure~\ref{fig:optim_path}b). 
 However, for two of the six randomly initialized restarts, 
-the optimization found local optima where the ELBO is lower than other restarts. 
+the optimization found local optima where the negative ELBO is higher than other restarts. 
 
 In contrast, optimizing the sleep objective consistently converged to a similar ELBO across all restarts and appeared to avoid shallow local optima (Figure~\ref{fig:optim_path}c).
-Recall that sleep phase optimization does not directly optimize the test ELBO. However, the test ELBO increases nonetheless because the variational posterior better approximates the true posterior as the optimization proceeds. 
+Recall that sleep phase optimization does not directly optimize the test ELBO. However, the test ELBO increases nonetheless, because the variational posterior better approximates the exact posterior as the optimization proceeds. 
 
 Shallow local optima in the ELBO result in unreliable catalogs. 
-The bottom row of Figure~\ref{fig:optim_path} displays the estimated locations, defined by the mode of the fitted variational distribution. 
+The bottom row of Figure~\ref{fig:optim_path} displays the estimated locations, defined as the mode of the fitted variational distribution. 
 The bottom left shows these locations after converging to a shallow local optimum. 
 In this local optimum, the upper left tile was correctly estimated to have two stars; however, both estimated stars were placed at the same location.
 For correct detections, one of the locations should be placed on the second star.
 However, in order to move one of the estimated locations to the second star, the optimization path must traverse a region where the log-likelihood is lower than the current configuration (Figure~\ref{fig:local_optima_cartoon}). 
-The displayed configuration is a local optima where the gradient with respect to its locations is approximately zero.
+The displayed configuration is a local optimum where the gradient with respect to its locations is approximately zero.
 In contrast, the sleep-phase variational distribution consistently placed its mode around the four true stars. 
 The sleep objective is quadratic in the logit-location estimate $\mu_\ell$ (Equation~\ref{eq:gaussian_sleep_loss}), and the gradient does not vanish in the sleep objective. 
 An example of correct detection after sleep-phase optimization is shown in the bottom right image of~Figure~\ref{fig:optim_path}.
@@ -95,15 +95,15 @@ An example of correct detection after sleep-phase optimization is shown in the b
     \label{fig:local_optima_cartoon}
 \end{figure}
 
-Also, note that low-variance gradients of the ELBO for this simple example were constructed by analytically integrating out $N$. Only then could the reparameterization trick be applied to the ELBO as the remaining latent variables are continuous. 
+Also, note that low-variance gradients of the ELBO for this simple example were constructed by analytically integrating out $N$. Only then could the reparameterization trick be applied to the ELBO, as the remaining latent variables are continuous. 
 In this example, the variational distribution has support over only 0, 1, or 2 stars for each tile. 
 Since the variational distribution factorizes over the four tiles, integrating $N$ is a summation of $3^4 = 81$ terms.
 On larger images with more tiles, analytically integrating $N$ would be computationally infeasible, 
-and the simple reparameterization trick would not apply. 
+and the simple reparameterization trick would not apply as it does in this small illustrative example. 
 
 Figure~\ref{fig:sim_data100x100} displays our results on a larger example: a simulated $100\times 100$ image with fifty stars. 
 The tiles again consisted of $10\times 10$ pixel regions. 
-Optimizing the ELBO appears does not produce accurate location estimates and appears to be hindered by regions with little gradient information; optimizing the sleep objective produced much improved perfect location estimates.
+Optimizing the ELBO does not produce accurate location estimates and appears to be hindered by regions with little gradient information; optimizing the sleep objective produced much improved location estimates.
 
 
 \begin{figure}[!htb]

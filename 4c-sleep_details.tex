@@ -20,7 +20,7 @@ Here, unbiased stochastic gradients can be obtained simply as
 
 In other words, the sleep phase simulates {\itshape complete} data $(z, x)$ from the generative model and evaluates the loss $-\log q_\eta(z | x)$. 
 Here, ``complete data" refers to the image along with its catalog. 
-This loss encourages the neural network to map images $x$ to a distribution $q_{\eta}(\cdot | x)$ that places large mass on the catalog $z$.
+This loss encourages the neural network to map an image $x$ to a distribution $q_{\eta}(\cdot | x)$ that places large mass on the image's catalog $z$.
 
 Furthermore, recall that $q_\eta$ factorizes over image tiles. Having sampled the catalog $z$ 
 and the $H\times W$ image $x$ from $p(x,z)$, convert $z$ to its tile parameterization $(\tilde N^{(s,t)}, \tilde \ell^{(s,t)}, \tilde f^{(s,t)})_{s=1,t=1}^{(S,T)}$, as detailed in Section~\ref{sec:factorization}.
@@ -34,7 +34,7 @@ For a given image tile, the latent variables $\tilde N^{(s,t)}$, $\tilde \ell^{(
         - \log q_\eta(\tilde f^{(s,t)} | x). 
         \label{eq:sleep_loss_decomp}
 \end{align}
-Each term can be interpreted separately. On tile $(s,t)$, the number of stars $\tilde N^{(s,t)}$ is categorical with parameter $\omega^{(s,t)}$. The loss function for the number of stars becomes
+Each term can be interpreted separately. In tile $(s,t)$, the number of stars $\tilde N^{(s,t)}$ is categorical with parameter $\omega^{(s,t)}$. The loss function for the number of stars becomes
 \begin{align}
     - \log q_\eta(\tilde N^{(s,t)} | x) = -\sum_{n = 0}^{\tilde N_{max}} 1\{\tilde N^{(s,t)} = n\} \log \omega^{(s,t)}_n, 
     \label{eq:cross_entropy_loss}
@@ -65,7 +65,7 @@ $\mu_{n,i}$ is the predicted value for that latent variable from the neural netw
 $\sigma_{n,i}$ is also outputted by the neural network, representing uncertainty -- the second term encourages small uncertainties, but this is 
 balanced by the scaling of the error $(y_{n,i} - \mu_{n,i})^2$ in the first term. 
 
-The losses in~\eqref{eq:cross_entropy_loss} and~\eqref{eq:gaussian_sleep_loss} show that the sleep objective results in a supervised learning problem on complete data simulated from our generative model: the objective function for number of stars is the usual cross-entropy loss for classification while the objective function for log-fluxes and logit-locations are $L_2$ losses in the mean parameters. 
+The losses in~\eqref{eq:cross_entropy_loss} and~\eqref{eq:gaussian_sleep_loss} show that the sleep objective results in a supervised learning problem on complete data simulated from our generative model: the objective function for the number of stars is the usual cross-entropy loss for classification, while the objective function for log-fluxes and logit-locations are $L_2$ losses in the mean parameters. 
 
 
 % In Section~\ref{sec:estep_sleep_compare}, we will see the benefits of using complete data and optimizing $q_\eta$ using the losses~\eqref{eq:cross_entropy_loss} and \eqref{eq:gaussian_sleep_loss}  rather than the traditional ELBO. 

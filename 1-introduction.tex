@@ -5,11 +5,11 @@ These catalogs are the starting point for many downstream analyses.
 For example, Bayestar used a catalog of stellar fluxes and colors to construct the 3D distribution of interstellar dust~\cite{Green_2019_argonaut}. 
 Catalogs of galaxy morphologies have been used to validate theoretical models of dark matter and dark energy~\cite{Abbott2018}. 
 
-A light source, either star or galaxy, produces a peak intensity of brightness in an image. 
-When light sources are well separated, catalog construction is straightforward: characteristics of each light source such as flux can be estimated by analyzing intensities at the peak and surrounding pixels. 
-However, in images crowded with many light sources, observed intensities may be the result of the combined light from multiple sources.
-Source separation, or {\itshape deblending}, is the task of characterizing each individual light source from a mixture of intensities on an image. 
-A key challenge in deblending is inferring whether any observed intensity is in fact blended, that is, whether it is comprised of a single bright source or multiple dimmer sources. 
+A light source, be it a star or a galaxy, produces a peak intensity of brightness in an image. 
+When light sources are well separated, catalog construction is straightforward: characteristics of each light source, such as flux, can be estimated by analyzing intensities at the peak and surrounding pixels. 
+However, in images crowded with many light sources, observed intensities may result from the combined light of multiple sources.
+Source separation, or {\itshape deblending}, is the task of differentiating and characterizing individual light sources from a mixture of intensities on an image. 
+A key challenge in deblending is inferring whether an observed intensity is in fact blended, that is, whether it is composed of a single bright source or multiple dimmer sources. 
 
 % In such settings, a key step in catalog construction is light source separation, or {\itshape deblending}, the process of 
 % Deblending first involves distinguishing whether a peak intensity corresponds to a single light source or multiple light sources. 
@@ -18,18 +18,18 @@ A key challenge in deblending is inferring whether any observed intensity is in 
 Deblending is challenging for several reasons.
 First, it is an unsupervised problem without ground truth labeled data. 
 Second, it is a problem with a sample size of one: there is only one night sky, which is imaged many times, and the collected survey images capture overlapping regions of it.
-Third, for blended fields, the properties of light sources are ambiguous; therefore, providing calibrated uncertainties surrounding catalog construction is as important as making accurate predictions.
+Third, for blended fields, the properties of light sources are ambiguous; therefore, providing calibrated uncertainties for catalog construction is as important as making accurate predictions.
 Finally, the scale of the data is immense. 
 The upcoming Rubin Observatory Legacy Survey of Space and Time (LSST), scheduled to begin data collection in 2022, is expected to produce 60 petabytes of astronomical images over its lifetime~\cite{LSST_about}.
 
-As more powerful telescopes are developed and their ability to detect more distant light sources improves, the density of light sources in the images they capture will only increase. 
-For instance, \cite{Bosch_2017_LSST} estimates that 58\% of light sources are blended in images captured by the Subaru Telescope’s Hyper Suprime-Cam, and that percentage is expected to increase for LSST. 
+As more powerful telescopes are developed, and their ability to detect more distant light sources improves, the density of light sources in the images they capture will only increase. 
+For instance, \cite{bosch2018hyper} estimates that 58\% of light sources are blended in images captured by the Subaru Telescope’s Hyper Suprime-Cam, and that percentage is expected to increase for LSST. 
 Therefore, developing a method that reliably characterizes light sources, even in cases of significant light source blending, 
-advances any astronomical research where conclusions about the physical universe are derived from estimated catalogs. 
+advances any astronomical research in which conclusions about the physical universe are derived from estimated catalogs. 
 
-We focus on cataloging applications where all light sources are well-modeled as points without spatial extent. 
+We focus on cataloging applications where all light sources are well modeled as points without spatial extent. 
 Point-source models are applicable to surveys such as DECam~\cite{Schlafly_2018_DECam}, which imaged the center of our own Milky Way, and WISE~\cite{Wright_2010_WISESurvey}, whose telescope resolution did not allow for differentiation between stars and galaxies.
-In this work, we use the globular cluster M2, a region imaged by the Sloan Digital Sky Survey (SDSS) and densely populated with stars, as a test bed for our method. 
+In this work, we use the globular cluster M2, a region imaged by the Sloan Digital Sky Survey (SDSS) that is densely populated with stars, as a test bed for our method. 
 
 \bigbreak
 
@@ -38,15 +38,14 @@ In this work, we use the globular cluster M2, a region imaged by the Sloan Digit
 Traditionally, most cataloging has been performed using software pipelines.
 These pipelines are algorithms that usually involve the following stages: locating the brightest peaks, estimating fluxes, and subtracting the estimated light source.
 These stages may be performed iteratively.
-These pipelines do not normally produce statistically calibrated error estimates that propagate 
-the uncertainty accumulating in each step of the pipeline. 
-Failure to properly accumulate error at each step results in unreliable catalogs for images with ambiguity in identifying sources and estimating their characteristics.
+Pipelines do not normally produce statistically calibrated error estimates that propagate 
+the uncertainty that accumulates in each of the steps. 
+Failure to properly accumulate error at each step results in unreliable catalogs for images in which ambiguity exists in identifying sources and estimating their characteristics.
 For example, PHOTO~\cite{lupton2001sdss}, the default cataloging pipeline used by the Sloan Digital Sky Survey (SDSS), failed to 
 produce a catalog on the globular cluster M2~\cite{Portillo_2017}. 
 
-In contrast, {\itshape probabilistic} cataloging posits a statistical model consisting of a likelihood for the observed image and a prior distribution over possible catalogs~\cite{Portillo_2017, Brewer_2013, Feder_2019}. 
+In contrast, {\itshape probabilistic} cataloging posits a statistical model consisting of a likelihood for the observed image given a catalog and a prior distribution over possible catalogs~\cite{Portillo_2017, Brewer_2013, Feder_2019}. 
 Instead of deriving a single catalog, probabilistic cataloging produces a posterior distribution over the set of all possible catalogs. 
-In other words, each sample from the posterior is a catalog. 
 Uncertainties are quantified by the posterior distribution. 
 For example, in an image with an ambiguously blended bright peak, some catalogs sampled from the posterior would contain multiple dim light sources while others would contain one bright source. 
 The relative density the posterior distribution places on one explanation over another represents the statistical confidence in that explanation. 
@@ -54,26 +53,26 @@ Moreover, a distribution over the set of all catalogs induces a distribution on 
 
 Previous work on probabilistic cataloging employed Markov chain Monte Carlo (MCMC) to sample from the posterior distribution.
 The MCMC procedure in~\cite{Portillo_2017, Feder_2019}
-was named PCAT, short for ``Probabilistic CATaloging."\footnote{
+was called PCAT, short for ``Probabilistic CATaloging."\footnote{
 We use ``probabilistic cataloging'' to refer to any method that produces a posterior over possible catalogs, whereas ``PCAT" refers specifically to the MCMC procedure in~\cite{Portillo_2017, Feder_2019}. }
 Because the posterior is defined over the set of all catalogs and the number of sources in a catalog is unknown and random, 
 the latent variable space is transdimensional. PCAT
-used reversible jump MCMC (RJ-MCMC) ~\cite{Green95reversiblejump} to sample transdimensional catalogs. In RJ-MCMC, auxiliary variables are added to encode the ``birth" of new sources 
-or the ``death" of existing sources in the Markov chain.
+used reversible jump MCMC (RJ-MCMC) ~\cite{Green95reversiblejump} to sample transdimensional catalogs. In RJ-MCMC, auxiliary variables are added to encode the ``birth" of new light sources 
+or the ``death" of existing ones in the Markov chain.
 
 The computational cost of MCMC for this model is problematic for large-scale astronomical surveys. 
 Early implementations of PCAT required a day to process a $100\times 100$ pixel image of the M2 globular cluster imaged by SDSS~\cite{Portillo_2017}. 
 More recent implementations running inexact MCMC brought the runtime down to 30  minutes~\cite{Feder_2019}.  
 In any case, a $100\times 100$ pixel image covers only a $0.66 \times 0.66$ arcminute patch of the sky.
 For comparison, in one night, SDSS scans a region on the order of $100 \times 1000$ arcminutes. 
-Extrapolating the 30 minute runtime, PCAT would take about three months to process the same amount of data.
+Extrapolating the 30-minute runtime, PCAT would take about three months to process a nightly SDSS run. 
 
 As an alternative to MCMC, \cite{regier2019_celeste} produced an approximate posterior using variational inference.
-Variational inference (VI) considers a constrained family of distributions and employs numerical optimization to find the distribution in the family closest
+Variational inference (VI) considers a family of candidate approximate posteriors and employs numerical optimization to find the distribution in the family closest
 in KL divergence to the exact posterior~\cite{Blei_2017_vi_review,Jordan_intro_vi, Wainwrite_graph_models_vi}. 
-With a sufficiently constrained family of distributions, the VI optimization problem can be orders of magnitude faster than MCMC. 
+With a sufficiently constrained family of distributions, the VI optimization problem can be solved orders of magnitude faster than MCMC runs. 
 
-However, \cite{regier2019_celeste} is limited in that the number of light sources in a given image is treated as known and fixed; the number of light sources in the catalog had to be set by a preprocessing routine. 
+However, \cite{regier2019_celeste} is limited in that the number of light sources in a given image is treated as known and fixed -- it had to be set using a preprocessing routine. 
 This simplification was made in order to have a tractable objective for numerical optimization. 
 
 \bigbreak
@@ -85,36 +84,37 @@ This simplification was made in order to have a tractable objective for numerica
 We propose {\itshape StarNet}, a deblending approach employing several recent VI innovations~\cite{zhang2019advances,le2020revisiting}.
 Unlike \cite{regier2019_celeste}, our VI approach is able to handle arbitrary probabilistic models, including a transdimensional model with an unknown number of sources. Section~\ref{sec:gen_model} introduces the statistical model, which is similar to the model used in PCAT.
 
-Secondly, unlike~\cite{regier2019_celeste}, 
+Secondly, again unlike~\cite{regier2019_celeste}, 
 we employ {\itshape amortization}, which enables StarNet to scale inference to large astronomical surveys. 
-In amortized variational inference, a neural network is fit to map input images to an approximate posterior.
-After a one-time cost to fit the neural network, inference 
+In amortized variational inference, a neural network maps input images to an approximate posterior.
+Following a one-time cost to fit the neural network, inference 
 on new images requires just a single forward pass.
-Rapid inference is available without the need to re-run MCMC or numerically optimize for each new image. 
+Rapid inference is available without the need to re-run MCMC or numerically optimize VI for each new image. 
 For StarNet, the forward pass on 
-a $100 \times 100$ pixel image takes $0.2$ seconds (cf.~30 minutes for inference using PCAT).
+a $100 \times 100$ pixel image takes $0.2$ seconds (vs.~30 minutes for inference using PCAT).
 Section~\ref{sec:var_inference} details the variational distribution and neural network architecture in StarNet. 
 
-Finally, and critically, StarNet is fit using the wake-sleep algorithm~\cite{Hinton1995wake_sleep}, which does not target the same KL divergence traditionally used in  variational inference. In traditional variational inference, the approximate posterior is fit to minimize the ``reverse" KL between the approximate posterior $q$ and the true posterior $p$, defined as the $q$-weighted average difference between $\log q$ and $\log p$. 
-Wake-sleep instead fits the approximate posterior using the ``forward" KL divergence, which weights the difference between $\log q$ and $\log p$ by $p$.
+Finally, and critically, StarNet is fit using the wake-sleep algorithm~\cite{Hinton1995wake_sleep}, which does not target the same KL divergence traditionally used in  variational inference. Traditionally, variational inference minimizes the ``reverse" KL divergence between the approximate posterior $q$ and the exact posterior $p$.
+Reverse KL is defined as the $q$-weighted average difference between $\log q$ and $\log p$. 
+Wake-sleep instead fits the approximate posterior using the ``forward" KL divergence, which weights the difference between $\log p$ and $\log q$ by $p$.
 The forward KL is minimized using stochastic gradient descent (SGD). 
-Procedurally, in this SGD routine, catalogs are sampled from the prior distribution along with corresponding images from the likelihood model. 
-The neural network is trained to map the sampled images to distributions that place probability mass on their corresponding catalogs. Section~\ref{sec:wake_sleep} details the wake-sleep procedure. 
+At each iteration, catalogs are sampled from the prior distribution, then used to generate images from the likelihood model. 
+The neural network is fit to map the generated images to distributions that place probability mass on their corresponding catalogs. Section~\ref{sec:wake_sleep} details the wake-sleep procedure. 
 
 In this application, optimizing the forward KL produces more reliable approximate posteriors than optimizing the traditional reverse KL (Section \ref{sec:elbo_sleep_compare}). 
-In particular, by taking advantage of complete data---the sampled images and their corresponding catalogs---wake-sleep avoids shallow local minima where the approximate posterior returned by the neural network is far from the true posterior in terms of KL divergence. 
+In particular, by taking advantage of complete data---the sampled images and their corresponding catalogs---wake-sleep avoids shallow local minima where the approximate posterior returned by the neural network is far from the exact posterior in terms of KL divergence. 
 
 The wake-sleep algorithm has been used in previous research to train deep generative models~\cite{Hinton1995wake_sleep, bornschein2014reweighted, le2020revisiting}.
 However, to the best of our knowledge, this is the first application of wake-sleep for scientific purposes. 
-Specifically, we use wake-sleep for inference to find a latent space that is interpretable, as it is the set of all possible astronomical catalogs.
+Specifically, we use wake-sleep for inference to find a latent space that is interpretable: it is the set of all possible astronomical catalogs.
 
 
-We applied StarNet on the M2 globular cluster as imaged by SDSS.
-We used the M2 catalog from the ACS Globular Cluster Survey~\cite{Sarajedini_2007} as a ground truth. 
+We applied StarNet to the M2 globular cluster as imaged by SDSS.
+We used the M2 catalog from the ACS Globular Cluster Survey~\cite{Sarajedini_2007} as ground truth. 
 The ACS survey used the Hubble Space telescope, 
 which has approximately 20 times the angular resolution and 30 times the exposure of the ground-based Sloan telescope. 
 StarNet was more accurate than the MCMC-based cataloger PCAT and traditional cataloging approaches while running $100,000$ times faster than the former (Section~\ref{sec:results_on_m2}).
-While the MCMC posterior approximation converges to the exact posterior asymptotically, over finite horizons an MCMC sampler may not mix well. The sleep-phase objective from the Wake-Sleep algorithm allows StarNet to circumvent many of the challenges of nonconvex optimization.
+Although the MCMC posterior approximation converges to the exact posterior asymptotically, over finite horizons an MCMC sampler may not mix well. The sleep-phase objective from the Wake-Sleep algorithm allows StarNet to circumvent many of the challenges of nonconvex optimization
 (Section~\ref{sec:discussion}).
 
 % However, in addition to greater speed, amortized inference may be better at nonconvex optimization: by learning a policy from many examples we learn a policy for avoiding shallow local minima. 
