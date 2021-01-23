@@ -1,0 +1,18 @@
+\begin{table}[ht]
+\centering
+\caption{Summary statistics on the M2 test subregion. 
+StarNet-init is the network fit on the original M2 subregion (equivalent to StarNet-WS in the main text). 
+StarNet-refit ran two further wake-sleep cycles on the M2 test subregion. }
+\label{tab:summary_stats_m2test}
+\begin{tabular}{l|ccc|cc}
+\toprule
+     Method &   TPR &   PPV &  F1 score &  \#stars & (q-5\%, q-95\%)\\
+\midrule
+    DAOPHOT &  0.13 &  0.53 &      0.21 &     338 & -- \\
+       PCAT &  0.44 &  0.37 &      0.41 &    1793 & (1799, 1805)\\
+ StarNet-init &  0.47 &  0.47 &      0.47 &    1466 & (1431, 1499)\\
+ StarNet-refit &  0.47 &  0.50 &      0.48 &     1396 & (1362, 1432)\\
+     Hubble &  1.00 &  1.00 &      1.00 &     1413 & -- \\
+\bottomrule
+\end{tabular}
+\end{table}

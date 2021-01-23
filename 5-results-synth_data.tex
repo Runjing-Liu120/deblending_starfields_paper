@@ -17,7 +17,7 @@ The image has four stars, each with the same flux.
 \begin{figure}[!h]
     \centering
     \vspace{-1em}
-    \includegraphics[width = 0.3\textwidth]{figures/vi_sleep_ex_figure.png}
+    \includegraphics[width = 0.3\textwidth]{figures/elbo_vs_sleep/vi_sleep_ex_figure.png}
     \vspace{-1.7em}
     \caption{The $20\times 20$ pixel synthetic image that we use for testing. It contains four stars and is partitioned into $10\times 10$ tiles. }
     \label{fig:toy_example}
@@ -63,16 +63,17 @@ An example of correct detection after sleep-phase optimization is shown in the b
     \centering
     \begin{subfigure}[t]{0.9\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{figures/optim_path_compare.png}
+    \includegraphics[width=\textwidth]{figures/elbo_vs_sleep/optim_path_compare.png}
     \end{subfigure}
     \begin{subfigure}[t]{\textwidth}
     \centering
-    \includegraphics[width=0.55\textwidth]{figures/optim_path_detect_compare.png}
+    \includegraphics[width=0.55\textwidth]{figures/elbo_vs_sleep/optim_path_detect_compare.png}
     \end{subfigure}
     \vspace{-3em}
     \caption{(Top row) The ELBO as the optimization progresses for six random restarts. 
     (Bottom row) Modal locations from two variational posteriors.
-    On the left, a randomly initialized run where optimizing the ELBO with the reparameterized gradient resulted in a local optimum.
+    On the left, a randomly initialized run where optimizing the ELBO with the reparameterized gradient resulted in a shallow local optimum: 
+    a star was missed by the modal catalog. 
     On the right, the variational posterior 
     was optimized using the sleep phase. }
     \label{fig:optim_path}
@@ -87,7 +88,7 @@ An example of correct detection after sleep-phase optimization is shown in the b
 
 \begin{figure}[!htb]
     \centering
-    \includegraphics[width=\textwidth]{figures/local_minima_cartoon.png}
+    \includegraphics[width=\textwidth]{figures/elbo_vs_sleep/local_minima_cartoon.png}
     \caption{An illustration of local optima in the ELBO objective. 
     To move an estimated location to a correct location, 
     the optimization path must traverse a region where the negative ELBO is larger than the current configuration. 
@@ -110,11 +111,11 @@ Optimizing the ELBO does not produce accurate location estimates and appears to 
     \centering
     \begin{subfigure}[!t]{0.59\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{figures/optim_path_detect_compare_100x100.png}
+    \includegraphics[width=\textwidth]{figures/elbo_vs_sleep/optim_path_detect_compare_100x100.png}
     \end{subfigure}
     \begin{subfigure}[!t]{0.4\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{figures/optim_path_compare_100x100.png}
+    \includegraphics[width=\textwidth]{figures/elbo_vs_sleep/optim_path_compare_100x100.png}
     \end{subfigure}
     \caption{
     (Left) Detections produced by ELBO optimization on a $100\times 100$ test image. Correct locations are blue and estimated locations are red. 

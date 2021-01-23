@@ -1,19 +1,17 @@
-\begin{table}[h]
+\begin{table}[ht]
 \centering
-\caption{
-Negative log-likelihood (NLL) for SDSS, wake-sleep, and Hubble estimated model parameters. In the right column, we fix the background to the Hubble estimate, and examine negative log-likelihood as the PSF varies.}
+\caption{The negative log-likelihood \eqref{eq:hubble_neg_loglik} for various model estimates. PHOTO provides the SDSS estimates of background and PSF for every data release. 
+We compare the PHOTO estimates with StarNet estimates of the PSF and background obtained using wake-sleep. }
 \label{tab:chi-square-stats1}
 \begin{tabular}{lrr}
 \toprule
-     \multicolumn{1}{p{5cm}}{\raggedright $ $ \\ {\bf Method}} & 
-     \multicolumn{1}{p{5cm}}{\raggedleft $ $ \\ {\bf NLL}} & 
-\multicolumn{1}{p{5cm}}{\raggedleft {\bf NLL} \\ (with Hubble \\ \raggedleft background)} \\
+\multicolumn{2}{c}{Model estimate} & Neg.Loglik \\
+\cmidrule(lr){1-2} background & PSF &  \\
 \midrule
-       SDSS &    1.01e+06 &                        2.78e+05 \\
- Wake-sleep &    3.04e+05 &                        2.62e+05 \\
-     Hubble &    2.43e+05 &                        2.43e+05 \\
+PHOTO & PHOTO & 8.671e+05\\
+PHOTO & StarNet & 8.665e+05 \\
+StarNet & PHOTO & 3.651e+05\\
+StarNet & StarNet & 3.395e+05 \\
 \bottomrule
 \end{tabular}
 \end{table}
-
-% \jeff{What is ``back.'' an abbreviation of? Maybe just call the two NLL columns ``NLL, StarNet'' (or whatever the alternative to Hubble is) and ``NLL, Hubble''}

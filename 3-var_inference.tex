@@ -66,7 +66,7 @@ the tile $\tilde x_{st}$ is composed of the following pixels:
 Figure~\ref{fig:ex_tiles} gives an example with $R = 2$. 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[width = 0.5\textwidth]{figures/example_tiled.png}
+    \includegraphics[width = 0.5\textwidth]{figures/vi_figures/example_tiled.png}
     \vspace{-1cm}
     \caption{Tiling a $10 \times 10$ image into $2 \times 2$ tiles.}
     \label{fig:ex_tiles}
@@ -176,7 +176,7 @@ where $\tau^{-1}(z)$ is the pre-image of $z$ under $\tau$.
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[width = 0.8\textwidth]{figures/tile_to_full_schematic.png}
+    \includegraphics[width = 0.8\textwidth]{figures/vi_figures/tile_to_full_schematic.png}
     \caption{An example image with four tiles illustrating the relationship between tile latent variables and the full-image latent variables. The upper-left tile has two stars; the upper-right and lower-left have one; the bottom right has none. 
     On each tile, we index into the appropriate row of the triangular array. 
     Colored variables in the tiles enter the full-image catalog.}
@@ -317,7 +317,7 @@ The optimization of the architecture is left for future work; our focus in this 
 \begin{figure}[!tb]
     \centering
     % \includegraphics[width=0.4\textwidth]{figures/starnet_archetecture2.png}
-    \includegraphics[width=\textwidth]{figures/starnet_archetecture4.png}
+    \includegraphics[width=\textwidth]{figures/vi_figures/starnet_archetecture4.png}
     \vspace{-0.5cm}
     \caption{The neural network architecture. For cataloging M2, the input image is an $8\times 8$ padded tile, and the network returns distributional parameters for latent variables contained in the center $2\times 2$ tile.\\
     }

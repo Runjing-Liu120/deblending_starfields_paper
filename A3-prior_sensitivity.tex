@@ -9,7 +9,7 @@ As expected, as $\mu$ increases the TPR increases while the PPV decreases  -- th
 \begin{figure}[ht]
 \begin{subfigure}{\textwidth}
 \centering
-\includegraphics[width = \textwidth]{figures/prior_mu_sensitivty.png}
+\includegraphics[width = \textwidth]{figures/prior_sensitivity/prior_mu_sensitivty.png}
 \end{subfigure}
 \begin{subfigure}{\textwidth}
 \begin{center}
@@ -17,9 +17,9 @@ As expected, as $\mu$ increases the TPR increases while the PPV decreases  -- th
 \toprule
      mu &   TPR &   PPV \\
 \midrule
- 0.10 &  0.49 &  0.69 \\
- 0.15 &  0.51 &  0.61 \\
- 0.20 &  0.52 &  0.49 \\
+ 0.10 &  0.46 &  0.66 \\
+ 0.15 &  0.51 &  0.60 \\
+ 0.20 &  0.51 &  0.49 \\
 \bottomrule
 \end{tabular}
 \par\vspace{0pt}
@@ -33,8 +33,8 @@ As $\alpha$ increases, StarNet estimates more dim sources: the prior distributio
 
 \begin{figure}[!h]
     \centering
-    \includegraphics[width = 0.6\textwidth]{figures/prior_fluxes.png}
-    \caption{The prior distribution on $r$-band magnitude for various power law slopes $\alpha$}
+    \includegraphics[width = 0.6\textwidth]{figures/prior_sensitivity/prior_fluxes.png}
+    \caption{The prior density of $r$-band magnitude for various power law slopes $\alpha$}
     \label{fig:flux_priors}
 \end{figure}
 
@@ -45,7 +45,7 @@ The stronger prior on dimmer stars also manifests in the flux distribution of th
 \begin{figure}[ht]
 \begin{subfigure}{\textwidth}
 \centering
-\includegraphics[width = \textwidth]{figures/prior_alpha_sensitivty.png}
+\includegraphics[width = \textwidth]{figures/prior_sensitivity/prior_alpha_sensitivity.png}
 \end{subfigure}
 \begin{subfigure}{\textwidth}
 \begin{center}
@@ -53,9 +53,9 @@ The stronger prior on dimmer stars also manifests in the flux distribution of th
 \toprule
  alpha &   TPR &   PPV \\
 \midrule
-  0.25 &  0.45 &  0.64 \\
-  0.50 &  0.51 &  0.61 \\
-  0.75 &  0.51 &  0.53 \\
+  0.25 &  0.46 &  0.60 \\
+  0.50 &  0.51 &  0.60 \\
+  0.75 &  0.52 &  0.54 \\
 \bottomrule
 \end{tabular}
 \par\vspace{0pt}
@@ -67,7 +67,7 @@ The stronger prior on dimmer stars also manifests in the flux distribution of th
 
 \begin{figure}
     \centering
-    \includegraphics[width = 0.6\textwidth]{figures/sensitivity_cdf_fluxes.png}
-    \caption{Sensitivity of estimated flux distribution to flux prior parameter $\alpha$}
+    \includegraphics[width = 0.6\textwidth]{figures/prior_sensitivity/sensitivity_cdf_fluxes.png}
+    \caption{Sensitivity of estimated flux distribution to flux prior parameter $\alpha$.}
     \label{fig:cdf_sensitivity}
 \end{figure}

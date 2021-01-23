@@ -26,7 +26,7 @@ Two additional wake-sleep cycles followed the first sleep phase,
 after which the model parameters and inferred catalog appeared stable.
 The subsequent sleep phases were shorter (10 epochs with 200 images each), and the wake phase employed SGD, with the gradient estimator \eqref{eq:mstep_grad}. In total, the two further wake-sleep cycles took three minutes. 
 
-After fitting the model and variational posterior, calculating the approximate posterior (that is, producing the distributional parameters of the variational approximation) for the $100 \times 100$ image of M2 took $29$ milliseconds. 
+After fitting the model and variational posterior, calculating the approximate posterior (that is, producing the distributional parameters of the variational approximation) for the $100 \times 100$ image of M2 took $30$ milliseconds. 
 By comparison, the reported runtime of PCAT, which uses MCMC, is 30 minutes on the same $100 \times 100$ image~\cite{Feder_2019}.
 In other words, after the initial fit, StarNet provided nearly a $10^5$-fold speed increase. 
 
@@ -44,7 +44,7 @@ on a small $100 \times 100$ subimage
 (while simultaneously obtaining estimates of the PSF and background),
 a one time computational cost of 18.2 minutes. 
 Producing a catalog with the full $1489 \times 2048$ image requires
-$29\text{ msec} \times 14 \times 20 = 8.1$ seconds. In practice, 
+$30\text{ msec} \times 14 \times 20 = 8.4$ seconds. In practice, 
 inference can be made even faster by batching the image tiles to run in parallel on a GPU.
 
 % An SDSS image is indexed by a run, camera column (camcol), and field.
@@ -106,8 +106,8 @@ In contrast, DAOPHOT failed to find dim stars; its flux distribution assigned ze
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.99\textwidth]{figures/summary_statistics_m2.png}
-    \caption{True positive rate and positive predicted value of various cataloging
+    \includegraphics[width=0.99\textwidth]{figures/m2_results/summary_statistics_m2.png}
+    \caption{True positive rate (left) and positive predicted value (right) of various cataloging
     procedures on M2, plotted against $r$-band magnitude.
     Smaller magnitudes correspond to brighter stars.
     }
@@ -116,15 +116,16 @@ In contrast, DAOPHOT failed to find dim stars; its flux distribution assigned ze
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.99\textwidth]{figures/m2_flux_estimation.png}
+    \includegraphics[width=0.99\textwidth]{figures/m2_results/m2_flux_estimation.png}
     \caption{True versus estimated magnitudes on the $r$-band of M2. 
-    Every estimated star was matched with the nearest Hubble star in L2 distance. The $y$-axis is the magnitude of the matched Hubble star. Red line is the identity, $y=x$. }
+    Every estimated star was matched with the nearest Hubble star in L2 distance between locations. 
+    Red line is the identity, $y=x$. }
     \label{fig:m2_flux_estimation}
 \end{figure}
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.99\textwidth]{figures/luminosity_fun.png}
+    \includegraphics[width=0.99\textwidth]{figures/m2_results/luminosity_fun.png}
     \caption{Source magnitude histograms for the $r$-band of M2. 
     The magnitude distribution of the Hubble catalog in grey. 
     Magnitude distributions for the DAOPHOT, PCAT, and StarNet-WS catalogs overlaid.
@@ -143,9 +144,9 @@ Figure~\ref{fig:example_subimages} shows the StarNet-WS catalog alongside PCAT, 
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.49\textwidth]{figures/example_subimages_ws.png}
+    \includegraphics[width=0.49\textwidth]{figures/m2_results/example_subimages_ws.png}
     \rulesep
-    \includegraphics[width=0.49\textwidth]{figures/example_subimages_pcat.png}
+    \includegraphics[width=0.49\textwidth]{figures/m2_results/example_subimages_pcat.png}
     \caption{Estimated catalogs on four 10$\times$10 subimages from
     M2. Blue dots are stars from the HST catalog used as ground truth. 
     Starnet-WS, PCAT, and DAOPHOT estimated stars are shown as
@@ -155,9 +156,9 @@ Figure~\ref{fig:example_subimages} shows the StarNet-WS catalog alongside PCAT, 
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.49\textwidth]{figures/example_subimages_samples_ws.png}
+    \includegraphics[width=0.49\textwidth]{figures/m2_results/example_subimages_samples_ws.png}
     \rulesep
-    \includegraphics[width=0.49\textwidth]{figures/example_subimages_samples_pcat.png}
+    \includegraphics[width=0.49\textwidth]{figures/m2_results/example_subimages_samples_pcat.png}
     \caption{Four 10$\times$10 subimages from
     M2. Blue dots are stars from the HST catalog used as ground truth. (Left) Posterior samples from StarNet-WS and (right) posterior samples from the MCMC chain of PCAT. }
     \label{fig:example_subimages_sampled}
@@ -176,7 +177,7 @@ The empirical z-score distributions are close to a standard Gaussian with some d
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.99\textwidth]{figures/z-score_calibration.png}
+    \includegraphics[width=0.99\textwidth]{figures/m2_results/zscore_calibration.png}
     \caption{The empirical distribution of z-scores for logit-locations or log-fluxes under the StarNet-WS variational posterior. 
 }
     \label{fig:z-score_calibration}
@@ -210,41 +211,7 @@ be the negative log-likelihood of the SDSS $r$-band image conditional on the Hub
 The log-likelihood of model parameters estimated by the wake phase is nearly four times larger than the log-likelihood of parameters estimated by SDSS~(Table~\ref{tab:chi-square-stats1}). 
 The largest improvement in log-likelihood came from the wake-estimated background, which was brighter than the SDSS background, suggesting that the SDSS background was too dim for this starfield. 
 
-% \begin{table}[ht]
-% \centering
-% \caption{The negative log-likelihood \eqref{eq:hubble_neg_loglik} for various model estimates. PHOTO provides the SDSS estimates of background and PSF for every data release. 
-% We compare the PHOTO estimates with StarNet estimates of the PSF and background obtained using wake-sleep. }
-% \label{tab:chi-square-stats1}
-% \begin{tabular}{lr}
-% \toprule
-%           Model Estimate & Neg. Loglik \\
-% \midrule
-%                      PHOTO background, PHOTO PSF&    1.88e+06 \\
-%               PHOTO background, StarNet PSF &    1.86e+06 \\
-%       StarNet background, PHOTO PSF &    4.94e+05 \\
-%  StarNet background, StarNet PSF &    4.80e+05 \\
-% \bottomrule
-% \end{tabular}
-% \end{table}
-
-\begin{table}[ht]
-\centering
-\caption{The negative log-likelihood \eqref{eq:hubble_neg_loglik} for various model estimates. PHOTO provides the SDSS estimates of background and PSF for every data release. 
-We compare the PHOTO estimates with StarNet estimates of the PSF and background obtained using wake-sleep. }
-\label{tab:chi-square-stats1}
-\begin{tabular}{lrr}
-\toprule
-\multicolumn{2}{c}{Model estimate} & Neg.Loglik \\
-\cmidrule(lr){1-2} background & PSF &  \\
-\midrule
-PHOTO & PHOTO & 1.88e+06\\
-PHOTO & StarNet & 1.86e+06 \\
-StarNet & PHOTO & 4.94e+05\\
-StarNet & StarNet & 4.80e+05 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
+\input{tables/chi_sq_stats.txt}
 % Figure~\ref{fig:loglik_table} displays the log-likelihood under the default SDSS estimates of the PSF and background compared with the estimates found using wake-sleep. 
 % The wake-sleep estimates improved the log-likelihood.
 % We also compared against the ``Hubble estimate" of the background and PSF, obtained by minimizing $- \log p_\phi(x | N_{H}, \ell_{H}, f_{H})$ for $\phi$ directly. 
