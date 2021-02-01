@@ -104,7 +104,7 @@ Of all methods, the StarNet-WS catalog best approximated the Hubble flux distrib
 PCAT overestimated the number of dim stars with magnitudes greater than 21. 
 In contrast, DAOPHOT failed to find dim stars; its flux distribution assigned zero probability to stars with magnitudes greater than $21$.
 
-\begin{figure}[ht]
+\begin{figure}[tb]
     \centering
     \includegraphics[width=0.99\textwidth]{figures/m2_results/summary_statistics_m2.png}
     \caption{True positive rate (left) and positive predicted value (right) of various cataloging
@@ -114,7 +114,7 @@ In contrast, DAOPHOT failed to find dim stars; its flux distribution assigned ze
     \label{fig:summary_stats}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}[tb]
     \centering
     \includegraphics[width=0.99\textwidth]{figures/m2_results/m2_flux_estimation.png}
     \caption{True versus estimated magnitudes on the $r$-band of M2. 
@@ -123,7 +123,7 @@ In contrast, DAOPHOT failed to find dim stars; its flux distribution assigned ze
     \label{fig:m2_flux_estimation}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}[tb]
     \centering
     \includegraphics[width=0.99\textwidth]{figures/m2_results/luminosity_fun.png}
     \caption{Source magnitude histograms for the $r$-band of M2. 
@@ -142,7 +142,7 @@ The StarNet-WS estimate increases the intensity of the background, and hence doe
 
 Figure~\ref{fig:example_subimages} shows the StarNet-WS catalog alongside PCAT, DAOPHOT, and Hubble catalogs. 
 
-\begin{figure}[ht]
+\begin{figure}[tb]
     \centering
     \includegraphics[width=0.49\textwidth]{figures/m2_results/example_subimages_ws.png}
     \rulesep
@@ -154,7 +154,7 @@ Figure~\ref{fig:example_subimages} shows the StarNet-WS catalog alongside PCAT, 
     \label{fig:example_subimages}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}[tb]
     \centering
     \includegraphics[width=0.49\textwidth]{figures/m2_results/example_subimages_samples_ws.png}
     \rulesep
@@ -175,10 +175,10 @@ logit-location; $\hat y$ and $\hat\sigma$ are the mean and the standard deviatio
 If the uncertainties were perfectly calibrated, the distribution of these z-scores would be a standard Gaussian. 
 The empirical z-score distributions are close to a standard Gaussian with some discrepancy in the tails and some evidence of unmodeled skewness, suggesting the uncertainties are not too mis-estimated (Figure~\ref{fig:z-score_calibration}). 
 
-\begin{figure}[ht]
+\begin{figure}[tb]
     \centering
     \includegraphics[width=0.99\textwidth]{figures/m2_results/zscore_calibration.png}
-    \caption{The empirical distribution of z-scores for logit-locations or log-fluxes under the StarNet-WS variational posterior. 
+    \caption{The empirical distribution of z-scores for logit-locations (left) and log-fluxes (right) under the StarNet-WS variational posterior. 
 }
     \label{fig:z-score_calibration}
 \end{figure}

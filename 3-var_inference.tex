@@ -64,11 +64,11 @@ the tile $\tilde x_{st}$ is composed of the following pixels:
     \label{eq:tiles}
 \end{align}
 Figure~\ref{fig:ex_tiles} gives an example with $R = 2$. 
-\begin{figure}[!ht]
+\begin{figure}[!h]
     \centering
     \includegraphics[width = 0.5\textwidth]{figures/vi_figures/example_tiled.png}
     \vspace{-1cm}
-    \caption{Tiling a $10 \times 10$ image into $2 \times 2$ tiles.}
+    \caption{Tiling a $10 \times 10$ pixel image into $2 \times 2$ tiles.}
     \label{fig:ex_tiles}
 \end{figure}
 
@@ -174,12 +174,11 @@ where $\tau^{-1}(z)$ is the pre-image of $z$ under $\tau$.
 % {\color{Orange} (\tilde \ell, \tilde f)^{(2,1)}_{1, 1}}
 % \}
 
-\begin{figure}[!ht]
+\begin{figure}[!tb]
     \centering
     \includegraphics[width = 0.8\textwidth]{figures/vi_figures/tile_to_full_schematic.png}
     \caption{An example image with four tiles illustrating the relationship between tile latent variables and the full-image latent variables. The upper-left tile has two stars; the upper-right and lower-left have one; the bottom right has none. 
-    On each tile, we index into the appropriate row of the triangular array. 
-    Colored variables in the tiles enter the full-image catalog.}
+    To construct the full-image catalog, we index into the appropriate row of the triangular array on each tile.}
     \label{fig:tile_to_full_schm}
 \end{figure}
 

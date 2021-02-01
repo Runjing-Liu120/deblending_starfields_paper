@@ -3,20 +3,21 @@ The initial $100\times100$ subregion of M2 considered in our main paper was loca
 After fitting StarNet on this initial region $x_0$, we evaluate StarNet on a neighboring region $x_{test}$. See Figure~\ref{fig:marked_m2} for locations of the considered subregions. 
 
 The subregion $x_{test}$ has approximately $25\%$ more stars than $x_0$ (1413 Hubble detections in $x_{test}$ versus 1114 detections in $x_0$). 
-Due the increased crowded, all methods suffered a 10 percentage point decrease in F1 score (Table~\ref{tab:summary_stats_m2test}). 
+Due the increased density, all methods suffered an $\approx10$ percentage point decrease in F1 score on $x_{test}$ compared to the F1 score on $x_0$ (compare Table~\ref{tab:summary_stats} and \ref{tab:summary_stats_m2test}). 
 
 \input{tables/summary_stats_m2test}
 
 In Table~\ref{tab:summary_stats_m2test} and Figure~\ref{fig:summary_stats_m2test},
-StarNet-init refers to the wake-sleep trained network on $x_0$. 
+``StarNet-init" refers to the wake-sleep trained network on $x_0$. 
 Using StarNet-init and its fitted background and PSF as an initialization, we ran two further cycles of wake-sleep on $x_{test}$ (StarNet-refit). 
 StarNet-refit improved the PPV over Starnet-init by two percentage points. 
 The TPR appeared to be nearly identical across all magnitudes (Figure~\ref{fig:summary_stats_m2test}). 
 
 These results suggest that StarNet-init extrapolates well to neighboring regions, and re-running wake-sleep is not necessary. 
 Evaluating StarNet-init on $x_{test}$ took 30 milliseconds. 
-Re-running PCAT takes another 30 minutes. 
-Even if StarNet requires refitting, the subsequent wake-sleep cycles required only an additional three minutes. 
+On the other hand, re-running PCAT takes another 30 minutes. 
+Even if StarNet did require refitting, the subsequent wake-sleep cycles takes only an additional three minutes. 
+The amortization enables StarNet inference to have much better scaling characteristics than PCAT. 
 
 \begin{figure}[!ht]
     \centering
@@ -29,7 +30,7 @@ Even if StarNet requires refitting, the subsequent wake-sleep cycles required on
     \centering
     \includegraphics[width=0.99\textwidth]{figures/m2_test/summary_statistics_m2.png}
     \caption{True positive rate (left) and positive predicted value (right) of various methods on the M2 test subregion. 
-    StarNet-init is the network fit on the original M2 subregion (equivalent to StarNet-WS in the main text). 
+    StarNet-init is the network fit on the original M2 subregion (the same network as StarNet-WS in the main text). 
 StarNet-refit ran two further wake-sleep cycles on the M2 test subregion. 
     }
     \label{fig:summary_stats_m2test}
