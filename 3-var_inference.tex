@@ -339,7 +339,7 @@ In total, the neural network has output dimension $(N_{max} + 1) + (B + 2) \time
 
 Because the output dimension is quadratic in $N_{max}$, factorizing the variational distribution spatially keeps the output dimension of the neural network manageable.
 On a crowded starfield with $H = W = 100$, the number of imaged stars is on the order of $10^3$.
-If the neural network were to return a variational distribution on the full $100\times 100$ image, the output dimension would be on the order of $(10^3)^2$. 
+If the neural network were to return a variational distribution on the full $100\times 100$ pixel image, the output dimension would be on the order of $(10^3)^2$. 
 On the $2\times 2$ tile, we set $N_{max} = 3$, and the output dimension of the neural network with two bands is 53. 
 With this factorization, the network can be used for inference on an image of any size. 
 

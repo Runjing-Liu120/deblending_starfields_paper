@@ -3,7 +3,7 @@ Under the framework of probabilistic modeling,
 StarNet produces catalogs in which uncertainties are captured by a Bayesian posterior over the set of all catalogs.
 Importantly, unlike MCMC, StarNet also has the capacity to scale probabilistic cataloging to process large astronomical surveys. 
 
-The quality of StarNet detections are the result of optimizing the forward KL, a different objective than the one traditionally used in variational inference. 
+The quality of StarNet detections is the result of optimizing the forward KL, a different objective than the one traditionally used in variational inference. 
 Optimizing the forward KL allows the variational posterior to be fit on large amounts of {\itshape complete} data -- the image along with its latent catalog -- generated from the statistical model. 
 While labeled data from simulators has been used in other astronomy applications to train deep neural networks (see for example~\cite{Lanusse_2017_cmudeeplens, huang2019finding}), StarNet is the first training procedure to employ simulated data in a statistical framework: the neural network specifies an approximate Bayesian posterior. 
 

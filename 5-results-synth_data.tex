@@ -101,7 +101,7 @@ Since the variational distribution factorizes over the four tiles, integrating $
 On larger images with more tiles, analytically integrating $N$ would be computationally infeasible, 
 and the simple reparameterization trick would not apply as it does in this small illustrative example. 
 
-Figure~\ref{fig:sim_data100x100} displays our results on a larger example: a simulated $100\times 100$ image with fifty stars. 
+Figure~\ref{fig:sim_data100x100} displays our results on a larger example: a simulated $100\times 100$ pixel image with fifty stars. 
 The tiles again consisted of $10\times 10$ pixel regions. 
 Optimizing the ELBO does not produce accurate location estimates and appears to be hindered by regions with little gradient information; optimizing the sleep objective produced much improved location estimates.
 
@@ -117,9 +117,10 @@ Optimizing the ELBO does not produce accurate location estimates and appears to 
     \includegraphics[width=\textwidth]{figures/elbo_vs_sleep/optim_path_compare_100x100.png}
     \end{subfigure}
     \caption{
-    (Left) Detections produced by ELBO optimization on a $100\times 100$ test image. Correct locations are blue and estimated locations are red. 
+    (Left) Detections produced by ELBO optimization on a $100\times 100$ pixel test image. 
+    Correct locations are blue and estimated locations are red. 
     (Middle) Detections produced by the sleep phase optimization.  
     (Right) The negative conditional log-likelihoood, $-\log p(x|\hat z)$, where $\hat z$ is the mode of the variational posterior and $x$ the 
-    $100\times 100$ test image. }
+    $100\times 100$ pixel test image. }
     \label{fig:sim_data100x100}
 \end{figure}

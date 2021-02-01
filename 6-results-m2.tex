@@ -4,7 +4,7 @@ M2 was also imaged in the ACS Globular Cluster Survey~\cite{Sarajedini_2007}
 using the Hubble Space telescope (HST),
 which has greater resolution than the Sloan telescope (0.05 arseconds per pixel and 0.4 arcseconds per pixel, respectively)~\cite{hubble_about, sdss_about}. The reported catalog from this Hubble survey serves as the ground truth for validating our results.
 
-We consider the $100 \times 100$ subimage of M2 that \cite{Portillo_2017, Feder_2019} analyzed with PCAT.
+We consider the $100 \times 100$ pixel subimage of M2 that \cite{Portillo_2017, Feder_2019} analyzed with PCAT.
 This subimage is located approximately two arcseconds from the heavily saturated core of the cluster;
 even in this subimage, the HST catalog contains over 1000 stars with F606W-band magnitudes less than 22.
 
@@ -13,7 +13,7 @@ The SDSS $r$-band and the Hubble F606W band are centered at roughly the same wav
 
 \subsection{Runtime} 
 \label{sec:runtime}
-We factorized our variational distribution into $2\times2$ tiles. 
+We factorized our variational distribution into $2\times2$ pixel tiles. 
 The neural network inputs were $8\times8$ pixel padded tiles: 
 $2\times 2$ tiles along with three surrounding pixels of padding (see Figure~\ref{fig:starnet_arch}). 
 The SDSS estimates for the PSF and background were used in the first sleep phase. 
@@ -26,13 +26,13 @@ Two additional wake-sleep cycles followed the first sleep phase,
 after which the model parameters and inferred catalog appeared stable.
 The subsequent sleep phases were shorter (10 epochs with 200 images each), and the wake phase employed SGD, with the gradient estimator \eqref{eq:mstep_grad}. In total, the two further wake-sleep cycles took three minutes. 
 
-After fitting the model and variational posterior, calculating the approximate posterior (that is, producing the distributional parameters of the variational approximation) for the $100 \times 100$ image of M2 took $30$ milliseconds. 
-By comparison, the reported runtime of PCAT, which uses MCMC, is 30 minutes on the same $100 \times 100$ image~\cite{Feder_2019}.
+After fitting the model and variational posterior, calculating the approximate posterior (that is, producing the distributional parameters of the variational approximation) for the $100 \times 100$ pixel image of M2 took $30$ milliseconds. 
+By comparison, the reported runtime of PCAT, which uses MCMC, is 30 minutes on the same $100 \times 100$ pixel image~\cite{Feder_2019}.
 In other words, after the initial fit, StarNet provided nearly a $10^5$-fold speed increase. 
 
 The speed at inference time (which excludes training time) gives StarNet the scaling characteristics necessary for processing large astronomical surveys. 
 A single SDSS image is $1489 \times 2048$ pixels. 
-Based on the reported 30-minute runtime of PCAT for a $100\times100$ subimage, we project that
+Based on the reported 30-minute runtime of PCAT for a $100\times100$ pixel subimage, we project that
 the runtime to process the full image would be $30\text{ min} \times 14 \times 20 = 8400$ minutes, or almost six days. 
 The SDSS survey consists of nearly one million images. Scaling PCAT to the entire SDSS survey would be infeasible.
 The upcoming LSST survey will be 300 times larger than SDSS.
@@ -40,10 +40,10 @@ The upcoming LSST survey will be 300 times larger than SDSS.
 In contrast, if we assume the PSF and background are homogeneous 
 across the full SDSS image (which is also assumed in PCAT), we can 
 fit StarNet using wake-sleep 
-on a small $100 \times 100$ subimage
+on a small $100 \times 100$ pixel subimage
 (while simultaneously obtaining estimates of the PSF and background),
 a one time computational cost of 18.2 minutes. 
-Producing a catalog with the full $1489 \times 2048$ image requires
+Producing a catalog with the full $1489 \times 2048$ pixel image requires
 $30\text{ msec} \times 14 \times 20 = 8.4$ seconds. In practice, 
 inference can be made even faster by batching the image tiles to run in parallel on a GPU.
 
@@ -97,6 +97,7 @@ Neither PCAT nor StarNet captured the true number of stars in their 90\% credibl
 The StarNet credible intervals were three times wider than the PCAT intervals.
 The small PCAT credible intervals may be indicative of an MCMC sampler that failed to mix well. 
 
+
 \input{tables/summary_stats_m2.txt}
 
 The improvement of StarNet-WS in PPV was most pronounced for dim stars (Figure~\ref{fig:summary_stats}). The TPR for StarNet-WS was uniformly better than DAOPHOT for stars of all magnitudes. 
@@ -126,7 +127,7 @@ In contrast, DAOPHOT failed to find dim stars; its flux distribution assigned ze
 \begin{figure}[tb]
     \centering
     \includegraphics[width=0.99\textwidth]{figures/m2_results/luminosity_fun.png}
-    \caption{Source magnitude histograms for the $r$-band of M2. 
+    \caption{Source magnitude histograms for the $r$-band observations of M2. 
     The magnitude distribution of the Hubble catalog in grey. 
     Magnitude distributions for the DAOPHOT, PCAT, and StarNet-WS catalogs overlaid.
     For PCAT, the distribution comes from a single catalog sampled by MCMC. 
@@ -212,6 +213,13 @@ The log-likelihood of model parameters estimated by the wake phase is nearly fou
 The largest improvement in log-likelihood came from the wake-estimated background, which was brighter than the SDSS background, suggesting that the SDSS background was too dim for this starfield. 
 
 \input{tables/chi_sq_stats.txt}
+
+Appendix~\ref{sec:test_m2} presents the results of StarNet, PCAT, and DAOPHOT on a neighboring $100 \times 100$ pixel subimage of M2. 
+The results remain qualitatively similar in that StarNet has the best F1 score of all methods. 
+Importantly, StarNet was applied to the new region without further wake-sleep optimization; StarNet produced a catalog on this new region in $\approx 30$ milliseconds. 
+On the other hand, PCAT required a new 30 minute run of MCMC. 
+
+
 % Figure~\ref{fig:loglik_table} displays the log-likelihood under the default SDSS estimates of the PSF and background compared with the estimates found using wake-sleep. 
 % The wake-sleep estimates improved the log-likelihood.
 % We also compared against the ``Hubble estimate" of the background and PSF, obtained by minimizing $- \log p_\phi(x | N_{H}, \ell_{H}, f_{H})$ for $\phi$ directly. 
