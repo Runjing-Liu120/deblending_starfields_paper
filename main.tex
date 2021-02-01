@@ -17,8 +17,8 @@
 \newcommand{\rulesep}{\unskip\ \vrule\ }
 
 % line numbers
-\usepackage{lineno}
-\linenumbers
+% \usepackage{lineno}
+% \linenumbers
 
 \usepackage{amsfonts}
 \usepackage{wrapfig}
@@ -26,6 +26,7 @@
 \newcommand{\Expect}{\mathbb{E}}
 \newcommand{\Reals}{\mathbb{R}}
 \newcommand{\KL}{\textrm{KL}}
+\interfootnotelinepenalty=10000
 
 % DON'T change margins - should be 1 inch all around.
 \addtolength{\oddsidemargin}{-.5in}%
@@ -38,10 +39,7 @@
 \DeclareMathOperator*{\argmin}{arg\,min}
 
 \usepackage{soul}
-\usepackage[disable]{todonotes}
-\newcommand{\jeff}[2][]{\todo[inline,color=blue!30, #1]{#2 \mbox{--Jeff}}}
-\newcommand{\bryan}[2][]{\todo[inline,color=green!30, #1]{#2 \mbox{--Bryan}}}
- 
+
 \date{\vspace{-10px}}
 
 \begin{document}
@@ -116,10 +114,15 @@ In addition, StarNet is as much as $100,000$ times faster than PCAT, exhibiting 
 
 \noindent%
 {\it Keywords:}  Bayesian methods, amortized inference, wake-sleep algorithm, approximate inference, astronomical surveys, cataloging. 
-\vfill
 
-\newpage
-\spacingset{1.45} % DON'T change the spacing!
+% COMMENTED OUT FOR ARXIV VERSION
+% \vfill
+% \newpage
+
+% \spacingset{1.45} % DON'T change the spacing!
+% CHANGED FOR ARXIV VERSION
+\spacingset{1.1}
+
 \section{Introduction}
 \label{sec:intro}
 \input{1-introduction}
@@ -152,6 +155,8 @@ In addition, StarNet is as much as $100,000$ times faster than PCAT, exhibiting 
 \section{Conclusion}
 \label{sec:discussion}
 \input{7-discussion}
+
+\clearpage
 
 \bibliographystyle{unsrt}
 \bibliography{bibliography}

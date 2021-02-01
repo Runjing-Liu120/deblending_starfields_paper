@@ -7,16 +7,6 @@ The quality of StarNet detections is the result of optimizing the forward KL, a 
 Optimizing the forward KL allows the variational posterior to be fit on large amounts of {\itshape complete} data -- the image along with its latent catalog -- generated from the statistical model. 
 While labeled data from simulators has been used in other astronomy applications to train deep neural networks (see for example~\cite{Lanusse_2017_cmudeeplens, huang2019finding}), StarNet is the first training procedure to employ simulated data in a statistical framework: the neural network specifies an approximate Bayesian posterior. 
 
-% Our method instead produces an approximate Bayesian posterior using amortized variational inference, which has potential to scale Bayesian inference to large astronomical surveys.
-% After a one time cost of training, the network efficiently returns approximate posteriors for batches of images.
-% The neural network is trained using the wake-sleep algorithm which optimizes an objective different than the ELBO used in traditional variational inference. 
-% In this problem of localizing stars, 
-% the ELBO suffers from shallow optimum. 
-% The wake-sleep algorithm produced approximate posteriors that were more reliably concentrated around the true catalogs. 
-% \jeff{This paper reads a lot like a narrative still. The term ``we'' shows up several hundred times, often unnecessarily, for example. (Perhaps one third of these occurrences could be safely eliminated by reworking sentences.) It's preferable to focus the reader on the model/results rather than on our experiences.
-% }
-% \jeff{Wake-sleep didn't really avoid the minima---it optimized a different objective entirely.}
-
 This variational approach, unlike previous MCMC approaches, enables StarNet to estimate model parameters such as the PSF and sky background.
 While the current work focuses on PSF models, our methodology can be extended to more general sources such as galaxies. 
 Unsurprisingly, the current performance of StarNet is sub-optimal for cataloging regions of the sky that contain both stars and galaxies, due to model misfit (Appendix~\ref{sec:results_sparse_field}).  
@@ -26,16 +16,6 @@ Here, a neural network encodes a conditional likelihood of galaxy images given a
 Using a neural network to encode a likelihood extends the flexibility of galaxy models beyond the simple models used here. 
 
 
-% Going even further, models for artifacts such as cosmic rays and bleed trails~\cite{Desai_2016} could be estimated in this framework.
-% \jeff{Readers likely won't know what cosmic rays and bleed trails are. Maybe cite something here that explains them, for the curious reader.}
-% These artifacts produce artificial bright spots in an image which do not correspond to celestial objects.
-% Currently, pixels corresponding to these objects need to be masked by a preprocessing routine before a catalog can be produced. 
-% However, including these artifacts in a statistical model allows for the quantification of uncertainties in their detection. 
-% Moreover, credible intervals for latent variables of interest can be computed by marginalizing out the uncertainties in artifact detection. 
-% In this way, the uncertainties in artifact detection can be propagated to uncertainties for variables of interest. 
-
-% Our ultimate goal is to provide a pipeline from raw images to catalogs to downstream analyses, where errors are appropriately quantified in each step. 
-
 The statistical framework in this research lays the foundation for building flexible models to incorporate the cataloging of all celestial objects. 
 Future astronomical surveys will only expand in terms of the volume of data they are able to amass. 
 As telescopes peer deeper into space, fields will reveal more sources and images will become more crowded. 
@@ -43,11 +23,3 @@ The uncertainties in crowded fields necessitate a probabilistic approach.
 Our method holds the promise of providing  a scalable inference tool that can meet the challenges of these future surveys. 
 
 
-% provides a statistical framework for 
-
-
-% Our method is scalable, works well on deblending, provides approximate inference in achieving this goal .... TODO. 
-
-\jeff{I think there's a bibtex command like ``max\_names'' that will insert et al. You might want to cap the number of names at 6: some of these citations are really long.}
-\jeff{A lot of the citations have letters in the wrong case. e.g. ``decam'' instead of ``DECam'', ``lsst'' instead of ``LSST'', ``markov'' instead of ``Markov'', ``Cmu'' instead of ``CMU'', etc.}
-\jeff{Also some first names are spelled out in full while others are initials.}

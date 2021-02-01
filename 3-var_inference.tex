@@ -67,7 +67,7 @@ Figure~\ref{fig:ex_tiles} gives an example with $R = 2$.
 \begin{figure}[!h]
     \centering
     \includegraphics[width = 0.5\textwidth]{figures/vi_figures/example_tiled.png}
-    \vspace{-1cm}
+    % \vspace{-1cm}
     \caption{Tiling a $10 \times 10$ pixel image into $2 \times 2$ tiles.}
     \label{fig:ex_tiles}
 \end{figure}
@@ -245,27 +245,6 @@ arrays determined by the number
 of stars falling in each tile. 
 
 
-% There is a bijection between latent variables on each tile and latent variables on the full image (locations on the full image map to locations on image tiles and vice-versa). 
-% \jeff{It's not clear what it means for a latent variable to be ``on a tile''. Why a bijection? They're the same latent variables, right?}
-% Thus, a variational distribution for latent variables on tiles induces a variational distribution for latent variables on the full image.
-% \jeff{This isn't such a good way to explain it. Better to directly explain the variational distribution over the whole image, from top down, introducing the concept of tiles along the way. Perhaps at the end make the point that our choice of variational distribution does not render the problem embarrassingly parallel.}
-% If $\tau$ is the mapping in~\eqref{eq:patch_to_full_map}, then 
-% we can express the variational distribution
-% on the full image catalog as 
-% \begin{align}
-%     z &\stackrel{d}{=} \tau\Big( \big(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)}\big)_{r=1, t = 1}^{s, t}\Big), \notag \\  
-%         &\text{where } 
-%         \big(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)}\big)_{r=1, t = 1}^{s, t}
-%         \sim 
-%         \prod_{r = 1}^R \prod_{t=1}^T q_\eta\big(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)} | x\big).
-% \end{align}
-% \jeff{I suggest getting rid of $T$ here. This bijection is a confusing way to explain things. Instead, to refer to the pixels in tile (i, j), you might define
-% \[
-%     \tilde x_{i,j} = \{x_{hw} : Si \ge h > S(i + 1) \text{ and } Sj \ge w > S(j+1)\}.
-% \]
-% You could do the same thing for $\tilde f$, etc.
-% }
-% \jeff{Is there somewhere you say that in the variational distribution, $N = \sum_{k=1}^K N^{(k)}$ ? That might be a good way to put it.}
 
 \subsubsection{Variational distributions on image tiles}
 We describe the variational distribution on each tile,
@@ -317,7 +296,7 @@ The optimization of the architecture is left for future work; our focus in this 
     \centering
     % \includegraphics[width=0.4\textwidth]{figures/starnet_archetecture2.png}
     \includegraphics[width=\textwidth]{figures/vi_figures/starnet_archetecture4.png}
-    \vspace{-0.5cm}
+    % \vspace{-0.5cm}
     \caption{The neural network architecture. For cataloging M2, the input image is an $8\times 8$ padded tile, and the network returns distributional parameters for latent variables contained in the center $2\times 2$ tile.\\
     }
     \label{fig:starnet_arch}
