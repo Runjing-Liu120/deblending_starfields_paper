@@ -1,4 +1,5 @@
 \documentclass[12pt]{article}
+
 \usepackage{amsmath}
 \usepackage{graphicx,psfrag,epsf}
 \usepackage{enumerate}
@@ -32,7 +33,8 @@
 \addtolength{\oddsidemargin}{-.5in}%
 \addtolength{\evensidemargin}{-.5in}%
 \addtolength{\textwidth}{1in}%
-\addtolength{\textheight}{-.3in}%
+% CHANGED FOR ARXIV
+\addtolength{\textheight}{1.1in}%
 \addtolength{\topmargin}{-.8in}%
 
 \DeclareMathOperator*{\argmax}{arg\,max}
@@ -51,19 +53,19 @@
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Reweighted Wake-Sleep for Deblending Crowded Starfields
 \if1\blind
 {
   \title{  \vspace{-30px}
 \bf Variational Inference for Deblending Crowded Starfields}
   \author{Runjing Liu
-  \thanks{The author gratefully acknowledges support from the NSF graduate research fellowship program.  
-  This paper has undergone internal review in the LSST Dark Energy Science Collaboration. 
+  \thanks{
+  Runjing Liu (e-mail: \url{runjing_liu@berkeley.edu}) gratefully acknowledges support from the NSF Graduate Research Fellowship Program.  
+  This paper has been approved by the LSST Dark Energy Science Collaboration following an internal review. 
   The internal reviewers were 
   Bastien Arcelin,
   Fran\c{c}ois Lanusse, and 
   Peter Melchior. 
-  We would also like to acknowledge Derek Hansen, Ismael Mendoza, Zhe Zhao for their comments on this manuscript and dedicated work to continued code development.
+  The authors also thank Derek Hansen, Ismael Mendoza, and Zhe Zhao for reviewing this manuscript and for continuing the development of our software.
   }
   \hspace{.2cm}\\
     Department of Statistics, University of California, Berkeley\\
@@ -92,28 +94,18 @@
 } \fi
 
 \bigskip
+% ADDED FOR ARXIV
+\vspace{-15px}
 \begin{abstract}
-In the image data collected by astronomical surveys, stars and galaxies often overlap.
-Deblending is the task of distinguishing and characterizing individual light sources from survey images.
-We propose StarNet, a fully Bayesian method to deblend sources in astronomical images of crowded star fields.
-StarNet leverages recent advances in variational inference, including amortized variational distributions and the wake-sleep algorithm.
-Wake-sleep, which minimizes forward KL divergence, has significant benefits compared to traditional variational inference, which minimizes a reverse KL divergence.
-In our experiments with SDSS images of the M2 globular cluster, StarNet is substantially more accurate than two competing methods: Probablistic Cataloging (PCAT), a method that uses MCMC for inference, and a software pipeline employed by SDSS for deblending (DAOPHOT).
-In addition, StarNet is as much as $100,000$ times faster than PCAT, exhibiting the scaling characteristics necessary to perform fully Bayesian inference on modern astronomical surveys.
-
-%Probabilistic cataloging defines a joint distribution on raw telescope images and their catalogs; ambiguities in catalog construction are captured by the Bayesian posterior.
-% However, current probabilistic cataloging methods typically employ MCMC (Markov chain Monte Carlo), whose computational cost is prohibitive for the terabytes of data collected by modern astronomical surveys. 
-%As an alternative, we propose StarNet, a method employing amortized variational inference.
-%StarNet fits an approximate posterior using the wake-sleep algorithm. 
-%Similar to variational EM (expectation maximization), the wake-sleep algorithm alternates between fitting approximate posteriors and estimating model parameters, such as the point spread function. 
-%However, the wake-sleep algorithm  fits the approximate posterior by optimizing the  forward KL (Kullback-Leibler) divergence instead of the traditionally used reverse KL divergence.
-% We find that the the wake-sleep algorithm produces more reliable catalogs by avoiding shallow local minima in the reverse KL. StarNet outperforms existing cataloging routines on the crowded starfield M2. In addition,  
-% and provides a statistical framework producing a cataloging pipeline whereby uncertainties are fully propagated from raw image to catalog to downstream analysis. 
-
+\input{abstract}
 \end{abstract}
+% ADDED FOR ARXIV
+\vspace{10px}
 
 \noindent%
 {\it Keywords:}  Bayesian methods, amortized inference, wake-sleep algorithm, approximate inference, astronomical surveys, cataloging. 
+% ADDED FOR ARXIV
+\vspace{10px}
 
 % COMMENTED OUT FOR ARXIV VERSION
 % \vfill
@@ -140,14 +132,9 @@ In addition, StarNet is as much as $100,000$ times faster than PCAT, exhibiting 
 \input{4a-wake_sleep}
 \input{4b-variational_em}
 \input{4c-sleep_details}
-% NO LONGER NEEDED
-% \section{Related work}
-% \label{sec:related_work}
-% \input{4-related_work}
 
 \section{Empirical comparison of ELBO optimization and sleep optimization}
 \input{5-results-synth_data}
-% \input{5b-results-deblending}
 
 \section{Results on the M2 globular cluster}
 \input{6-results-m2}
@@ -158,10 +145,21 @@ In addition, StarNet is as much as $100,000$ times faster than PCAT, exhibiting 
 
 \clearpage
 
-\bibliographystyle{unsrt}
+% \bibliographystyle{unsrt}
+% asa style taken from 
+% https://raw.githubusercontent.com/ggobi/paper-inference-jasa/master/asa.bst
+\bibliographystyle{asa}
 \bibliography{bibliography}
 
 \appendix
+
+% this makes figure number start with A.#
+\renewcommand\thefigure{A.\arabic{figure}}
+\renewcommand\thetable{A.\arabic{table}}
+\setcounter{figure}{0}    
+\setcounter{table}{0}    
+
+
 \section{Reparameterized and REINFORCE gradients}
 \label{sec:reparam_details}
 \input{A1-reparam_details}
@@ -179,7 +177,5 @@ In addition, StarNet is as much as $100,000$ times faster than PCAT, exhibiting 
 \section{Results on Stripe-82}
 \label{sec:results_sparse_field}
 \input{A4-results-sparse_field}
-
-% \input{comparison_w_is}
 
 \end{document}

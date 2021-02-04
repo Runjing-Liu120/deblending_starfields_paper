@@ -19,7 +19,7 @@ is $N\in\mathbb{N}$,
 the location of the $i$th star is $\ell_i \in \Reals^2$, and 
 the flux of the $i$th star in the $b$th band is $f_{i, b}\in\Reals^+$. 
 
-A Bayesian approach requires specification of a prior over catalog space $\mathcal{Z}$ and a likelihood for the observed images. Our likelihood and prior, detailed below, are similar to previous approaches~\cite{Portillo_2017, Brewer_2013, Feder_2019, regier2019_celeste}.
+A Bayesian approach requires specification of a prior over catalog space $\mathcal{Z}$ and a likelihood for the observed images. Our likelihood and prior, detailed below, are similar to previous approaches~\citep{Brewer_2013, Portillo_2017, regier2019_celeste, Feder_2019}.
 
 \subsection{The prior}
 The prior over $\mathcal{Z}$ is a marked spatial Poisson process. To sample the prior, first draw the number of stars contained in the $H\times W$ image as
@@ -90,6 +90,6 @@ The background parameters are specific to the band.
 
 StarNet estimates these parameters jointly with the approximate posterior (Section~\ref{sec:wake_sleep}). 
 Prior work on probabilistic cataloging relied 
-on estimates from the SDSS software pipeline and found the PSF estimates to be suboptimal in crowded starfields~\cite{Feder_2019}. 
+on estimates from the SDSS software pipeline and found the PSF estimates to be suboptimal in crowded starfields~\citep{Feder_2019}. 
 
 

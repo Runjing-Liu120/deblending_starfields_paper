@@ -1,3 +1,4 @@
+
 We examine the sensitivity of StarNet to prior parameters $\mu$ and $\alpha$ on the image M2. 
 Recall $\mu$ is the prior mean number of stars per pixel~\eqref{eq:n_prior};
 $\alpha$ is the power law slope on the $r$-band fluxes~\eqref{eq:flux_prior}. 
@@ -25,7 +26,7 @@ As expected, as $\mu$ increases the TPR increases while the PPV decreases  -- th
 \par\vspace{0pt}
 \end{center}
 \end{subfigure}\hfill
-\caption{Sensitivity of performance metrics to Poisson mean parameter on number of stars. }
+\caption{Sensitivity of performance metrics to Poisson mean parameter on number of stars ($\mu$ in Equation \ref{eq:n_prior}). }
 \label{fig:mu_sensitivity}
 \end{figure}
 
@@ -34,7 +35,7 @@ As $\alpha$ increases, StarNet estimates more dim sources: the prior distributio
 \begin{figure}[!h]
     \centering
     \includegraphics[width = 0.6\textwidth]{figures/prior_sensitivity/prior_fluxes.png}
-    \caption{The prior density of $r$-band magnitude for various power law slopes $\alpha$}
+    \caption{The prior density of $r$-band magnitude for various power law slopes $\alpha$.}
     \label{fig:flux_priors}
 \end{figure}
 

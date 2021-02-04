@@ -71,8 +71,8 @@ An example of correct detection after sleep-phase optimization is shown in the b
     \end{subfigure}
     % \vspace{-3em}
     \caption{(Top row) The ELBO as the optimization progresses for six random restarts. 
-    (Bottom row) Modal locations from two variational posteriors.
-    On the left, a randomly initialized run where optimizing the ELBO with the reparameterized gradient resulted in a shallow local optimum: the variational posterior over-split a source while missing another source entirely.  
+    (Bottom row) Modal locations from two variational posteriors in red.
+    On the left, a randomly initialized run where optimizing the ELBO with the reparameterized gradient resulted in a shallow local optimum: the estimated locations split a single source into two sources, while missing another source entirely.  
     On the right, the variational posterior 
     was optimized using the sleep phase and correctly identified all four sources. }
     \label{fig:optim_path}

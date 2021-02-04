@@ -4,7 +4,7 @@ nontrivial probabilistic models, including our own, the posterior distribution i
 Calculation of the posterior requires us to compute the marginal likelihood, $p(x)$, which involves integrating over the latent variable $z$. 
 In our model, the latent variable space is high dimensional: it is the set of all catalogs. Approximate methods such as MCMC and variational inference are therefore required. 
 
-Variational inference~\cite{Blei_2017_vi_review, Jordan_intro_vi, Wainwrite_graph_models_vi} posits a family of distributions $\mathcal{Q}$ and seeks
+Variational inference~\citep{Jordan_intro_vi, Wainwrite_graph_models_vi, Blei_2017_vi_review} posits a family of distributions $\mathcal{Q}$ and seeks
 the distribution $q^*\in \mathcal{Q}$ that is closest to the exact posterior
 in $\KL$ divergence. 
 $\mathcal{Q}$ is chosen such that $q^*$ will not be too difficult to find via optimization. 
@@ -14,7 +14,7 @@ We index the distributions in $\mathcal{Q}$ using a real-valued vector $\eta$, t
    \label{eq:kl_objective}
 \end{align}
 
-Minimizing the $\KL$ divergence in~\eqref{eq:kl_objective} is equivalent to maximizing the evidence lower bound (ELBO)~\cite{Blei_2017_vi_review}:
+Minimizing the $\KL$ divergence in~\eqref{eq:kl_objective} is equivalent to maximizing the evidence lower bound (ELBO)~\citep{Blei_2017_vi_review}:
 \begin{align}
     \mathcal{L}_{elbo}(\eta) = 
     \Expect_{q_\eta(z | x)}\Big[\log p(x, z) - \log q_\eta(z | x)\Big].
@@ -36,7 +36,7 @@ Even in models with hierarchical structure, the variational distribution will ge
 
 On the other hand, 
 in {\itshape amortized} variational
-inference~\cite{kingma2013autoencoding, rezende2014stochastic}, $q_\eta$ explicitly depends on the data. 
+inference~\citep{kingma2013autoencoding, rezende2014stochastic}, $q_\eta$ explicitly depends on the data. 
 A flexible, parameterized function maps input $x$, in this case an observed image, to the parameters of a variational distribution on the latent space $\mathcal{Z}$. 
 Typically, the function is a neural network, in which case the variational parameters $\eta$ are the neural network weights. 
 After the neural network is fitted with~\eqref{eq:kl_objective} using a collection of observed $x$'s, the approximate posterior $q_\eta(z^{new} | x^{new})$ for a new data point 
@@ -286,7 +286,7 @@ Let $\hat x^{(s,t)}$ denote the padded tile pixel intensities (which includes al
 \end{align}
 The same neural network is evaluated for all tiles $(s,t)$. Our variational parameters are neural network weights, here denoted $\eta$. 
 The architecture consists of several convolutional layers followed by a series of fully connected layers (Figure~\ref{fig:starnet_arch}). 
-This architecture has been successful on image classification challenges such as ImageNet~\cite{imagenet2015}. 
+This architecture has been successful on image classification challenges such as ImageNet~\citep{imagenet2015}. 
 The optimization of the architecture is left for future work; our focus in this paper is the application of neural networks to provide a variational posterior for cataloging starfields, not the network architecture per se. 
 
 
