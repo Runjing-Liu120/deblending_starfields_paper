@@ -1,26 +1,36 @@
 \documentclass[12pt]{article}
 
+% default packages
 \usepackage{amsmath}
 \usepackage{graphicx,psfrag,epsf}
 \usepackage{enumerate}
 \usepackage{natbib}
 \usepackage{url} % not crucial - just used below for the URL
+
+% my packages
 \usepackage{subcaption}
 \usepackage{booktabs}
 \usepackage{hyperref}
 \usepackage{float}
 \usepackage{ulem}
 \usepackage{xfrac}
+\usepackage{wrapfig}
+
+% remove figures
+% \usepackage{endfloat}
+
 %\pdfminorversion=4
 % NOTE: To produce blinded version, replace "0" with "1" below.
-\newcommand{\blind}{1}
+\newcommand{\blind}{0}
 
+% my added command
 \newcommand{\rulesep}{\unskip\ \vrule\ }
 
 % line numbers
 % \usepackage{lineno}
 % \linenumbers
 
+% more of my packages
 \usepackage{amsfonts}
 \usepackage{wrapfig}
 \newcommand{\Prob}{P}
@@ -33,10 +43,17 @@
 \addtolength{\oddsidemargin}{-.5in}%
 \addtolength{\evensidemargin}{-.5in}%
 \addtolength{\textwidth}{1in}%
-% CHANGED FOR ARXIV
-\addtolength{\textheight}{1.1in}%
+\addtolength{\textheight}{-.3in}%
 \addtolength{\topmargin}{-.8in}%
 
+% CHANGED FOR ARXIV
+% \addtolength{\oddsidemargin}{-.5in}%
+% \addtolength{\evensidemargin}{-.5in}%
+% \addtolength{\textwidth}{1in}%
+% \addtolength{\textheight}{1.1in}%
+% \addtolength{\topmargin}{-.8in}%
+
+% my functions
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
 
@@ -88,32 +105,32 @@
   \bigskip
   \bigskip
   \begin{center}
-    {\LARGE\bf A Variational Inference Approach to Deblending Crowded Starfields using the Wake-sleep Algorithm}
+    {\LARGE\bf Variational Inference for Deblending Crowded Starfields}
 \end{center}
   \medskip
 } \fi
 
 \bigskip
 % ADDED FOR ARXIV
-\vspace{-15px}
+% \vspace{-15px}
 \begin{abstract}
 \input{abstract}
 \end{abstract}
 % ADDED FOR ARXIV
-\vspace{10px}
+% \vspace{10px}
 
 \noindent%
 {\it Keywords:}  Bayesian methods, amortized inference, wake-sleep algorithm, approximate inference, astronomical surveys, cataloging. 
 % ADDED FOR ARXIV
-\vspace{10px}
+% \vspace{10px}
 
 % COMMENTED OUT FOR ARXIV VERSION
-% \vfill
-% \newpage
+\vfill
+\newpage
 
-% \spacingset{1.45} % DON'T change the spacing!
+\spacingset{1.45} % DON'T change the spacing!
 % CHANGED FOR ARXIV VERSION
-\spacingset{1.1}
+% \spacingset{1.1}
 
 \section{Introduction}
 \label{sec:intro}
