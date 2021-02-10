@@ -10,16 +10,13 @@ records its location and its flux, or brightness,
 in each band. 
 The space of latent variables 
 $\mathcal{Z}$ is the collection of all possible catalogs of the form
-\begin{align}
-    z := \{N, (\ell_i, f_{i,1}, ..., f_{i,B})_{i = 1}^N\},
-    \label{eq:cat_formulation}
-\end{align}
+$z := \{N, (\ell_i, f_{i,1}, ..., f_{i,B})_{i = 1}^N\}$, 
 where the number of stars in the catalog
-is $N\in\mathbb{N}$,
-the location of the $i$th star is $\ell_i \in \Reals^2$, and 
+is $N\in\mathbb{N}$;
+the location of the $i$th star is $\ell_i \in \Reals^2$; and 
 the flux of the $i$th star in the $b$th band is $f_{i, b}\in\Reals^+$. 
 
-A Bayesian approach requires specification of a prior over catalog space $\mathcal{Z}$ and a likelihood for the observed images. Our likelihood and prior, detailed below, are similar to previous approaches~\citep{Brewer_2013, Portillo_2017, regier2019_celeste, Feder_2019}.
+A Bayesian approach requires specification of a prior over catalog space $\mathcal{Z}$ and a likelihood for the observed images. Our likelihood and prior, detailed below, are similar to previous approaches~\citep{Brewer_2013, Portillo_2017, Feder_2019}.
 
 \subsection{The prior}
 The prior over $\mathcal{Z}$ is a marked spatial Poisson process. To sample the prior, first draw the number of stars contained in the $H\times W$ image as
@@ -60,17 +57,12 @@ observations are drawn as
   \quad 
   b = 1, ..., B; \;
   h = 1,..., H; \; 
-  w = 1, ..., W, 
-\end{align}
-where 
-\begin{align}
-  \lambda^b_{hw} = I^{b}(h, w) + \sum_{i = 1}^N f_{i,b} \mathcal{P}^b\big(h - \ell_{i, 1}, w - \ell_{i, 2}\big).
+  w = 1, ..., W, \\
+ \text{where } \quad \lambda^b_{hw} = I^{b}(h, w) + \sum_{i = 1}^N f_{i,b} \mathcal{P}^b\big(h - \ell_{i, 1}, w - \ell_{i, 2}\big).
   \label{eq:expected_intensity}
 \end{align}
 Here, $\mathcal{P}^b$ is the point spread function (PSF) for band $b$ and $I^{b}$ is the background intensity. The PSF is a function 
-\begin{align}
-\mathcal{P}^b : \Reals \times \Reals \mapsto \Reals^+,
-\end{align}
+$\mathcal{P}^b : \Reals \times \Reals \mapsto \Reals^+$,
 describing the appearance of a stellar point source at any 2D position of the image (but ignoring pixelation). 
 Our PSF model is a weighted average between a Gaussian ``core" and a power-law ``wing," as described in~\cite{Xin2018psf}. For each band, the PSF has the form
 
@@ -86,7 +78,7 @@ The background intensity at pixel $(h,w)$ is modeled with an affine function:
 \begin{align}
     I^{b}(h,w) = \beta_0^{b} + \beta_1^{b} \times h + \beta_2^{b} \times w.
 \end{align}
-The background parameters are specific to the band. 
+The background parameters $(\beta^b_0, \beta^b_1, \beta^b_1)$ are specific to the band. 
 
 StarNet estimates these parameters jointly with the approximate posterior (Section~\ref{sec:wake_sleep}). 
 Prior work on probabilistic cataloging relied 

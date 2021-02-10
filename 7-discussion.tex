@@ -1,6 +1,6 @@
 StarNet employs variational inference and outperforms both an MCMC-based probabilistic cataloger and a non-model-based approach in terms of accuracy and runtime. 
 Under the framework of probabilistic modeling, 
-StarNet produces catalogs in which uncertainties are captured by a Bayesian posterior over the set of all catalogs.
+StarNet produces catalogs in which uncertainties are captured by a posterior over the set of all catalogs.
 Importantly, unlike MCMC, StarNet also has the capacity to scale probabilistic cataloging to process large astronomical surveys. 
 
 The quality of StarNet detections is the result of optimizing the forward KL, a different objective than the one traditionally used in variational inference. 
@@ -11,7 +11,7 @@ This variational approach, unlike previous MCMC approaches, enables StarNet to e
 While the current work focuses on PSF models, our methodology can be extended to more general sources such as galaxies. 
 Unsurprisingly, the current performance of StarNet is sub-optimal for cataloging regions of the sky that contain both stars and galaxies, due to model misfit (Appendix~\ref{sec:results_sparse_field}).  
 
-One promising direction is using a neural network for the generative model and fitting a deep generative model for galaxies~\citep{Regier2015ADG, Reiman_2019_gans_deblend, lanusse2020deep, Arcelin_2020}. 
+One promising direction is to use a deep generative model for galaxies~\citep{Regier2015ADG, Reiman_2019_gans_deblend, lanusse2020deep, Arcelin_2020}. 
 Here, a neural network encodes a conditional likelihood of galaxy images given a low-dimensional galaxy representation. 
 Using a neural network to encode a likelihood extends the flexibility of galaxy models beyond the simple models used here. 
 
@@ -20,6 +20,6 @@ The statistical framework in this research lays the foundation for building flex
 Future astronomical surveys will only expand in terms of the volume of data they are able to amass. 
 As telescopes peer deeper into space, fields will reveal more sources and images will become more crowded. 
 The uncertainties in crowded fields necessitate a probabilistic approach. 
-Our method holds the promise of providing  a scalable inference tool that can meet the challenges of these future surveys. 
+Our method holds the promise of providing  a scalable inference tool that can meet the challenges of future surveys. 
 
 

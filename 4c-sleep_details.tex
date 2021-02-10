@@ -8,7 +8,7 @@ First, observe that optimizing the sleep objective does not require computing th
 \argmax_\eta\; \mathcal{L}_{sleep}(\eta)
     & = \argmin_{\eta} \; \mathbb{E}_{x \sim p(x)}\Big[ \mathrm{KL}(p(z | x) \| q_\eta(z | x)\Big] \\
   &=\argmin_{\eta} \; \mathbb E_{p(x)}\Big[\mathbb E_{p(z | x)}\Big(\log p(z | x) - \log q_\eta(z | x) \Big)\Big]\\
-&=\argmin_{\eta} \; \mathbb E_{p(x)}\Big[\mathbb E_{p(z | x)}\Big( - \log q_\eta(z | x) \Big)\Big]\\
+%&=\argmin_{\eta} \; \mathbb E_{p(x)}\Big[\mathbb E_{p(z | x)}\Big( - \log q_\eta(z | x) \Big)\Big]\\
 &=\argmin_{\eta} \; \mathbb E_{p(x, z)}\Big[- \log q_\eta(z | x) \Big]\label{eq:sleep_loss_simple}.
 \end{align}
 Crucially, the integrating distribution, $p(x,z)$, does not depend on the optimization parameter $\eta$.

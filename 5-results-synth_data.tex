@@ -5,6 +5,15 @@
 
 \label{sec:elbo_sleep_compare}
 
+\begin{wrapfigure}{r}{0.35\textwidth}
+    \centering
+    \vspace{-1em}
+    \includegraphics[width = 0.32\textwidth]{figures/elbo_vs_sleep/vi_sleep_ex_figure.png}
+    \vspace{-1.7em}
+    \caption{The $20\times 20$ pixel synthetic image $x_{test}$. It contains four stars and is partitioned into $10\times 10$ tiles. }
+    \label{fig:toy_example}
+\end{wrapfigure}
+
 A simple example demonstrates that there exist shallow local optima in the ELBO
 where the fitted approximate posterior is far in KL divergence from the exact posterior. 
 These local optima result in unreliable catalogs. 
@@ -14,14 +23,6 @@ For this example, the data were simulated with known PSF and background, and the
 The simulated $20\times20$ single-band image $x_{test}$ is shown in Figure~\ref{fig:toy_example}.
 The image has four stars, each with the same flux. 
 
-\begin{figure}[!h]
-    \centering
-    % \vspace{-1em}
-    \includegraphics[width = 0.3\textwidth]{figures/elbo_vs_sleep/vi_sleep_ex_figure.png}
-    % \vspace{-1.7em}
-    \caption{The $20\times 20$ pixel synthetic image $x_{test}$. It contains four stars and is partitioned into $10\times 10$ tiles. }
-    \label{fig:toy_example}
-\end{figure}
 
 We compare three approaches to deblending. The first two approaches directly optimize the test ELBO, 
 \begin{align}
@@ -101,26 +102,26 @@ Since the variational distribution factorizes over the four tiles, integrating $
 On larger images with more tiles, analytically integrating $N$ would be computationally infeasible, 
 and the simple reparameterization trick would not apply as it does in this small illustrative example. 
 
-Figure~\ref{fig:sim_data100x100} displays our results on a larger example: a simulated $100\times 100$ pixel image with fifty stars. 
-The tiles again consisted of $10\times 10$ pixel regions. 
-Optimizing the ELBO does not produce accurate location estimates and appears to be hindered by regions with little gradient information; optimizing the sleep objective produced much improved location estimates.
+% Figure~\ref{fig:sim_data100x100} displays our results on a larger example: a simulated $100\times 100$ pixel image with fifty stars. 
+% The tiles again consisted of $10\times 10$ pixel regions. 
+% Optimizing the ELBO does not produce accurate location estimates and appears to be hindered by regions with little gradient information; optimizing the sleep objective produced much improved location estimates.
 
 
-\begin{figure}[!htb]
-    \centering
-    \begin{subfigure}[!t]{0.59\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{figures/elbo_vs_sleep/optim_path_detect_compare_100x100.png}
-    \end{subfigure}
-    \begin{subfigure}[!t]{0.4\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{figures/elbo_vs_sleep/optim_path_compare_100x100.png}
-    \end{subfigure}
-    \caption{
-    (Left) Detections produced by ELBO optimization on a $100\times 100$ pixel test image. 
-    Correct locations are blue and estimated locations are red. 
-    (Middle) Detections produced by the sleep phase optimization.  
-    (Right) The negative conditional log-likelihoood, $-\log p(x|\hat z)$, where $\hat z$ is the mode of the variational posterior and $x$ the 
-    $100\times 100$ pixel test image. }
-    \label{fig:sim_data100x100}
-\end{figure}
+% \begin{figure}[!htb]
+%     \centering
+%     \begin{subfigure}[!t]{0.59\textwidth}
+%     \centering
+%     \includegraphics[width=\textwidth]{figures/elbo_vs_sleep/optim_path_detect_compare_100x100.png}
+%     \end{subfigure}
+%     \begin{subfigure}[!t]{0.4\textwidth}
+%     \centering
+%     \includegraphics[width=\textwidth]{figures/elbo_vs_sleep/optim_path_compare_100x100.png}
+%     \end{subfigure}
+%     \caption{
+%     (Left) Detections produced by ELBO optimization on a $100\times 100$ pixel test image. 
+%     Correct locations are blue and estimated locations are red. 
+%     (Middle) Detections produced by the sleep phase optimization.  
+%     (Right) The negative conditional log-likelihoood, $-\log p(x|\hat z)$, where $\hat z$ is the mode of the variational posterior and $x$ the 
+%     $100\times 100$ pixel test image. }
+%     \label{fig:sim_data100x100}
+% \end{figure}

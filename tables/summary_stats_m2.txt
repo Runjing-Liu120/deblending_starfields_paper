@@ -1,7 +1,7 @@
 \begin{table}[!tb]
 \centering
 \caption{Performance metrics on M2. 
-In the bottom row, ``Hubble" refers to the catalog which we use as ground-truth. 
+``Hubble" refers to the catalog which we use as ground-truth. 
 For probabilistic methods (StarNet and PCAT)
 the ``\#stars" column refers to the mean number of stars under the (approximate) posterior, while the right-most column displays the 5-th and 95-th percentiles under the posterior. }
 \label{tab:summary_stats}

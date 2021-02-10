@@ -1,17 +1,20 @@
-\begin{table}[ht]
+\begin{table}[tb]
 \centering
-\caption{The negative log-likelihood \eqref{eq:hubble_neg_loglik} for various model estimates. PHOTO provides estimates of background and PSF for every SDSS data release. 
+\caption{The negative log-likelihood \eqref{eq:hubble_neg_loglik} for various model estimates.
+PHOTO provides estimates of background and PSF for every SDSS data release. 
 We compare the PHOTO estimates with StarNet estimates obtained after two cycles of wake-sleep. }
 \label{tab:chi-square-stats1}
-\begin{tabular}{lrr}
-\toprule
-\multicolumn{2}{c}{Model estimate} & Neg.Loglik \\
-\cmidrule(lr){1-2} background & PSF &  \\
-\midrule
-PHOTO & PHOTO & 8.671e+05\\
-PHOTO & StarNet & 8.665e+05 \\
-StarNet & PHOTO & 3.651e+05\\
-StarNet & StarNet & 3.395e+05 \\
-\bottomrule
+\begin{tabular}{|c|c|cccc|}
+    \hline
+    \multirow{2}{*}{Model estimate} & background
+    & PHOTO & PHOTO & StarNet & StarNet \\
+    & PSF & PHOTO & StarNet & PHOTO & StarNet \\
+    \hline
+    & Neg.Loglik 
+    & 8.671e+05
+    & 8.665e+05
+    & 3.651e+05 
+    & 3.395e+05\\
+    \hline
 \end{tabular}
 \end{table}
