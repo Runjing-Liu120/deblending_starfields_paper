@@ -7,9 +7,8 @@ which has greater resolution than the Sloan telescope (0.05 and 0.4 arcseconds p
 We focus on the $100 \times 100$ pixel subimage of M2 that \cite{Portillo_2017} and \cite{Feder_2019} analyzed with PCAT.
 This subimage is located approximately two arcseconds from the heavily saturated core of the cluster;
 even in this subimage, the HST catalog contains over 1000 stars with F606W-band magnitudes less than 22.
-We include two bands in our analysis, the SDSS $r$-band and $i$-band. 
-
-%The SDSS $r$-band and the Hubble F606W band are centered at roughly the same wavelength, but the wavelength range of the Hubble F606W band is slightly broader. 
+We include two bands in our model, the SDSS $r$-band and $i$-band. 
+The SDSS $r$-band and the Hubble F606W band are centered at roughly the same wavelength, but the wavelength range of the Hubble F606W band is slightly broader. 
 
 \subsection{Runtime} 
 \label{sec:runtime}
@@ -78,7 +77,7 @@ Estimated catalogs are evaluated on three metrics: the true positive rate (TPR),
 the PPV is the proportion of stars in the estimated catalog matched with a star in the HST catalog. The F1 score summarizes the two metrics as the harmonic mean of the PPV and the TPR.
 
 Like \cite{Portillo_2017} and \cite{Feder_2019}, a ``match" between an estimated star and an HST star is defined as follows: (1) the estimated location and the HST location are within 0.5 SDSS pixels, and (2) the estimated SDSS $r$-band flux and the HST F606W band flux are within half a magnitude. 
-The slack in magnitude accounts for the fact that the wavelength range of the HST F606W band is slightly broader than the SDSS $r$-band (though they are centered at roughly the same wavelength). 
+% The slack in magnitude accounts for the fact that the wavelength range of the HST F606W band is slightly broader than the SDSS $r$-band (though they are centered at roughly the same wavelength). 
 
 In probabilistic cataloging (PCAT and StarNet), the posterior defines a distribution over catalogs. 
 For StarNet, the TPR, PPV, and F1 score were computed for the catalog corresponding to the mode of the variational distribution (henceforth, the StarNet catalog). 

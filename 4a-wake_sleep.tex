@@ -13,7 +13,7 @@ ADVI is closely related to the reparameterization trick \citep{kingma2013autoenc
 
 In our model, the number of stars $N$ is discrete.
 As an alternative, the REINFORCE estimator~\citep{Williams1992reinforce} produces an unbiased stochastic gradient for both continuous and discrete latent variables.
-However, REINFORCE gradients without additional modification often suffer from high variance in practice, resulting in slow convergence of stochastic optimization. We find this to be true in our application (Section~\ref{sec:elbo_sleep_compare}). 
+However, REINFORCE gradients without additional modification often suffer from high variance in practice, resulting in slow convergence of stochastic optimization. We find this to be true in our empirical study.  (Section~\ref{sec:elbo_sleep_compare}). 
 % See Appendix~\ref{sec:reparam_details} for details concerning both the reparameterization and REINFORCE estimators. 
 
 The key difficulty in constructing stochastic gradients of the ELBO is that the integrating distribution depends on the optimization parameter $\eta$. 

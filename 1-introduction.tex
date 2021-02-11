@@ -70,7 +70,7 @@ in KL divergence to the exact posterior~\citep{Jordan_intro_vi, Wainwrite_graph_
 With a sufficiently constrained family of distributions, the VI optimization problem can be solved orders of magnitude faster than MCMC runs. 
 
 However, \cite{regier2019_celeste} is limited in that the number of light sources in a given image is treated as known and fixed -- it had to be set using a preprocessing routine.
-It avoided the transdimensional latent variable space in order to have a tractable objective for numerical optimization. 
+They avoided the transdimensional latent variable space in order to have a tractable objective for numerical optimization. 
 
 \bigbreak
 
@@ -101,7 +101,7 @@ Section~\ref{sec:wake_sleep} details the wake-sleep procedure.
 % The neural network is fit to map the generated images to distributions that place probability mass on their corresponding catalogs. Section~\ref{sec:wake_sleep} details the wake-sleep procedure. 
 
 In this application, optimizing the forward KL produces more reliable approximate posteriors than optimizing the traditional reverse KL (Section \ref{sec:elbo_sleep_compare}). 
-In particular, optimizing the forward KL involves sampling {\itshape complete} data---images and their corresponding catalogs---from the joint likelihood and fitting the network in a supervised fashion.
+In particular, optimizing the forward KL involves sampling {\itshape complete} data---images and their corresponding catalogs---from their joint likelihood and fitting the network in a supervised fashion.
 Taking advantage of complete data allows the network to better avoid shallow local minima where the approximate posterior is far from the exact posterior in terms of KL divergence. 
 
 The wake-sleep algorithm has been used in previous research to train deep generative models~\citep{Hinton1995wake_sleep, bornschein2014reweighted, le2020revisiting}.

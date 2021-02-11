@@ -106,7 +106,7 @@ The ultimate latent variable of interest is $z = \{N, (\ell_i, f_{i,1}, ..., f_{
 There is a natural mapping from $\tilde z$ to $z$. 
 First, the number of stars in the full catalog is given by the sum of the stars in each tile, $N = \sum_{s,t} \tilde N^{(s, t)}$. 
 Then, for every tile $(s,t)$, we index into the $\tilde N^{(s,t)}$-th row of the triangular array of tile latent variables $\tilde f^{(s,t)}$ and $\tilde \ell^{(s,t)}$. 
-The collection of these fluxes and locations form the full catalog (tile locations are shifted by the position of the tile in the full image to obtain locations in the full image). 
+The union of these fluxes and locations over all tiles form the full catalog (tile locations are shifted by the position of the tile in the full image to obtain locations in the full image). 
 See Figure~\ref{fig:tile_to_full_schm} for a schematic.
 
 
