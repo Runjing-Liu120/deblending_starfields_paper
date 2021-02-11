@@ -32,15 +32,15 @@ This optimization did not converge, likely due to the high variance of the REINF
 For a lower variance gradient estimator, the second approach employed the reparameterized gradient. To employ this gradient estimator, we analytically integrated the ELBO with respect to the number of stars $N$ to remove the discrete random variable. 
 See Appendix~\ref{sec:reparam_details} for details about the gradient estimators. 
 Using reparameterized gradients instead of REINFORCE gradients enabled the optimization to converge to stationary points (Figure~\ref{fig:optim_path}b). 
-However, for two of randomly initialized restarts, 
+However, for two randomly initialized restarts, 
 the optimization found local optima where the negative ELBO is higher than other restarts. 
 
 In contrast, optimizing the sleep objective consistently converged to a similar ELBO across all restarts and appeared to avoid shallow local optima (Figure~\ref{fig:optim_path}c).
 Recall that sleep phase optimization does not directly optimize the test ELBO. However, the test ELBO increases nonetheless, because the variational posterior better approximates the exact posterior as the optimization proceeds. 
 
 Shallow local optima in the ELBO result in unreliable catalogs. 
-Figure~\ref{fig:optim_path}(e) displays the estimated locations, defined as the mode of the fitted variational distribution. 
-The bottom left shows these locations after converging to a shallow local optimum. 
+The bottom row of Figure~\ref{fig:optim_path} displays the estimated locations, defined as the mode of the fitted variational distribution. 
+Figure~\ref{fig:optim_path}(e) shows these locations after converging to a shallow local optimum. 
 Here, the upper left tile was correctly estimated to have two stars, though both estimated stars were placed at the same location.
 For correct detections, one of the locations should be placed on the second star.
 However, in order to move one of the estimated locations to the second star, the optimization path must traverse a region where the log-likelihood is lower than the current configuration (Figure~\ref{fig:local_optima_cartoon}). 

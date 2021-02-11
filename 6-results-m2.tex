@@ -2,7 +2,7 @@
 We validated StarNet using an SDSS image of the Messier 2 (M2) globular cluster, a crowded starfield found in field 136 of camera column 2 in run 2583.
 M2 was also imaged in the ACS Globular Cluster Survey~\citep{Sarajedini_2007}
 using the Hubble Space telescope (HST),
-which has greater resolution than the Sloan telescope (0.05 and 0.4 arcseconds per pixel, respectively; see~\cite{hubble_about} and~\cite{sdss_about}). The reported catalog from this Hubble survey serves as the ground truth for validating our results.
+which has greater resolution than the Sloan telescope (0.05 and 0.4 arcseconds per pixel, respectively; see~\cite{hubble_about} and~\cite{sdss_about}). The catalog from this Hubble survey (henceforth the ``HST catalog") serves as ground truth for validating our results.
 
 We focus on the $100 \times 100$ pixel subimage of M2 that \cite{Portillo_2017} and \cite{Feder_2019} analyzed with PCAT.
 This subimage is located approximately two arcseconds from the heavily saturated core of the cluster;
@@ -146,14 +146,14 @@ Of all methods, StarNet-WS best approximated the HST flux distribution (Figure~\
     \centering
     \includegraphics[width=0.99\textwidth]{figures/m2_results/luminosity_fun.png}
     \vspace{-0.4cm}
-    \caption{Source magnitude histograms for the $r$-band observations of M2. 
-    The magnitude distribution of the HST catalog in grey. 
-    Magnitude distributions for the DAOPHOT, PCAT, and StarNet-WS catalogs overlaid.
-    For PCAT, the magnitude histogram is from a single catalog sample. }
+    \caption{Flux distributions for the $r$-band observations of M2. 
+    The flux distribution of the HST catalog in grey. 
+    Estimated distributions by DAOPHOT, PCAT, and StarNet-WS catalogs overlaid.
+    For PCAT, the flux distribution is from a single catalog sample. }
     \label{fig:luminosity_fun_m2}
 \end{figure}
 
-The difference between the source-magnitude histograms  (Figure~\ref{fig:luminosity_fun_m2}) produced by StarNet-WS and PCAT
+The difference between the flux distributions  (Figure~\ref{fig:luminosity_fun_m2}) produced by StarNet-WS and PCAT
 is partly due to the fact that StarNet-WS estimates the background with maximum likelihood, while the background in PCAT is fixed.
 As discussed below, the SDSS estimate of the background (which PCAT uses) is too dim, and PCAT compensates for the model mis-match by estimating more dim stars. 
 The StarNet-WS estimate increases the intensity of the background, and hence does not over-estimate dim stars. 
