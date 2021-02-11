@@ -27,12 +27,14 @@ Computing the ELBO does not require computing the marginal distribution $p(x)$, 
 % We now describe our family of distributions $\mathcal{Q}$. 
 Traditionally in variational inference, the posterior approximation $q_\eta$ depends on the data $x$ only implicitly, 
 in that $\eta^*$ is chosen according to~\eqref{eq:kl_objective}.
-In this case, $q_\eta(z | x)$ is usually written $q_\eta(z)$, suppressing the dependence on $x$.
+In this case, $q_\eta(z | x)$ is usually written $q_\eta(z)$, suppressing the dependence on $x$. 
+When a new data point $x^{new}$ arrives, finding a variational  approximation to the posterior $p(z^{new} | x^{new})$ requires re-solving~\eqref{eq:kl_objective} with $x = x^{new}$.
 
-The generative model in Section~\ref{sec:gen_model} does not assume any hierarchical structure over replicated  images. Therefore, given a new image $x^{new}$, the posterior factorizes; in other words,
-$p(z^{new}, z | x^{new}, x) = p(z^{new} | x^{new}) p(z | x)$. 
-To find a variational  approximation to the posterior $p(z^{new} | x^{new})$, the optimization problem~\eqref{eq:kl_objective} must be solved again with $x = x^{new}$.
-Even in models with hierarchical structure, the variational distribution will generally need to be updated via optimization for every newly observed data point. 
+
+% The generative model in Section~\ref{sec:gen_model} does not assume any hierarchical structure over replicated  images. Therefore, given a new image $x^{new}$, the posterior factorizes; in other words,
+% $p(z^{new}, z | x^{new}, x) = p(z^{new} | x^{new}) p(z | x)$. 
+% To find a variational  approximation to the posterior $p(z^{new} | x^{new})$, the optimization problem~\eqref{eq:kl_objective} must be solved again with $x = x^{new}$.
+% Even in models with hierarchical structure, the variational distribution will generally need to be updated via optimization for every newly observed data point. 
 
 On the other hand, 
 in {\itshape amortized} variational
@@ -88,7 +90,6 @@ on each tile:
     \tilde f^{(s, t)} &= (\tilde f_{N, i}^{(s, t)} : i = 1, ..., N; N = 1, 2, ...),
 \end{align}
 where $\tilde\ell_{N, i}^{(s, t)}$ and $\tilde f_{N, i}^{(s, t)}$ are the elements of the triangular array corresponding to location and fluxes, respectively. 
-
 Tile locations $\tilde\ell_{N, i}^{(s, t)} \in [0, R]\times[0, R]$ give the location of stars within a tile. The fluxes $\tilde f_{N, i}^{(s, t)}$ are vectors in $\mathbb{R}^B_+$ (one flux for each band). 
 
 Call $(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)})_{s=1,t=1}^{S,T}$ the {\itshape tile latent variables}. The tile latent variables factorize over image tiles:
@@ -106,7 +107,7 @@ There is a natural mapping from $\tilde z$ to $z$
 (see Figure~\ref{fig:tile_to_full_schm} for a schematic). 
 First, the number of stars in the full catalog is given by the sum of the stars in each tile, $N = \sum_{s,t} \tilde N^{(s, t)}$. 
 Then, for every tile $(s,t)$, we index into the $\tilde N^{(s,t)}$-th row of the triangular array of tile latent variables $\tilde f^{(s,t)}$ and $\tilde \ell^{(s,t)}$. 
-The collection of these fluxes and locations form the full catalog (for locations on the full catalog, locations on each tile $(s,t)$ is shifted by the position of the tile in the full image). 
+The collection of these fluxes and locations form the full catalog (tile locations are shifted by the position of the tile in the full image to obtain locations in the full image). 
 
 
 % \begin{align}
@@ -172,16 +173,18 @@ See appendix REF for details on evaluating $q_\eta(z | x)$ for any given catalog
 % {\color{Orange} (\tilde \ell, \tilde f)^{(2,1)}_{1, 1}}
 % \}
 
-\begin{figure}[!tb]
+\begin{figure}[tb]
     \centering
-    \includegraphics[width = 0.7\textwidth]{figures/vi_figures/tile_to_full_schematic.png}
-    \caption{An example image with four tiles illustrating the relationship between tile latent variables and the full-image latent variables. The upper-left tile has two stars; the upper-right and lower-left have one; the bottom right has none. 
+    \includegraphics[width = 0.9\textwidth]{figures/vi_figures/tile_to_full_schematic.png}
+    \vspace{-0.7cm}
+    \caption{An example image with four tiles and four stars illustrating the relationship between tile latent variables and the full-image latent variables. 
     To construct the full-image catalog, we index into the appropriate row of the triangular array on each tile.}
     \label{fig:tile_to_full_schm}
 \end{figure}
 
 
 \subsubsection{Variational distributions on image tiles}
+\label{sec:distr_on_tiles}
 We describe the variational distribution on each tile,
 $\tilde q_\eta\big(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)} | x\big)$.
 The latent variables also fully factorize within each tile. 
@@ -198,8 +201,7 @@ $\omega$ is a $(\tilde N_{max} + 1)$-dimensional vector on the simplex. $\mu_{\e
 The latent variables also fully factorize within each tile. Note that in the exact posterior, $\tilde N$ has support on the nonnegative integers; in the variational distribution, we truncate at some large $N_{max}$. 
 
 
-These distributions were taken for convenience: fluxes are positive and right skewed, so we place a normal distribution on log-fluxes; locations are between zero and $R$, so 
-we place a normal distribution on the logit of the location scaled by $1 / R$. 
+These distributions were taken to match the constraints of the latent variables: fluxes are positive and right skewed, suggesting a log-normal; locations are between zero and $R$, suggesting a scaled logit-normal. 
 
 \subsubsection{Neural network architecture}
 \label{sec:nn_archetecture}
@@ -216,13 +218,15 @@ we set $R = 2$ and padded the tile with a three-pixel-wide boundary.
 Thus, while the distribution on tile latent variables factorize over tiles, the neural network is able to use information from neighboring tiles in producing the distributional parameters. 
 
 
-Let $\hat x^{(s,t)}$ denote the padded tile pixel intensities (which includes all $B$ bands) and $h_\eta$ be the neural network, which returns the collection of distributional parameters in~\eqref{eq:var_distr_n}-\eqref{eq:var_distr_f} on tile $(s,t)$. 
+% Let $\hat x^{(s,t)}$ denote the padded tile pixel intensities (which includes all $B$ bands) and $h_\eta$ be the neural network.
+% which returns the collection of distributional parameters %in~\eqref{eq:var_distr_n}-\eqref{eq:var_distr_f} on tile $(s,t)$. 
 % \begin{align}
 %     h_\eta(\hat x^{(s,t)}) = (\omega^{(s,t)}, \mu_\ell^{(s,t)}, \nu_{\ell}^{(s,t)}, \mu_f^{(s,t)}, \sigma^{(s,t)}_f).
 %     \label{eq:nn_output}
 % \end{align}
-The same neural network is evaluated for all tiles $(s,t)$. Our variational parameters are neural network weights, here denoted $\eta$. 
-The architecture consists of several convolutional layers followed by a series of fully connected layers (Figure~\ref{fig:starnet_arch}). 
+% The same neural network is evaluated for all tiles $(s,t)$. 
+In amortized inference, the variational parameters $\eta$ to be optimized are neural network weights.
+The architecture consists of several convolutional layers followed by fully connected layers (Figure~\ref{fig:starnet_arch}). 
 This architecture has been successful on image classification challenges such as ImageNet~\citep{imagenet2015}. 
 The optimization of the architecture is left for future work. 
 % our focus in this paper is the application of neural networks to provide a variational posterior for cataloging starfields, not the network architecture per se. 
@@ -234,31 +238,30 @@ The optimization of the architecture is left for future work.
     \centering
     % \includegraphics[width=0.4\textwidth]{figures/starnet_archetecture2.png}
     \includegraphics[width=\textwidth]{figures/vi_figures/starnet_archetecture4.png}
-    % \vspace{-0.5cm}
+    \vspace{-1.25cm}
     \caption{The neural network architecture. For cataloging M2, the input image is an $8\times 8$ padded tile, and the network returns distributional parameters for latent variables contained in the center $2\times 2$ tile.
     }
     \label{fig:starnet_arch}
 \end{figure}
 
-Note the output dimension of the neural network. For each tile $(s,t)$, the categorical parameter $\omega^{(s,t)}$
-lies on the simplex and has dimension $N_{max} + 1$. 
-Furthermore, each index of the triangular array
-$i = 1, ..., \tilde N^{(s,t)}$, $\tilde N^{(s,t)} = 1, ..., N_{max}$
-describes a star. The star has a mean and variance for each location coordinate, and a mean and variance for its flux in each band. 
-Thus, for each star $(\tilde N^{(s,t)}, i)$, 
-the neural network outputs $2 \times (B + 2)$ parameters. 
-In total, the neural network has output dimension $(N_{max} + 1) + (B + 2) \times (N_{max}^2 + N_{max})$. 
+% Note the output dimension of the neural network. For each tile $(s,t)$, the categorical parameter $\omega^{(s,t)}$
+% lies on the simplex and has dimension $N_{max} + 1$. 
+% Furthermore, each index of the triangular array
+% $i = 1, ..., \tilde N^{(s,t)}$, $\tilde N^{(s,t)} = 1, ..., N_{max}$
+% describes a star. The star has a mean and variance for each location coordinate, and a mean and variance for its flux in each band. 
+% Thus, for each star $(\tilde N^{(s,t)}, i)$, 
+% the neural network outputs $2 \times (B + 2)$ parameters. 
+% In total, the neural network has output dimension $(N_{max} + 1) + (B + 2) \times (N_{max}^2 + N_{max})$. 
 
 % Recall that locations on the 
 % full image $\ell_{N, i}$ are parameterized to be in $[0, H] \times [0, W]$. 
 % On the tiles, locations $\ell^{(k)}_{N, i}$ are parameterized to be in
 % $[0, s] \times [0, s]$. 
 
-Because the output dimension is quadratic in $N_{max}$, factorizing the variational distribution spatially keeps the output dimension of the neural network manageable.
-On a crowded starfield with $H = W = 100$, the number of imaged stars is on the order of $10^3$.
-If the neural network were to return a variational distribution on the full $100\times 100$ pixel image, the output dimension would be on the order of $(10^3)^2$. 
-On the $2\times 2$ tile, we set $N_{max} = 3$, and the output dimension of the neural network with two bands is 53. 
-With this factorization, our approach can be used for inference on an image of any size. 
-
+Note that the output dimension of the neural network is quadratic in $N_{max}$: the outputs are parameters for a triangular array consisting of $\frac{1}{2}(N_{max}^2 + N_{max})$ sources. 
+Factorizing the variational distribution spatially keeps the output dimension manageable.
+While the full image may contain many stars (on the region of M2 we consider, the number of stars is on the order of thousands), 
+we set $N_{max} = 3$ on each $2\times 2$ tile. 
+Thus, the network is responsible for inferring only a few stars at once---a much easier task than inferring all $\sim1000$ stars simultaneously. 
 
 We emphasize that while the variational distribution factorizes over $2 \times 2$ tiles, our method does not break the inference problem for the full image into isolated subproblems. The evaluation of the likelihood, e.g., when computing the ELBO in~\eqref{eq:elbo}, is always on the full image. Light from a star within a $2 \times 2$ tile spills over into neighboring tiles, so the likelihood should not and does not decouple across image tiles. 

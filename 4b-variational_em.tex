@@ -3,7 +3,7 @@ The wake-sleep algorithm is closely related to variational EM~\citep{Jordan_intr
 which alternates between an {\itshape expectation} step (E-step) and a {\itshape maximization} step (M-step). 
 Variational EM can be viewed as block coordinate ascent on the ELBO objective, with the E-step optimizing variational parameters $\eta$ and the M-step optimizing the model parameters $\phi$. 
 The wake phase of the wake-sleep algorithm is equivalent to the M-step of variational EM. 
-As discussed above, the optimization of variational parameters $\eta$ using the ELBO objective is not conducive to using simple stochastic gradient estimators.
+As discussed above, the optimization of the ELBO with respect to $\eta$ is not conducive to using simple stochastic gradient estimators.
 Thus, the sleep phase replaces the ELBO objective of the E-step with the expected reverse KL in~\eqref{eq:sleep_obj}.
 
 

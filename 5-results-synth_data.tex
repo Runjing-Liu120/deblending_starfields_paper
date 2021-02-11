@@ -5,23 +5,12 @@
 
 \label{sec:elbo_sleep_compare}
 
-\begin{wrapfigure}{r}{0.35\textwidth}
-    \centering
-    \vspace{-1em}
-    \includegraphics[width = 0.32\textwidth]{figures/elbo_vs_sleep/vi_sleep_ex_figure.png}
-    \vspace{-1.7em}
-    \caption{The $20\times 20$ pixel synthetic image $x_{test}$. It contains four stars and is partitioned into $10\times 10$ tiles. }
-    \label{fig:toy_example}
-\end{wrapfigure}
-
 A simple example demonstrates that there exist shallow local optima in the ELBO
 where the fitted approximate posterior is far in KL divergence from the exact posterior. 
 These local optima result in unreliable catalogs. 
 The sleep objective, by taking advantage of  complete data, appears to better avoid these local optima. 
 For this example, the data were simulated with known PSF and background, and the wake phase is not needed. 
-
-The simulated $20\times20$ single-band image $x_{test}$ is shown in Figure~\ref{fig:toy_example}.
-The image has four stars, each with the same flux. 
+The simulated $20\times20$ single-band image $x_{test}$ is shown in the bottom row of Figure~\ref{fig:optim_path}.
 
 
 We compare three approaches to deblending. The first two approaches directly optimize the test ELBO, 
@@ -52,7 +41,7 @@ Recall that sleep phase optimization does not directly optimize the test ELBO. H
 Shallow local optima in the ELBO result in unreliable catalogs. 
 The bottom row of Figure~\ref{fig:optim_path} displays the estimated locations, defined as the mode of the fitted variational distribution. 
 The bottom left shows these locations after converging to a shallow local optimum. 
-In this local optimum, the upper left tile was correctly estimated to have two stars; however, both estimated stars were placed at the same location.
+Here, the upper left tile was correctly estimated to have two stars, though both estimated stars were placed at the same location.
 For correct detections, one of the locations should be placed on the second star.
 However, in order to move one of the estimated locations to the second star, the optimization path must traverse a region where the log-likelihood is lower than the current configuration (Figure~\ref{fig:local_optima_cartoon}). 
 The displayed configuration is a local optimum where the gradient with respect to its locations is approximately zero.
@@ -68,14 +57,12 @@ An example of correct detection after sleep-phase optimization is shown in the b
     \end{subfigure}
     \begin{subfigure}[t]{\textwidth}
     \centering
-    \includegraphics[width=0.55\textwidth]{figures/elbo_vs_sleep/optim_path_detect_compare.png}
+    \includegraphics[width=0.9\textwidth]{figures/elbo_vs_sleep/optim_path_detect_compare.png}
     \end{subfigure}
-    % \vspace{-3em}
+    \vspace{-1.5cm}
     \caption{(Top row) The ELBO as the optimization progresses for six random restarts. 
-    (Bottom row) Modal locations from two variational posteriors in red.
-    On the left, a randomly initialized run where optimizing the ELBO with the reparameterized gradient resulted in a shallow local optimum: the estimated locations split a single source into two sources, while missing another source entirely.  
-    On the right, the variational posterior 
-    was optimized using the sleep phase and correctly identified all four sources. }
+    (Bottom row) In red, modal locations from ELBO-optimized and sleep-optimized variational posteriors, for one of the six restarts.
+    In blue, the true locations. }
     \label{fig:optim_path}
 \end{figure}
 
@@ -88,7 +75,8 @@ An example of correct detection after sleep-phase optimization is shown in the b
 
 \begin{figure}[!htb]
     \centering
-    \includegraphics[width=\textwidth]{figures/elbo_vs_sleep/local_minima_cartoon.png}
+    \includegraphics[width=0.9\textwidth]{figures/elbo_vs_sleep/local_minima_cartoon.png}
+    \vspace{-0.5cm}
     \caption{An illustration of local optima in the ELBO objective. 
     To move an estimated location to a correct location, 
     the optimization path must traverse a region where the negative ELBO is larger than the current configuration. 
@@ -96,11 +84,15 @@ An example of correct detection after sleep-phase optimization is shown in the b
     \label{fig:local_optima_cartoon}
 \end{figure}
 
-Also, note that low-variance gradients of the ELBO for this simple example were constructed by analytically integrating out $N$. Only then could the reparameterization trick be applied to the ELBO, as the remaining latent variables are continuous. 
-In this example, the variational distribution has support over only 0, 1, or 2 stars for each tile. 
-Since the variational distribution factorizes over the four tiles, integrating $N$ is a summation of $3^4 = 81$ terms.
-On larger images with more tiles, analytically integrating $N$ would be computationally infeasible, 
-and the simple reparameterization trick would not apply as it does in this small illustrative example. 
+% Also, note that low-variance gradients of the ELBO for this simple example were constructed by analytically integrating out $N$.
+% On a larger images where $N$ is on the order of $\sim1000$ (e.g. on M2), analytically integrating out $N$ would be infeasible. 
+
+% Only then could the reparameterization trick be applied to the ELBO, as the remaining latent variables are continuous. 
+
+% In this example, the variational distribution has support over only 0, 1, or 2 stars for each tile. 
+% Since the variational distribution factorizes over the four tiles, integrating $N$ is a summation of $3^4 = 81$ terms.
+% On larger images with more tiles, analytically integrating $N$ would be computationally infeasible, 
+% and the simple reparameterization trick would not apply as it does in this small illustrative example. 
 
 % Figure~\ref{fig:sim_data100x100} displays our results on a larger example: a simulated $100\times 100$ pixel image with fifty stars. 
 % The tiles again consisted of $10\times 10$ pixel regions. 

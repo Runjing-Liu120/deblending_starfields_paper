@@ -22,7 +22,7 @@
 
 %\pdfminorversion=4
 % NOTE: To produce blinded version, replace "0" with "1" below.
-\newcommand{\blind}{0}
+\newcommand{\blind}{1}
 
 % my added command
 \newcommand{\rulesep}{\unskip\ \vrule\ }
@@ -73,7 +73,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \if1\blind
 {
-  \title{  \vspace{-30px}
+  \title{   \vspace{-30px}
 \bf Variational Inference for Deblending Crowded Starfields}
   \author{Runjing Liu
   \thanks{
@@ -126,8 +126,8 @@
 % \vspace{10px}
 
 % COMMENTED OUT FOR ARXIV VERSION
-\vfill
-\newpage
+% \vfill
+% \newpage
 
 \spacingset{1.45} % DON'T change the spacing!
 % CHANGED FOR ARXIV VERSION
@@ -149,9 +149,9 @@
 \label{sec:wake_sleep}
 \input{4a-wake_sleep}
 \input{4b-variational_em}
-% \input{4c-sleep_details}
+\input{4c-sleep_details}
 
-\section{Empirical comparison of ELBO optimization and sleep optimization}
+\section{Empirical comparison of ELBO and sleep objectives}
 \input{5-results-synth_data}
 
 \section{Results on the M2 globular cluster}
