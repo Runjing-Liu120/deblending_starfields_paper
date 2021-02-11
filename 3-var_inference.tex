@@ -92,7 +92,7 @@ on each tile:
 where $\tilde\ell_{N, i}^{(s, t)}$ and $\tilde f_{N, i}^{(s, t)}$ are the elements of the triangular array corresponding to location and fluxes, respectively. 
 Tile locations $\tilde\ell_{N, i}^{(s, t)} \in [0, R]\times[0, R]$ give the location of stars within a tile. The fluxes $\tilde f_{N, i}^{(s, t)}$ are vectors in $\mathbb{R}^B_+$ (one flux for each band). 
 
-Call $(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)})_{s=1,t=1}^{S,T}$ the {\itshape tile latent variables}. The tile latent variables factorize over image tiles:
+Call $(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)})_{s=1,t=1}^{S,T}$ the {\itshape tile latent variables}. The distribution on tile latent variables factorize over image tiles:
 \begin{align}
     \tilde q_\eta\big( \big(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)}\big)_{s=1, t = 1}^{S, T}|x\big) 
     &=
@@ -103,11 +103,11 @@ Call $(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)})_{s=1,t=1}^{S,
 
 Succinctly denote tile latent variables as $\tilde z$.
 The ultimate latent variable of interest is $z = \{N, (\ell_i, f_{i,1}, ..., f_{i,B})_{i = 1}^N\}$, the catalog for the full image.
-There is a natural mapping from $\tilde z$ to $z$
-(see Figure~\ref{fig:tile_to_full_schm} for a schematic). 
+There is a natural mapping from $\tilde z$ to $z$. 
 First, the number of stars in the full catalog is given by the sum of the stars in each tile, $N = \sum_{s,t} \tilde N^{(s, t)}$. 
 Then, for every tile $(s,t)$, we index into the $\tilde N^{(s,t)}$-th row of the triangular array of tile latent variables $\tilde f^{(s,t)}$ and $\tilde \ell^{(s,t)}$. 
 The collection of these fluxes and locations form the full catalog (tile locations are shifted by the position of the tile in the full image to obtain locations in the full image). 
+See Figure~\ref{fig:tile_to_full_schm} for a schematic.
 
 
 % \begin{align}
@@ -198,7 +198,7 @@ $(s,t)$ in this subsection,
 \end{align}
 independently for $i = 1, ..., \tilde N$; $\tilde{N} = 1, ..., N_{max}$. 
 $\omega$ is a $(\tilde N_{max} + 1)$-dimensional vector on the simplex. $\mu_{\ell_{\tilde N, i}}$ and $\nu_{\ell_{\tilde N, }}$ are two-dimensional vectors -- the covariance on locations is diagonal. 
-The latent variables also fully factorize within each tile. Note that in the exact posterior, $\tilde N$ has support on the nonnegative integers; in the variational distribution, we truncate at some large $N_{max}$. 
+Note that in the exact posterior, $\tilde N$ has support on the nonnegative integers; in the variational distribution, we truncate at some large $N_{max}$. 
 
 
 These distributions were taken to match the constraints of the latent variables: fluxes are positive and right skewed, suggesting a log-normal; locations are between zero and $R$, suggesting a scaled logit-normal. 
@@ -226,9 +226,9 @@ Thus, while the distribution on tile latent variables factorize over tiles, the 
 % \end{align}
 % The same neural network is evaluated for all tiles $(s,t)$. 
 In amortized inference, the variational parameters $\eta$ to be optimized are neural network weights.
-The architecture consists of several convolutional layers followed by fully connected layers (Figure~\ref{fig:starnet_arch}). 
+The architecture consists of several convolutional layers followed by several fully connected layers (Figure~\ref{fig:starnet_arch}). 
 This architecture has been successful on image classification challenges such as ImageNet~\citep{imagenet2015}. 
-The optimization of the architecture is left for future work. 
+The optimization of the architecture for this specific application is left for future work. 
 % our focus in this paper is the application of neural networks to provide a variational posterior for cataloging starfields, not the network architecture per se. 
 
 

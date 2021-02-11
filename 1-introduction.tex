@@ -62,15 +62,15 @@ Early implementations of PCAT required a day to process a $100\times 100$ pixel 
 More recent implementations running inexact MCMC brought the runtime down to 30  minutes~\citep{Feder_2019}.  
 In any case, a $100\times 100$ pixel image covers only a $0.66 \times 0.66$ arcminute patch of the sky.
 For comparison, in one night, SDSS scans a region on the order of $100 \times 1000$ arcminutes. 
-Extrapolating the 30-minute runtime, PCAT would take about ten years to process a nightly SDSS run. 
+Extrapolating the 30-minute runtime, PCAT would take on the order of ten years to process a nightly SDSS run. 
 
 As an alternative to MCMC, \cite{regier2019_celeste} produced an approximate posterior using variational inference.
 Variational inference (VI) considers a family of candidate approximate posteriors and employs numerical optimization to find the distribution in the family closest
 in KL divergence to the exact posterior~\citep{Jordan_intro_vi, Wainwrite_graph_models_vi, Blei_2017_vi_review}. 
 With a sufficiently constrained family of distributions, the VI optimization problem can be solved orders of magnitude faster than MCMC runs. 
 
-However, \cite{regier2019_celeste} is limited in that the number of light sources in a given image is treated as known and fixed -- it had to be set using a preprocessing routine. 
-This simplification was made in order to have a tractable objective for numerical optimization. 
+However, \cite{regier2019_celeste} is limited in that the number of light sources in a given image is treated as known and fixed -- it had to be set using a preprocessing routine.
+It avoided the transdimensional latent variable space in order to have a tractable objective for numerical optimization. 
 
 \bigbreak
 
@@ -102,7 +102,7 @@ Section~\ref{sec:wake_sleep} details the wake-sleep procedure.
 
 In this application, optimizing the forward KL produces more reliable approximate posteriors than optimizing the traditional reverse KL (Section \ref{sec:elbo_sleep_compare}). 
 In particular, optimizing the forward KL involves sampling {\itshape complete} data---images and their corresponding catalogs---from the joint likelihood and fitting the network in a supervised fashion.
-Taking advantage of complete data allows the network to better avoid shallow local minima where the approximate posterior returned is far from the exact posterior in terms of KL divergence. 
+Taking advantage of complete data allows the network to better avoid shallow local minima where the approximate posterior is far from the exact posterior in terms of KL divergence. 
 
 The wake-sleep algorithm has been used in previous research to train deep generative models~\citep{Hinton1995wake_sleep, bornschein2014reweighted, le2020revisiting}.
 However, to the best of our knowledge, this is the first application of wake-sleep for scientific purposes. 
@@ -115,7 +115,7 @@ StarNet was more accurate than both the MCMC-based cataloger PCAT and traditiona
 % Although the MCMC posterior approximation converges to the exact posterior asymptotically, over finite horizons an MCMC sampler may not mix well. The sleep-phase objective from the Wake-Sleep algorithm allows StarNet to circumvent many of the challenges of nonconvex optimization
 % (Section~\ref{sec:discussion}).
 Code to reproduce our results is publicly available in a GitHub repository.\footnote{
-\url{https://github.com/NAME_IS_BLINDED/DeblendingStarfields}. 
+\url{https://github.com/Runjing-Liu120/DeblendingStarfields}. 
 } 
 
 % However, in addition to greater speed, amortized inference may be better at nonconvex optimization: by learning a policy from many examples we learn a policy for avoiding shallow local minima. 

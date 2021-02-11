@@ -1,6 +1,6 @@
 \subsection{Decomposing the sleep objective}
 \label{sec:sleep_details}
-In this section, we decompose the sleep objective in~\eqref{eq:sleep_obj} for closer study. 
+In this subsection, we decompose the sleep objective in~\eqref{eq:sleep_obj} for closer study. 
 We take $\phi$ as fixed in this section and drop the explicit dependence of $p$ on $\phi$.
 
 First, observe that optimizing the sleep objective does not require computing the intractable term $p(x)$:
@@ -15,34 +15,33 @@ Crucially, the integrating distribution, $p(x,z)$, does not depend on the optimi
 % In the ELBO, the integrating distribution is $q_\eta$, resulting in the need for reparameterization or other adjustments to compute stochastic gradients. 
 Thus, unbiased stochastic gradients can be obtained simply as 
 \begin{align}
-    g = -\nabla_\eta \log q_\eta(z | x) \quad \text{ for } (z, x)\sim p(x, z).
+    g = -\nabla_\eta \log q_\eta(z | x) \quad \text{ for } (x, z)\sim p(x, z).
 \end{align}
 
-In other words, the sleep phase simulates {\itshape complete} data $(z, x)$ from the generative model and evaluates the loss $-\log q_\eta(z | x)$. 
+In other words, at each iteration of SGD, the sleep phase simulates {\itshape complete} data $(x,z)$ from the generative model and evaluates the loss $-\log q_\eta(z | x)$. 
 Here, ``complete data" refers to the image along with its catalog. 
 This loss encourages the neural network to map an image $x$ to a distribution $q_{\eta}(\cdot | x)$ that places large mass on the image's catalog $z$.
 
 We decompose the loss $-\log q_\eta(z | x)$ further. 
 Recall that $q_\eta$ fully factorizes over tile latent variables, and thus $-\log q_\eta(z | x)$ is a summation over all tile latent variables. 
-To evaluate the $-\log q_\eta(z | x)$ for some $(x,z)\sim p$, first convert $z$ to its tile parameterization $(\tilde N^{(s,t)}, \tilde \ell^{(s,t)}, \tilde f^{(s,t)})_{s=1,t=1}^{(S,T)}$, as detailed in Appendix REF.
+To evaluate $-\log q_\eta(z | x)$ for some $(x,z)\sim p$, first convert $z$ to its tile parameterization $(\tilde N^{(s,t)}, \tilde \ell^{(s,t)}, \tilde f^{(s,t)})_{s=1,t=1}^{(S,T)}$, as detailed in Appendix REF.
 On each tile $(s,t)$, the number of stars $\tilde N^{(s,t)}$ is categorical with parameter $\omega^{(s,t)}$ (recall Section~\ref{sec:distr_on_tiles}).
 The loss function for the number of stars becomes
 \begin{align}
-    - \log q_\eta(\tilde N^{(s,t)} | x) = -\sum_{n = 0}^{\tilde N_{max}} 1\{\tilde N^{(s,t)} = n\} \log \omega^{(s,t)}_n, 
+    - \log q_\eta(\tilde N^{(s,t)} | x) = -\sum_{n = 0}^{\tilde N_{max}} 1\{\tilde N^{(s,t)} = n\} \log \omega^{(s,t)}_n.
     \label{eq:cross_entropy_loss}
 \end{align}
-$\omega^{(s,t)}_n$ is the output of the neural network, and \eqref{eq:cross_entropy_loss} is the usual cross-entropy loss for a multi-class classification problem. 
+The vector $\omega^{(s,t)}$ is the output of the neural network, and \eqref{eq:cross_entropy_loss} is the usual cross-entropy loss for a multi-class classification problem. 
 
 Next, recall that location coordinates are logit-normal and fluxes are log-normal. 
-Let $y$ generically denote either the logit-location or log-flux for a star in catalog $z$; let $(\mu, \sigma)$ be the Guassian mean and standard deviation returned by the neural network. Then,
+Let $y$ generically denote either the logit-location or log-flux for a star in the sampled catalog $z$; let $(\mu, \sigma^2)$ be the Guassian mean and variance returned by the neural network. Then,
 \begin{align}
     -\log q_\eta(y | x) = 
         \frac{1}{2\sigma^2}(y - \mu)^2
-         + \log\sigma
-         + \frac{1}{2}\log(2\pi).
+         + \frac{1}{2}\log(2\pi\sigma^2).
          \label{eq:gaussian_sleep_loss}
 \end{align}
-The first term encourages network predictions $\mu$ to be close to the sampled latent variable $y$, while $\sigma^2$ encodes the uncertainty of the network: the second term encourages small uncertainties, but this is 
+The first term encourages network predictions $\mu$ to be close to the sampled latent variable $y$, while $\sigma^2$ encodes the uncertainty of the network: the second term encourages small uncertainties, but is 
 balanced by the scaling of the error $(y - \mu)^2$ in the first term. 
 
 % By our discussion in Section~\ref{sec:factorization}, 
@@ -58,7 +57,7 @@ balanced by the scaling of the error $(y - \mu)^2$ in the first term.
 % $\sigma_{n,i}$ is also outputted by the neural network, representing uncertainty -- the second term encourages small uncertainties, but this is 
 % balanced by the scaling of the error $(y_{n,i} - \mu_{n,i})^2$ in the first term. 
 
-The losses in~\eqref{eq:cross_entropy_loss} and~\eqref{eq:gaussian_sleep_loss} show that the sleep objective results in a supervised learning problem on complete data simulated from our generative model: the objective function for the number of stars is the usual cross-entropy loss for classification, while the objective function for log-fluxes and logit-locations are $L_2$ losses in the mean parameters. 
+The losses in~\eqref{eq:cross_entropy_loss} and~\eqref{eq:gaussian_sleep_loss} show that the sleep objective results in a supervised learning problem on complete data sampled from our generative model: the objective function for the number of stars is the usual cross-entropy loss for classification, while the objective function for log-fluxes and logit-locations are $L_2$ losses in the mean parameters. 
 
 
 % In Section~\ref{sec:estep_sleep_compare}, we will see the benefits of using complete data and optimizing $q_\eta$ using the losses~\eqref{eq:cross_entropy_loss} and \eqref{eq:gaussian_sleep_loss}  rather than the traditional ELBO. 
