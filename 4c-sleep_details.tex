@@ -34,15 +34,15 @@ The loss function for the number of stars becomes
 The vector $\omega^{(s,t)}$ is the output of the neural network, and \eqref{eq:cross_entropy_loss} is the usual cross-entropy loss for a multi-class classification problem. 
 
 Next, recall that location coordinates are logit-normal and fluxes are log-normal. 
-Let $y$ generically denote either the logit-location or log-flux for a star in the sampled catalog $z$; let $(\mu, \sigma^2)$ be the Guassian mean and variance returned by the neural network. Then,
+Let $y$ generically denote either the logit-location or log-flux for a star in the sampled catalog $z$; let $(\hat\mu, \hat\sigma^2)$ be the Guassian mean and variance returned by the neural network. Then,
 \begin{align}
     -\log q_\eta(y | x) = 
-        \frac{1}{2\sigma^2}(y - \mu)^2
-         + \frac{1}{2}\log(2\pi\sigma^2).
+        \frac{1}{2\hat\sigma^2}(y - \hat\mu)^2
+         + \frac{1}{2}\log(2\pi\hat\sigma^2).
          \label{eq:gaussian_sleep_loss}
 \end{align}
-The first term encourages network predictions $\mu$ to be close to the sampled latent variable $y$, while $\sigma^2$ encodes the uncertainty of the network: the second term encourages small uncertainties, but is 
-balanced by the scaling of the error $(y - \mu)^2$ in the first term. 
+The first term encourages network predictions $\hat\mu$ to be close to the sampled latent variable $y$, while $\hat\sigma^2$ encodes the uncertainty of the network: the second term encourages small uncertainties, but is 
+balanced by the scaling of the error $(y - \hat\mu)^2$ in the first term. 
 
 % By our discussion in Section~\ref{sec:factorization}, 
 % only the $N = N^{(s,t)}$-th row of the triangular 

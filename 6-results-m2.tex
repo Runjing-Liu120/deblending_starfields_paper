@@ -115,7 +115,7 @@ The small PCAT credible intervals may be indicative of an MCMC sampler that fail
 
 \input{tables/summary_stats_m2.txt}
 
-The improvement of StarNet-WS in PPV was most pronounced for dim stars (Figure~\ref{fig:summary_stats}). The TPR for StarNet-WS was uniformly better than DAOPHOT across all magnitudes. 
+The improvement of StarNet-WS over PCAT in PPV was most pronounced for dim stars (Figure~\ref{fig:summary_stats}). The TPR for StarNet-WS was uniformly better than DAOPHOT across almost all magnitudes. 
 Of all methods, StarNet-WS best approximated the HST flux distribution (Figure~\ref{fig:luminosity_fun_m2}). 
 % PCAT overestimated the number of dim stars with magnitudes greater than 21. 
 % In contrast, DAOPHOT failed to find stars with magnitudes greater than $21$.
@@ -175,8 +175,8 @@ The StarNet-WS estimate increases the intensity of the background, and hence doe
 To examine the uncertainty calibration of StarNet-WS, we evaluated the approximate posterior 
 conditional on the true number of stars in the HST catalog. 
 Then, each star in the StarNet-WS catalog was matched with exactly one Hubble star by finding the permutation of Hubble stars that had the largest log-likelihood under our variational distribution $q_\eta$. 
-For each star, we computed the z-score $(y - \hat y) / \hat \sigma$, where $y$ is the HST log-flux or 
-logit-location; $\hat y$ and $\hat\sigma$ are the mean and the standard deviation, respectively, of the Gaussian variational distribution for the log-flux or logit-location.
+For each star, we computed the z-score $(y - \hat \mu) / \hat \sigma$, where $y$ is the HST log-flux or 
+logit-location; $\hat \mu$ and $\hat\sigma$ are the mean and the standard deviation, respectively, of the Gaussian variational distribution for the log-flux or logit-location.
 % If the uncertainties were perfectly calibrated, the distribution of these z-scores would be a standard Gaussian. 
 The empirical z-score distributions are close to a standard Gaussian with some discrepancy in the tails and some evidence of skewness, suggesting the uncertainties are not too mis-estimated (Figure~\ref{fig:z-score_calibration}). 
 
