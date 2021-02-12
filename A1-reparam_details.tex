@@ -1,79 +1,101 @@
-The ELBO objective~\eqref{eq:elbo} is of the form 
+The ELBO objective~\eqref{eq:elbo} is of the form
 \begin{align}
     \mathcal{L}(\eta) = \Expect_{q_\eta(z)}[f_\eta(z)].
     \label{eq:gen_elbo}
 \end{align}
-The parameter $\eta$ is to be optimized, and $z$ is the latent variable. The integrating distribution $q$ and the function $f$ depend on $\eta$. 
+The parameter $\eta$ is to be optimized, and $z$ is the latent variable. The integrating distribution $q$ and the function $f$ depend on $\eta$.
 
-The REINFORCE estimator~\cite{Williams1992reinforce} is a general-purpose unbiased estimate for the gradient of~\eqref{eq:gen_elbo}. 
-It is given by 
+The REINFORCE estimator~\cite{Williams1992reinforce} is a general-purpose unbiased estimate for the gradient of~\eqref{eq:gen_elbo}.
+It is given by
 \begin{align}
-    g_{\textrm{rf}}(z) = \nabla_\eta f_\eta(z) + 
+    g_{\textrm{rf}}(z) = \nabla_\eta f_\eta(z) +
             f_\eta(z)  \nabla_\eta \log q_\eta(z)
-    \quad \text{for } 
-    z\sim q_\eta(z). 
+    \quad \text{for }
+    z\sim q_\eta(z).
 \end{align}
 The REINFORCE estimate is unbiased for the true gradient:
 \begin{align}
-    \Expect_{q_\eta(z)}[g_{\textrm{rf}}(z)] &= 
-    \int q_\eta(z) \nabla_\eta f_\eta(z) \; dz+ 
+    \Expect_{q_\eta(z)}[g_{\textrm{rf}}(z)] &=
+    \int q_\eta(z) \nabla_\eta f_\eta(z) \; dz+
     \int q_\eta(z) f_\eta(z)  \nabla_\eta \log q_\eta(z)\; dz \\
-    &= \int q_\eta(z) \nabla_\eta f_\eta(z) \; dz+ 
+    &= \int q_\eta(z) \nabla_\eta f_\eta(z) \; dz+
     \int f_\eta(z) \nabla_\eta q_\eta(z)  \; dz \\
     &= \int \nabla_\eta[q_\eta(z) f_\eta(z)] \; dz \\
-    &= \nabla_\eta \int q_\eta(z) f_\eta(z) \; dz 
+    &= \nabla_\eta \int q_\eta(z) f_\eta(z) \; dz
     = \nabla_\eta \Expect_{q_\eta(z)}[f_\eta(z)],
 \end{align}
-assuming that $f$ is well-behaved so that integration and differentiation can be interchanged. 
+assuming that $f$ is well-behaved so that integration and differentiation can be interchanged.
 
-Alternatively, the reparameterized gradient~\cite{rezende2014stochastic, kingma2013autoencoding} can be used when there exists some distribution $F$ not involving $\eta$ and a differentiable mapping $h_\eta$ such that 
+Alternatively, the reparameterized gradient~\cite{rezende2014stochastic, kingma2013autoencoding} can be used when there exists some distribution $F$ not involving $\eta$ and a differentiable mapping $h_\eta$ such that
 \begin{align}
-    w \sim F \implies h_\eta(w) \sim q_\eta. 
+    w \sim F \implies h_\eta(w) \sim q_\eta.
 \end{align}
-For example, if $q_{\eta}(z) = \mathcal{N}(z; 0, \eta)$ that is, a Gaussian with zero mean and variance $\eta$, one possibility is to let $F$ be the standard Gaussian and $h_\eta(w) = w \sqrt{\eta}$. 
+For example, if $q_{\eta}(z) = \mathcal{N}(z; 0, \eta)$ that is, a Gaussian with zero mean and variance $\eta$, one possibility is to let $F$ be the standard Gaussian and $h_\eta(w) = w \sqrt{\eta}$.
 
-The gradient of $\mathcal{L}(\eta)$ can be written as 
+The gradient of $\mathcal{L}(\eta)$ can be written as
 \begin{align}
-    \nabla_\eta \Expect_{q_\eta(z)}[f_\eta(z)] &= 
-        \nabla_\eta \Expect_{w\sim F}[f_\eta(h_\eta(w)] = \Expect_{w\sim F}[\nabla_\eta f_\eta(h_\eta(w)], 
+    \nabla_\eta \Expect_{q_\eta(z)}[f_\eta(z)] &=
+        \nabla_\eta \Expect_{w\sim F}[f_\eta(h_\eta(w)] = \Expect_{w\sim F}[\nabla_\eta f_\eta(h_\eta(w)],
 \end{align}
-again assuming the interchangability of integrals and derivatives. 
-Unbiased gradients are computed as 
+again assuming the interchangability of integrals and derivatives.
+Unbiased gradients are computed as
 \begin{align}
-    g_{\textrm{rp}} 
+    g_{\textrm{rp}}
     = \nabla_\eta f_\eta(h_\eta(w))
     = \nabla_z f_\eta(z)\Big|_{z = h_\eta(w)}
-    \nabla_\eta h_\eta(w) \quad \text{for } w\sim F. 
+    \nabla_\eta h_\eta(w) \quad \text{for } w\sim F.
 \end{align}
 
-The reparameterized gradient includes gradient information $\nabla_z f_\eta(z)$ while the REINFORCE gradient does not. Taking into account the structure of $f$ through its gradient lowers the variance of reparameterized gradient in comparison to the REINFORCE gradient. 
-However, if $z$ contains discrete components, there cannot be a differentiable mapping $h_\eta$, and the reparameterization trick will not apply. 
+The reparameterized gradient includes gradient information $\nabla_z f_\eta(z)$ while the REINFORCE gradient does not. Taking into account the structure of $f$ through its gradient lowers the variance of reparameterized gradient in comparison to the REINFORCE gradient.
+However, if $z$ contains discrete components, there cannot be a differentiable mapping $h_\eta$, and the reparameterization trick will not apply.
 
-% In Section~\ref{sec:elbo_sleep_compare}, a combination of reparameterized and REINFORCE gradients. Let $N$ be the discrete component of $z$ (the number of stars) and $y$ be the continuous components (the locations and fluxes). Our variational distribution factorizes, so we write the expectation as 
-% \begin{align}
-%  \Expect_{q_\eta(N)}\Expect_{q_\eta(y)}[f_\eta(N, y)]. 
-% \end{align}
-% We use the REINFORCE estimator for the outer expectation and the reparameterization trick for the inner expectation. We first apply the REINFORCE to the outer expectation: 
-% \begin{align}
-%     \nabla_\eta  \Expect_{q_\eta(N)}&\Expect_{q_\eta(y)}\Big[f_\eta(N, y)\Big] \\
-%     &=  \Expect_{q_\eta(N)}\Big[ \nabla_\eta \log q_\eta(N) \Expect_{q_\eta(y)}[f_\eta(N, y)] + 
-%     \nabla_\eta \Expect_{q_\eta(y)}[f_\eta(N, y)] \Big]\\
-%     &\approx \nabla_\eta \log q_\eta(N) \Expect_{q_\eta(y)}[f_\eta(N, y)] + 
-%     \nabla_\eta \Expect_{q_\eta(y)}[f_\eta(N, y)] \quad \text{for } N \sim q_\eta(N). 
-%     \label{eq:reinforce_partial}
-% \end{align}
-% Then we use the reparameterization trick for $y$, so 
-% \begin{align}
-%     \Expect_{q_\eta(y)}[f_\eta(N, y)] &\approx f_\eta(N, h_\eta(w))\\
-%     \nabla_\eta \Expect_{q_\eta(y)}[f_\eta(N, y)] &\approx  \nabla_y f_\eta(N, y)\Big|_{y = h_\eta(w)}
-%     \nabla_\eta h_\eta(w) 
-%     \label{eq:reparam_partial}
-% \end{align}
-% for $w \sim F$, where $h_\eta$ and $F$ are chosen appropriately. Combining~\eqref{eq:reinforce_partial} and~\eqref{eq:reparam_partial}, our gradient estimator is 
-% \begin{align}
-%     g(z) = \nabla_\eta \log q_\eta(N) 
-%     f_\eta(N, h_\eta(w)) + 
-%     \nabla_y f_\eta(N, y)\Big|_{y = h_\eta(w)}
-%     \nabla_\eta h_\eta(w) 
-% \end{align}
-% for $N\sim q_\eta(N)$ and $w\sim F$. Because the variational distribution on locations and fluxes are transformation of Gaussians (recall locations are logit-normal and fluxes log-normal), we take $F$ to be the standard Gaussian, while $h(\cdot ; \eta)$ shifts and scales the standard Gaussian according the the parameters returned by the neural network and applies the appropriate transformation. 
+\subsection{Gradients for our ELBO vs sleep experiment}
+In Section~\ref{sec:elbo_sleep_compare}, we used a combination of reparameterized and REINFORCE gradients.
+Let $N$ be the discrete component of $z$ (the number of stars) and $y$ be the continuous components (the locations and fluxes).
+Our variational distribution factorizes, so we write the expectation as
+\begin{align}
+ \mathcal{L}(\eta) = \Expect_{q_\eta(N)}\Expect_{q_\eta(y)}[f_\eta(N, y)].
+ \label{eq:elbo_factorized}
+\end{align}
+We use the REINFORCE estimator for the outer expectation and the reparameterization trick for the inner expectation. We first apply the REINFORCE to the outer expectation:
+\begin{align}
+    \nabla_\eta  \Expect_{q_\eta(N)}&\Expect_{q_\eta(y)}\Big[f_\eta(N, y)\Big] \\
+    &=  \Expect_{q_\eta(N)}\Big[ \nabla_\eta \log q_\eta(N) \Expect_{q_\eta(y)}[f_\eta(N, y)] +
+    \nabla_\eta \Expect_{q_\eta(y)}[f_\eta(N, y)] \Big]\\
+    &\approx \nabla_\eta \log q_\eta(N) \Expect_{q_\eta(y)}[f_\eta(N, y)] +
+    \nabla_\eta \Expect_{q_\eta(y)}[f_\eta(N, y)] \quad \text{for } N \sim q_\eta(N).
+    \label{eq:reinforce_partial}
+\end{align}
+Then we use the reparameterization trick for $y$, so
+\begin{align}
+    \Expect_{q_\eta(y)}[f_\eta(N, y)] &\approx f_\eta(N, h_\eta(w))\\
+    \nabla_\eta \Expect_{q_\eta(y)}[f_\eta(N, y)] &\approx  \nabla_y f_\eta(N, y)\Big|_{y = h_\eta(w)}
+    \nabla_\eta h_\eta(w)
+    \label{eq:reparam_partial}
+\end{align}
+for $w \sim F$, where $h_\eta$ and $F$ are chosen appropriately. Combining~\eqref{eq:reinforce_partial} and~\eqref{eq:reparam_partial}, our gradient estimator is
+\begin{align}
+    g(z) = \nabla_\eta \log q_\eta(N)
+    f_\eta(N, h_\eta(w)) +
+    \nabla_y f_\eta(N, y)\Big|_{y = h_\eta(w)}
+    \nabla_\eta h_\eta(w)
+    \label{eq:appendix_reinforce}
+\end{align}
+Equation~\ref{eq:appendix_reinforce} is what our main text called the ``REINFORCE gradient."
+These gradients produced the optimization path in Figure~\ref{fig:optim_path}(a).
+
+The ``reparameterized" gradient in Section~\ref{sec:elbo_sleep_compare} required integrating out $N$.
+Here, we wrote the outer expectation in~\eqref{eq:elbo_factorized} as a summation of $N_{max}$ terms:
+\begin{align}
+\mathcal{L}(\eta) = \sum_{n=1}^{N_{max}}\Expect_{q_\eta(y)}[f_\eta(n, y)].
+\end{align}
+Then, the reparameterization trick was applied to each term of the summation.
+Stochastic gradients were computed as,
+\begin{align}
+g(z) = \sum_{n=1}^{N_{max}}\nabla_y f_\eta(n, y)\Big|_{y = h_\eta(w)}
+\nabla_\eta h_\eta(w) \quad \text{for } w\sim F.
+\end{align}
+Gradients of this form produced the optimization path in Figure~\ref{fig:optim_path}(b).
+
+
+% for $N\sim q_\eta(N)$ and $w\sim F$. Because the variational distribution on locations and fluxes are transformation of Gaussians (recall locations are logit-normal and fluxes log-normal), we take $F$ to be the standard Gaussian, while $h(\cdot ; \eta)$ shifts and scales the standard Gaussian according the the parameters returned by the neural network and applies the appropriate transformation.
