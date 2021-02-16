@@ -96,6 +96,7 @@ g(z) = \sum_{n=1}^{N_{max}}\nabla_y f_\eta(n, y)\Big|_{y = h_\eta(w)}
 \nabla_\eta h_\eta(w) \quad \text{for } w\sim F.
 \end{align}
 Gradients of this form produced the optimization path in Figure~\ref{fig:optim_path}(b).
+No REINFORCE estimates were required. 
 
 
 % for $N\sim q_\eta(N)$ and $w\sim F$. Because the variational distribution on locations and fluxes are transformation of Gaussians (recall locations are logit-normal and fluxes log-normal), we take $F$ to be the standard Gaussian, while $h(\cdot ; \eta)$ shifts and scales the standard Gaussian according the the parameters returned by the neural network and applies the appropriate transformation.

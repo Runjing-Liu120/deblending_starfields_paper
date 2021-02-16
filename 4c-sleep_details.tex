@@ -24,7 +24,7 @@ This loss encourages the neural network to map an image $x$ to a distribution $q
 
 We decompose the loss $-\log q_\eta(z | x)$ further.
 Recall that $q_\eta$ fully factorizes over tile latent variables, and thus $-\log q_\eta(z | x)$ is a summation over all tile latent variables.
-To evaluate $-\log q_\eta(z | x)$ for some $(x,z)\sim p$, first convert $z$ to its tile parameterization $(\tilde N^{(s,t)}, \tilde \ell^{(s,t)}, \tilde f^{(s,t)})_{s=1,t=1}^{(S,T)}$, as detailed in Appendix REF.
+To evaluate $-\log q_\eta(z | x)$ for some $(x,z)\sim p$, first convert $z$ to its tile parameterization $(\tilde N^{(s,t)}, \tilde \ell^{(s,t)}, \tilde f^{(s,t)})_{s=1,t=1}^{(S,T)}$, as detailed in Appendix~\ref{sec:eval_var_distr}.
 On each tile $(s,t)$, the variational distribution on the number of stars $\tilde N^{(s,t)}$ is categorical with probability vector $\omega^{(s,t)}\in\Delta^{N_{max}}$ (recall Section~\ref{sec:distr_on_tiles}).
 The loss function for the number of stars becomes
 \begin{align}
