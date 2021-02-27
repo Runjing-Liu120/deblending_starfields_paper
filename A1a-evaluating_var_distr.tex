@@ -1,14 +1,14 @@
 The sleep phase optimization requires evaluating
 $q_\eta(z | x)$ for a given catalog
-\[z = \{N, (\ell_i, f_{i,1}, ..., f_{i,B})_{i = 1}^N\}\]
+\[z = \{N, (\ell_i, f_{i,1}, ..., f_{i,B})_{i = 1}^N\}.\]
 By~\eqref{eq:pull_back_of_q}, 
 it suffices to evaluate $\tilde q_\eta(\tau^{-1}(z) | x)$, 
-where $\tau$ is the mapping from tile latent variables to the full image catalog as described in Section~\ref{sec:factorization}, 
-and $\tilde q$ is the distribution on tile latent variables~\eqref{eq:factorize_patches}. 
+where $\tau$ is the mapping from tile latent variables $\tilde z$ to the catalog $z$ as described in Section~\ref{sec:factorization}, 
+and $\tilde q_\eta$ is the distribution on tile latent variables. 
 
-Here, $\tau^{-1}(z)$ is a {\itshape set} of tile latent variables because the mapping from tile latent variables to catalogs $z$ is not injective, as we now explain.  
+Here, $\tau^{-1}(z)$ is a {\itshape set} of tile latent variables because the mapping from tile latent variables $\tilde z$ to catalogs $z$ is not injective, as we now explain.  
 
-Locations in the full-image catalog $\{\ell_i\}_{i=1}^N$
+Locations in the catalog $\{\ell_i\}_{i=1}^N$
 determine the number of stars on tile $(s,t)$. 
 The number of stars $\tilde N^{(s,t)}$ is simply the count of the locations that reside within that tile:
 \begin{align}
@@ -53,21 +53,21 @@ On each tile $(x,t)$,
 %     \Big\}.
 % \end{align}
 In words, given a catalog $z$,
-first convert $z$ to tile random variables;
+first convert $z$ to tile latent variables;
 then on each tile, it suffices to evaluate $\tilde q_\eta$ only at the rows of triangular 
 arrays determined by the number 
 of stars falling in each tile. 
 
-The last technical detail involves computing 
-a given row of the triangular array. 
-Because catalogs are {\itshape sets}, on each tile, 
-latent variable must 
+The last technical detail is computing 
+a given row of a triangular array. 
+Because catalogs are {\itshape sets},
+each star in the tile must 
 be matched with corresponding variational parameters. 
-Let $(\tilde \ell_i, \tilde f_i), i = 1, ..., n$ be the tile latent variables in a given row of the triangular array, on some tile. 
-Let $\theta_1, ..., \theta_n$ be the collection of variational parameters in that row (that is, the parameters in Equations~\ref{eq:var_distr_loc}-\ref{eq:var_distr_f}). 
-On each row, we find the minimal permutation of the tile latent variables that maximize its log-probability under $q$. 
-Thus, to evaluate each row of the triangular array, we find
+Let $(\tilde \ell_i, \tilde f_i)_{i = 1}^n$ generically denote the tile latent variables in the $n$-th row of a triangular array, on some tile. 
+We find the permutation of the tile latent variables that maximize its log-probability under $q$. 
+Recalling the variational distribution in~\eqref{eq:var_distr_loc}-\eqref{eq:var_distr_f}, we permute the stars by finding 
 \begin{align}
-    \argmin_\pi \sum_{i=1}^n \log \tilde q((\tilde \ell_{\pi(i)}, \tilde f_{\pi(i)} | \theta_i)), 
+    \argmax_\pi \Big\{ \prod_{i=1}^n \text{LogitNormal}(\tilde \ell_{\pi(i)}; \mu_{\ell_{i}}, \nu_{\ell_{i}})\times 
+	\text{LogNormal}(\tilde f_{\pi(i)}; \mu_{f_{i}}, \sigma^2_{f_{i}})\Big\}
 \end{align}
-where the argmin is taken over all permutations on $\{1, ..., n\}$. This is feasible because on each tile $N_{max} = 3$, so there are at most three stars. 
+where the argmax is taken over all permutations on $\{1, ..., n\}$. This is feasible because on each tile $N_{max} = 3$, so we only need to search through $3!=6$ possibilities. 

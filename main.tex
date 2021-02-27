@@ -1,137 +1,87 @@
-\documentclass[12pt]{article}
+\documentclass[twoside,11pt]{article}
 
-% default packages
+% packages I need
 \usepackage{amsmath}
-\usepackage{graphicx,psfrag,epsf}
-\usepackage{enumerate}
-\usepackage{natbib}
-\usepackage{url} % not crucial - just used below for the URL
-
-% my packages
-\usepackage{subcaption}
-\usepackage{booktabs}
-\usepackage{hyperref}
-\usepackage{float}
-\usepackage{ulem}
+\usepackage{wrapfig}
 \usepackage{xfrac}
 \usepackage{wrapfig}
 \usepackage{multirow}
+\usepackage{subcaption}
+\usepackage{booktabs}
 
-% remove figures
-% \usepackage{endfloat}
+% Any additional packages needed should be included after jmlr2e.
+% Note that jmlr2e.sty includes epsfig, amssymb, natbib and graphicx,
+% and defines many common macros, such as 'proof' and 'example'.
+%
+% It also sets the bibliographystyle to plainnat; for more information on
+% natbib citation styles, see the natbib documentation, a copy of which
+% is archived at http://www.jmlr.org/format/natbib.pdf
+\usepackage{jmlr2e}
 
-%\pdfminorversion=4
-% NOTE: To produce blinded version, replace "0" with "1" below.
-\newcommand{\blind}{1}
-
-% my added command
-\newcommand{\rulesep}{\unskip\ \vrule\ }
-
-% line numbers
-% \usepackage{lineno}
-% \linenumbers
-
-% more of my packages
-\usepackage{amsfonts}
-\usepackage{wrapfig}
+% Definitions of handy macros can go here
 \newcommand{\Prob}{P}
 \newcommand{\Expect}{\mathbb{E}}
 \newcommand{\Reals}{\mathbb{R}}
 \newcommand{\KL}{\textrm{KL}}
-\interfootnotelinepenalty=10000
 
-% DON'T change margins - should be 1 inch all around.
-\addtolength{\oddsidemargin}{-.5in}%
-\addtolength{\evensidemargin}{-.5in}%
-\addtolength{\textwidth}{1in}%
-\addtolength{\textheight}{-.3in}%
-\addtolength{\topmargin}{-.8in}%
+\newcommand{\dataset}{{\cal D}}
+\newcommand{\fracpartial}[2]{\frac{\partial #1}{\partial  #2}}
 
-% CHANGED FOR ARXIV
-% \addtolength{\oddsidemargin}{-.5in}%
-% \addtolength{\evensidemargin}{-.5in}%
-% \addtolength{\textwidth}{1in}%
-% \addtolength{\textheight}{1.1in}%
-% \addtolength{\topmargin}{-.8in}%
-
-% my functions
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
 
-\usepackage{soul}
+\newcommand{\rulesep}{\unskip\ \vrule\ }
 
-\date{\vspace{-10px}}
+% Heading arguments are {volume}{year}{pages}{date submitted}{date published}{paper id}{author-full-names}
+
+\jmlrheading{1}{2000}{1-48}{2/21}{00/00}{meila00a}{Runjing Liu and Jon D. McAuliffe and Jeffrey Regier and the LSST Dark Energy Science Collaboration}
+
+% Short headings should be running head and authors last names
+
+\ShortHeadings{Variational Inference for Deblending Crowded Starfields}{Liu, McAuliffe, Regier, and LSST}
+\firstpageno{1}
 
 \begin{document}
 
-%\bibliographystyle{natbib}
+\title{Variational Inference for Deblending Crowded Starfields}
 
-\def\spacingset#1{\renewcommand{\baselinestretch}%
-{#1}\small\normalsize} \spacingset{1}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\if1\blind
-{
-  \title{   \vspace{-30px}
-\bf Variational Inference for Deblending Crowded Starfields}
-  \author{Runjing Liu
-  \thanks{
-  Runjing Liu (e-mail: \url{runjing_liu@berkeley.edu}) gratefully acknowledges support from the NSF Graduate Research Fellowship Program.  
-  This paper has been approved by the LSST Dark Energy Science Collaboration following an internal review. 
-  The internal reviewers were 
-  Bastien Arcelin,
-  Fran\c{c}ois Lanusse, and 
-  Peter Melchior. 
-  The authors also thank Derek Hansen, Ismael Mendoza, and Zhe Zhao for reviewing this manuscript and for continuing the development of our software.
-  }
-  \hspace{.2cm}\\
-    Department of Statistics, University of California, Berkeley\\
-    \\
-    Jon D. McAuliffe \\
+\author{\name Runjing Liu 
+    \email runjing\_liu@berkeley.edu \\
+    \addr Department of Statistics\\
+    University of California\\
+    Berkeley, CA 94720, USA
+    \AND
+    \name Jon D. McAuliffe 
+    \email jon@stat.berkeley.edu \\
+    \addr 
     The Voleon Group \\
-    Department of Statistics, University of California, Berkeley\\
-    \\
-    Jeffrey Regier \\
-    Department of Statistics, University of Michigan\\
-    \\
-    The LSST Dark Energy Science Collaboration
+    Berkeley, CA 94704, USA \\
+    and\\
+    Department of Statistics\\
+    University of California\\
+    Berkeley, CA 94720, USA 
+    \AND
+    \name Jeffrey Regier
+    \email regier@umich.edu \\
+    \addr 
+    Department of Statistics \\
+    University of Michigan \\
+    Ann Arbor, MI 48109
+    \AND
+    \name The LSST Dark Energy Science Collaboration
     }
-  \maketitle
-} \fi
 
-\if0\blind
-{
-  \bigskip
-  \bigskip
-  \bigskip
-  \begin{center}
-    {\LARGE\bf Variational Inference for Deblending Crowded Starfields}
-\end{center}
-  \medskip
-} \fi
+\editor{}
 
-\bigskip
-% ADDED FOR ARXIV
-% \vspace{-15px}
-\begin{abstract}
+\maketitle
+
+\begin{abstract}%   <- trailing '%' for backward compatibility of .sty file
 \input{abstract}
 \end{abstract}
-% ADDED FOR ARXIV
-% \vspace{10px}
 
-\noindent%
-{\it Keywords:}  Bayesian methods, amortized inference, wake-sleep algorithm, approximate inference, astronomical surveys, cataloging. 
-% ADDED FOR ARXIV
-% \vspace{10px}
-
-% COMMENTED OUT FOR ARXIV VERSION
-% \vfill
-% \newpage
-
-\spacingset{1.45} % DON'T change the spacing!
-% CHANGED FOR ARXIV VERSION
-% \spacingset{1.1}
+\begin{keywords}
+  Bayesian methods, amortized inference, wake-sleep algorithm, approximate inference, cataloging astronomical surveys
+\end{keywords}
 
 \section{Introduction}
 \label{sec:intro}
@@ -161,17 +111,17 @@
 \label{sec:discussion}
 \input{7-discussion}
 
-% \clearpage
 
-% \bibliographystyle{unsrt}
-% asa style taken from 
-% https://raw.githubusercontent.com/ggobi/paper-inference-jasa/master/asa.bst
-\bibliographystyle{asa}
-\bibliography{bibliography}
+% Acknowledgements should go at the end, before appendices and references
+
+\acks{\input{acknowledgements}}
+
+% Manual newpage inserted to improve layout of sample file - not
+% needed in general before appendices/bibliography.
 
 \newpage
-\appendix
 
+\appendix
 % this makes figure number start with A.#
 \renewcommand\thefigure{A.\arabic{figure}}
 \renewcommand\thetable{A.\arabic{table}}
@@ -179,13 +129,13 @@
 \setcounter{table}{0}    
 
 
-\section{Reparameterized and REINFORCE gradients}
-\label{sec:reparam_details}
-\input{A1-reparam_details}
-
 \section{Evaluating the variational distribution}
 \label{sec:eval_var_distr}
 \input{A1a-evaluating_var_distr}
+
+\section{Reparameterized and REINFORCE gradients}
+\label{sec:reparam_details}
+\input{A1-reparam_details}
 
 \section{Results on a test M2 image}
 \label{sec:test_m2}
@@ -200,5 +150,10 @@
 \section{Results on Stripe-82}
 \label{sec:results_sparse_field}
 \input{A4-results-sparse_field}
+
+\clearpage
+
+\vskip 0.2in
+\bibliography{bibliography}
 
 \end{document}

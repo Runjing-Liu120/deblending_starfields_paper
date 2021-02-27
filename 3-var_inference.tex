@@ -47,19 +47,24 @@ No additional run of an optimization routine is needed for a new data point $x^{
 
 The following subsections detail the construction of our variational distribution.
 
-\begin{wrapfigure}{r}{0.35\textwidth}
-\vspace{-4em}
-    \centering
-    \includegraphics[width = 0.32\textwidth]{figures/vi_figures/example_tiled_less_whitespace.png}
-    % \vspace{-1cm}
-    \caption{Tiling a $10 \times 10$ pixel image into $2 \times 2$ tiles.}
-    \label{fig:ex_tiles}
-    \vspace{-1em}
-\end{wrapfigure}
-
 
 \subsubsection{The factorization}
 \label{sec:factorization}
+
+% \begin{wrapfigure}{r}{0.35\textwidth}
+%     \centering
+%     \includegraphics[width = 0.32\textwidth]{figures/vi_figures/example_tiled_less_whitespace.png}
+%     \caption{Tiling a $10 \times 10$ pixel image into $2 \times 2$ tiles.}
+%     \label{fig:ex_tiles}
+% \end{wrapfigure}
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width = 0.25\textwidth]{figures/vi_figures/example_tiled_less_whitespace.png}
+    \caption{Tiling a $10 \times 10$ pixel image into $2 \times 2$ tiles.}
+    \label{fig:ex_tiles}
+\end{figure}
+
 To make the objective in \eqref{eq:kl_objective} tractable, the family $\mathcal{Q}$ is normally restricted to probability distributions 
 without conditional dependencies between some latent variables. In the most extreme case, known as mean-field variational inference, the variational distribution completely factorizes across all latent variables. 
 
@@ -177,7 +182,7 @@ See Appendix~\ref{sec:eval_var_distr} for details on evaluating $q_\eta(z | x)$ 
     \centering
     \includegraphics[width = 0.9\textwidth]{figures/vi_figures/tile_to_full_schematic.png}
     \vspace{-0.6cm}
-    \caption{An example image with four tiles and four stars illustrating the relationship between the tile latent variables and the full-image latent variables. 
+    \caption{An example image with four tiles and four stars illustrating the relationship between the tile latent variables and the full-image catalog. 
     To construct the full-image catalog, we index into the appropriate row of the triangular array on each tile.}
     \label{fig:tile_to_full_schm}
 \end{figure}
@@ -238,7 +243,7 @@ The optimization of the architecture for this specific application is left for f
     \centering
     % \includegraphics[width=0.4\textwidth]{figures/starnet_archetecture2.png}
     \includegraphics[width=\textwidth]{figures/vi_figures/starnet_archetecture4.png}
-    \vspace{-1.25cm}
+    \vspace{-1.cm}
     \caption{The neural network architecture. For cataloging M2, the input is an $8\times 8$ padded tile, and the network returns distributional parameters for latent variables contained in the center $2\times 2$ tile.
     }
     \label{fig:starnet_arch}

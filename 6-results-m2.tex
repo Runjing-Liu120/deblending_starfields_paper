@@ -2,7 +2,9 @@
 We validated StarNet using an SDSS image of the Messier 2 (M2) globular cluster, a crowded starfield found in field 136 of camera column 2 in run 2583.
 M2 was also imaged in the ACS Globular Cluster Survey~\citep{Sarajedini_2007}
 using the Hubble Space telescope (HST),
-which has greater resolution than the Sloan telescope (0.05 and 0.4 arcseconds per pixel, respectively; see~\cite{hubble_about} and~\cite{sdss_about}). The catalog from this Hubble survey (henceforth the ``HST catalog") serves as ground truth for validating our results.
+which has greater resolution than the Sloan telescope. 
+The resolution of the HST wide-field channel is 0.05 arcseconds per pixel versus 0.4 arcseconds per pixel in SDSS \citep{hubble_about, sdss_about}. 
+The catalog from this Hubble survey (henceforth the ``HST catalog") serves as ground truth for validating our results.
 
 We focus on the $100 \times 100$ pixel subimage of M2 that \cite{Portillo_2017} and \cite{Feder_2019} analyzed with PCAT.
 This subimage is located approximately two arcseconds from the heavily saturated core of the cluster;
@@ -88,7 +90,7 @@ For PCAT, 300 catalogs were sampled using MCMC; the metrics were computed for ea
     \includegraphics[width=0.49\textwidth]{figures/m2_results/example_subimages_ws.png}
     \rulesep
     \includegraphics[width=0.49\textwidth]{figures/m2_results/example_subimages_pcat.png}
-    \vspace{-1cm}
+    % \vspace{-1cm}
     \caption{Estimated catalogs on four 10$\times$10 subimages from
     M2. Blue dots are stars from the HST catalog used as ground truth. 
     Starnet-WS, PCAT, and DAOPHOT estimated stars are shown as
