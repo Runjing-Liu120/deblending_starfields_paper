@@ -1,11 +1,11 @@
-\subsection{Decomposing the sleep objective}
+\subsection{Decomposing the forward KL objective}
 \label{sec:sleep_details}
-In this subsection, we decompose the sleep objective in~\eqref{eq:sleep_obj} for closer study.
+In this subsection, we decompose the objective in~\eqref{eq:sleep_obj} for closer study.
 We take $\phi$ as fixed in this section and drop the explicit dependence of $p$ on $\phi$.
 
 First, observe that optimizing the sleep objective does not require computing the intractable term $p(x)$:
 \begin{align}
-\argmax_\eta\; \mathcal{L}_{sleep}(\eta)
+\argmax_\eta\; \mathcal{L}_{favi}(\eta)
     & = \argmin_{\eta} \; \mathbb{E}_{x \sim p(x)}\Big[ \mathrm{KL}(p(z | x) \| q_\eta(z | x)\Big] \\
   &=\argmin_{\eta} \; \mathbb E_{p(x)}\Big[\mathbb E_{p(z | x)}\Big(\log p(z | x) - \log q_\eta(z | x) \Big)\Big]\\
 %&=\argmin_{\eta} \; \mathbb E_{p(x)}\Big[\mathbb E_{p(z | x)}\Big( - \log q_\eta(z | x) \Big)\Big]\\
