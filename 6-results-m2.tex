@@ -1,89 +1,59 @@
-\label{sec:results_on_m2}
-We validated StarNet using an SDSS image of the Messier 2 (M2) globular cluster, a crowded starfield found in field 136 of camera column 2 in run 2583.
+First, we validate StarNet using an SDSS image of the Messier 2 (M2) globular cluster,
+a crowded starfield found in field 136 of camera column 2 in run 2583.
 M2 was also imaged in the ACS Globular Cluster Survey~\citep{Sarajedini_2007}
 using the Hubble Space telescope (HST),
-which has greater resolution than the Sloan telescope. 
-The resolution of the HST wide-field channel is 0.05 arcseconds per pixel versus 0.4 arcseconds per pixel in SDSS \citep{hubble_about, sdss_about}. 
-The catalog from this Hubble survey (henceforth the ``HST catalog") serves as ground truth for validating our results.
+which has greater resolution than the Sloan telescope.
+The resolution of the HST wide-field channel is 0.05 arcseconds per pixel versus
+0.4 arcseconds per pixel in SDSS \citep{hubble_about, sdss_about}.
+For this image, whe catalog from this Hubble survey (henceforth the ``HST catalog")
+serves as ground truth for validating our results.
 
-We focus on the $100 \times 100$ pixel subimage of M2 that \cite{Portillo_2017} and \cite{Feder_2019} analyzed with PCAT.
+Then, we run StarNet on a frame from the DECam survey,
+and demonstrate the ability of StarNet to scale to large astronomical surveys.
+
+\subsection{Results on the M2 globular cluster}
+\label{sec:results_on_m2}
+
+We first focus on the $100 \times 100$ pixel subimage of M2 that
+\cite{Portillo_2017} and \cite{Feder_2019} analyzed with PCAT.
 This subimage is located approximately two arcseconds from the heavily saturated core of the cluster;
 even in this subimage, the HST catalog contains over 1000 stars with F606W-band magnitudes less than 22.
-We include two bands in our model, the SDSS $r$-band and $i$-band. 
-The SDSS $r$-band and the Hubble F606W band are centered at roughly the same wavelength, but the wavelength range of the Hubble F606W band is slightly broader. 
+We include two bands in our model, the SDSS $r$-band and $i$-band.
+The SDSS $r$-band and the Hubble F606W band are centered at roughly the same wavelength,
+but the wavelength range of the Hubble F606W band is slightly broader.
 
-\subsection{Runtime} 
-\label{sec:runtime}
-We factorized our variational distribution into $2\times2$ pixel tiles. 
-The neural network inputs were $8\times8$ pixel padded tiles: 
-$2\times 2$ tiles along with three surrounding pixels of padding (see Figure~\ref{fig:starnet_arch}). 
-The SDSS estimates for the PSF and background were used in the first sleep phase. 
-This phase ran for 200 epochs; at each epoch, 200 images were sampled from the generative model. 
-Optimization was done with Adam~\citep{kingma2014adam}. 
-On a single NVIDIA GeForce RTX 2080 Ti GPU, 
-the initial sleep phase took 15.2 minutes.
-
-Two additional wake-sleep cycles followed the first sleep phase, 
-after which the model parameters and inferred catalog appeared stable.
-The subsequent sleep phases were shorter (10 epochs with 200 images each), and the wake phase employed SGD, with the gradient estimator \eqref{eq:mstep_grad}. In total, the two further wake-sleep cycles took three minutes. 
-
-After fitting the model and variational posterior, calculating the approximate posterior (that is, producing the distributional parameters of the variational approximation) for the $100 \times 100$ pixel image of M2 took $30$ milliseconds. 
-By comparison, the reported runtime of PCAT, which uses MCMC, is 30 minutes on the same $100 \times 100$ pixel image~\citep{Feder_2019}.
-After the initial fit, StarNet provided nearly a $10^5$-fold speed increase. 
-
-The speed at inference time (which excludes training time) gives StarNet the scaling characteristics necessary for processing large astronomical surveys. 
-A single SDSS image is $1489 \times 2048$ pixels. 
-Based on the reported 30-minute runtime of PCAT for a $100\times100$ pixel subimage, we project that
-the runtime to process the full image would be $30\text{ min} \times 14 \times 20 = 8400$ minutes, or almost six days. 
-The SDSS survey consists of nearly one million images. Scaling PCAT to the entire SDSS survey would be infeasible.
-The upcoming LSST survey will be 300 times larger than SDSS.
-
-In contrast, if we assume the PSF and background are homogeneous 
-across the full SDSS image (which is also assumed in PCAT), we can 
-fit StarNet using wake-sleep 
-on a small $100 \times 100$ pixel subimage
-(while simultaneously obtaining estimates of the PSF and background),
-a one time computational cost of 18.2 minutes. 
-Producing a catalog with the full $1489 \times 2048$ pixel image requires
-$30\text{ msec} \times 14 \times 20 = 8.4$ seconds. In practice, 
-inference can be made even faster by batching the image tiles to run in parallel on a GPU.
-
-% An SDSS image is indexed by a run, camera column (camcol), and field.
-% A run is one continuous scan of the telescope, usually corresponding to one night of data collection. 
-% A run is broken down into fields; some runs have over 800 fields. 
-% Each field contains six camera columns. 
-% Thus, for a large-scale sky survey like SDSS which 
-% consists of over 8000 runs for a total of nearly one million images, MCMC will be infeasible. 
-
-
-\subsection{Inference}
-\label{sec:results_on_m2_inference}
-The cataloging accuracy of StarNet is compared with PCAT and DAOPHOT~\citep{stetson2987daophot}. 
-DAOPHOT is an algorithmic routine for detecting stars in crowded starfields which does not use a generative model. 
-This software convolves the observed image with a Gaussian kernel and scans for peaks above a given threshold. 
-The DAOPHOT catalog of M2 was reported in \cite{An_2008_m2}. 
+The cataloging accuracy of StarNet is compared with PCAT and DAOPHOT~\citep{stetson2987daophot}.
+DAOPHOT is an algorithmic routine for detecting stars in crowded starfields which does not use a generative model.
+This software convolves the observed image with a Gaussian kernel and scans for peaks above a given threshold.
+The DAOPHOT catalog of M2 was reported in \cite{An_2008_m2}.
 
 
 % Both DAOPHOT and the Hubble survey produce a single catalog -- that is, a set of estimated stellar locations and fluxes -- with
 % error bars nominally representing marginal uncertainties.
-% In the context of probabilistic cataloging (StarNet and PCAT), the posterior 
+% In the context of probabilistic cataloging (StarNet and PCAT), the posterior
 % defines a distribution over catalogs.
-% Each sample from the (approximate) posterior returns a catalog, and each 
-% sampled catalog may have different cardinally. 
+% Each sample from the (approximate) posterior returns a catalog, and each
+% sampled catalog may have different cardinally.
 
-To evaluate the three methods, the HST catalog was used as ground truth. 
-We filtered the HST catalog to stars with magnitudes smaller than 22.5 in the Hubble F606W band, because stars with lower apparent brightness cannot be detected in SDSS images. 
+To evaluate the three methods, the HST catalog was used as ground truth.
+We filtered the HST catalog to stars with magnitudes smaller than 22.5 in the Hubble F606W band,
+because stars with lower apparent brightness cannot be detected in SDSS images.
 
 
-Estimated catalogs are evaluated on three metrics: the true positive rate (TPR), the positive predicted value (PPV), and the F1 score. The TPR is the proportion of stars in the HST catalog matched with a star in the estimated catalog;
-the PPV is the proportion of stars in the estimated catalog matched with a star in the HST catalog. The F1 score summarizes the two metrics as the harmonic mean of the PPV and the TPR.
+Estimated catalogs are evaluated on three metrics: the true positive rate (TPR),
+the positive predicted value (PPV), and the F1 score.
+The TPR is the proportion of stars in the HST catalog matched with a star in the estimated catalog;
+the PPV is the proportion of stars in the estimated catalog matched with a star in the HST catalog.
+The F1 score summarizes the two metrics as the harmonic mean of the PPV and the TPR.
 
-Like \cite{Portillo_2017} and \cite{Feder_2019}, a ``match" between an estimated star and an HST star is defined as follows: (1) the estimated location and the HST location are within 0.5 SDSS pixels, and (2) the estimated SDSS $r$-band flux and the HST F606W band flux are within half a magnitude. 
-% The slack in magnitude accounts for the fact that the wavelength range of the HST F606W band is slightly broader than the SDSS $r$-band (though they are centered at roughly the same wavelength). 
+Like \cite{Portillo_2017} and \cite{Feder_2019}, a ``match" between an estimated star
+and an HST star is defined as follows: (1) the estimated location and the HST location are within 0.5 SDSS pixels,
+and (2) the estimated SDSS $r$-band flux and the HST F606W band flux are within half a magnitude.
+% The slack in magnitude accounts for the fact that the wavelength range of the HST F606W band is slightly broader than the SDSS $r$-band (though they are centered at roughly the same wavelength).
 
-In probabilistic cataloging (PCAT and StarNet), the posterior defines a distribution over catalogs. 
-For StarNet, the TPR, PPV, and F1 score were computed for the catalog corresponding to the mode of the variational distribution (henceforth, the StarNet catalog). 
-For PCAT, 300 catalogs were sampled using MCMC; the metrics were computed for each sampled catalog and averaged. 
+In probabilistic cataloging (PCAT and StarNet), the posterior defines a distribution over catalogs.
+For StarNet, the TPR, PPV, and F1 score were computed for the catalog corresponding to the mode of the variational distribution (henceforth, the StarNet catalog).
+For PCAT, 300 catalogs were sampled using MCMC; the metrics were computed for each sampled catalog and averaged.
 
 \begin{figure}[tb]
     \centering
@@ -92,36 +62,36 @@ For PCAT, 300 catalogs were sampled using MCMC; the metrics were computed for ea
     \includegraphics[width=0.49\textwidth]{figures/m2_results/example_subimages_pcat.png}
     % \vspace{-1cm}
     \caption{Estimated catalogs on four 10$\times$10 subimages from
-    M2. Blue dots are stars from the HST catalog used as ground truth. 
+    M2. Blue dots are stars from the HST catalog used as ground truth.
     Starnet-WS, PCAT, and DAOPHOT estimated stars are shown as
     red, cyan, and orange crosses, respectively. }
     \label{fig:example_subimages}
 \end{figure}
 
-Fitting StarNet using wake-sleep (StarNet-WS) resulted in a catalog that outperforms DAOPHOT and PCAT in F1 score (Table~\ref{tab:summary_stats}). 
-Figure~\ref{fig:example_subimages} shows the StarNet-WS catalog alongside PCAT, DAOPHOT, and HST catalogs. 
+Fitting StarNet using wake-sleep (StarNet-WS) resulted in a catalog that outperforms DAOPHOT and PCAT in F1 score (Table~\ref{tab:summary_stats}).
+Figure~\ref{fig:example_subimages} shows the StarNet-WS catalog alongside PCAT, DAOPHOT, and HST catalogs.
 Fitting StarNet without the wake phase
 and using only the default SDSS background and PSF (StarNet-S) produced a catalog with a TPR similar to that of StarNet-WS but with a smaller PPV.
-PCAT estimated the most stars of all methods; it therefore had a large TPR but a small PPV. 
-On the other hand, DAOPHOT estimated less than half the number of stars when compared to the other methods. It therefore had a large PPV but a small TPR. 
-The StarNet-WS catalog had about the same PPV as DAOPHOT while having nearly the same TPR as PCAT. 
+PCAT estimated the most stars of all methods; it therefore had a large TPR but a small PPV.
+On the other hand, DAOPHOT estimated less than half the number of stars when compared to the other methods. It therefore had a large PPV but a small TPR.
+The StarNet-WS catalog had about the same PPV as DAOPHOT while having nearly the same TPR as PCAT.
 
-Table~\ref{tab:summary_stats} also prints the number of stars inferred by each method. 
-For probabilistic methods (StarNet and PCAT), we display the mean number of stars under the approximate posterior, along with the 5-th and 95-th quantiles. 
+Table~\ref{tab:summary_stats} also prints the number of stars inferred by each method.
+For probabilistic methods (StarNet and PCAT), we display the mean number of stars under the approximate posterior, along with the 5-th and 95-th quantiles.
 There are 1114 stars in the HST catalog.
-Neither PCAT nor StarNet captured the true number of stars in their 90\% credible interval, though StarNet-WS came the closest. 
+Neither PCAT nor StarNet captured the true number of stars in their 90\% credible interval, though StarNet-WS came the closest.
 The StarNet credible intervals were three times wider than the PCAT intervals.
-The small PCAT credible intervals may be indicative of an MCMC sampler that failed to mix well. 
+The small PCAT credible intervals may be indicative of an MCMC sampler that failed to mix well.
 
 
 \input{tables/summary_stats_m2.txt}
 
-The improvement of StarNet-WS over PCAT in PPV was most pronounced for dim stars (Figure~\ref{fig:summary_stats}). The TPR for StarNet-WS was uniformly better than DAOPHOT across almost all magnitudes. 
-Of all methods, StarNet-WS best approximated the HST flux distribution (Figure~\ref{fig:luminosity_fun_m2}). 
-% PCAT overestimated the number of dim stars with magnitudes greater than 21. 
+The improvement of StarNet-WS over PCAT in PPV was most pronounced for dim stars (Figure~\ref{fig:summary_stats}). The TPR for StarNet-WS was uniformly better than DAOPHOT across almost all magnitudes.
+Of all methods, StarNet-WS best approximated the HST flux distribution (Figure~\ref{fig:luminosity_fun_m2}).
+% PCAT overestimated the number of dim stars with magnitudes greater than 21.
 % In contrast, DAOPHOT failed to find stars with magnitudes greater than $21$.
 
-% (Figures~\ref{fig:m2_flux_estimation} and \ref{fig:luminosity_fun_m2}). 
+% (Figures~\ref{fig:m2_flux_estimation} and \ref{fig:luminosity_fun_m2}).
 
 \begin{figure}[tb]
     \centering
@@ -137,8 +107,8 @@ Of all methods, StarNet-WS best approximated the HST flux distribution (Figure~\
 % \begin{figure}[tb]
 %     \centering
 %     \includegraphics[width=0.99\textwidth]{figures/m2_results/m2_flux_estimation.png}
-%     \caption{True versus estimated magnitudes on the $r$-band of M2. 
-%     Every estimated star was matched with the nearest Hubble star in L2 distance between locations. 
+%     \caption{True versus estimated magnitudes on the $r$-band of M2.
+%     Every estimated star was matched with the nearest Hubble star in L2 distance between locations.
 %     Red line is the identity, $y=x$. }
 %     \label{fig:m2_flux_estimation}
 % \end{figure}
@@ -147,17 +117,12 @@ Of all methods, StarNet-WS best approximated the HST flux distribution (Figure~\
     \centering
     \includegraphics[width=0.99\textwidth]{figures/m2_results/luminosity_fun.png}
     \vspace{-0.4cm}
-    \caption{Flux distributions for the $r$-band observations of M2. 
-    The flux distribution of the HST catalog in grey. 
+    \caption{Flux distributions for the $r$-band observations of M2.
+    The flux distribution of the HST catalog in grey.
     Estimated distributions by DAOPHOT, PCAT, and StarNet-WS catalogs overlaid.
     For PCAT, the flux distribution is from a single catalog sample. }
     \label{fig:luminosity_fun_m2}
 \end{figure}
-
-The difference between the flux distributions  (Figure~\ref{fig:luminosity_fun_m2}) produced by StarNet-WS and PCAT
-is partly due to the fact that StarNet-WS estimates the background with maximum likelihood, while the background in PCAT is fixed.
-As discussed below, the SDSS estimate of the background (which PCAT uses) is too dim, and PCAT compensates for the model mis-match by estimating more dim stars. 
-The StarNet-WS estimate increases the intensity of the background, and hence does not over-estimate dim stars. 
 
 
 % \begin{figure}[tb]
@@ -171,21 +136,21 @@ The StarNet-WS estimate increases the intensity of the background, and hence doe
 % \end{figure}
 
 % StarNet-WS returns a well-defined distribution over the set of all catalogs
-% and is thus able to capture uncertainties in catalog construction. 
-% Samples from the StarNet-WS variational distribution are compared with samples from PCAT in Figure~\ref{fig:example_subimages_sampled}. 
-To examine the uncertainty calibration of StarNet-WS, we evaluated the approximate posterior 
-conditional on the true number of stars in the HST catalog. 
-Then, each star in the StarNet-WS catalog was matched with exactly one Hubble star by finding the permutation of Hubble stars that had the largest log-likelihood under our variational distribution $q_\eta$. 
-For each star, we computed the z-score $(y - \hat \mu) / \hat \sigma$, where $y$ is the HST log-flux or 
+% and is thus able to capture uncertainties in catalog construction.
+% Samples from the StarNet-WS variational distribution are compared with samples from PCAT in Figure~\ref{fig:example_subimages_sampled}.
+To examine the uncertainty calibration of StarNet-WS, we evaluated the approximate posterior
+conditional on the true number of stars in the HST catalog.
+Then, each star in the StarNet-WS catalog was matched with exactly one Hubble star by finding the permutation of Hubble stars that had the largest log-likelihood under our variational distribution $q_\eta$.
+For each star, we computed the z-score $(y - \hat \mu) / \hat \sigma$, where $y$ is the HST log-flux or
 logit-location; $\hat \mu$ and $\hat\sigma$ are the mean and the standard deviation, respectively, of the Gaussian variational distribution for the log-flux or logit-location.
-% If the uncertainties were perfectly calibrated, the distribution of these z-scores would be a standard Gaussian. 
-The empirical z-score distributions are close to a standard Gaussian with some discrepancy in the tails and some evidence of skewness, suggesting the uncertainties are not too mis-estimated (Figure~\ref{fig:z-score_calibration}). 
+% If the uncertainties were perfectly calibrated, the distribution of these z-scores would be a standard Gaussian.
+The empirical z-score distributions are close to a standard Gaussian with some discrepancy in the tails and some evidence of skewness, suggesting the uncertainties are not too mis-estimated (Figure~\ref{fig:z-score_calibration}).
 
 \begin{figure}[tb]
     \centering
     \includegraphics[width=0.99\textwidth]{figures/m2_results/zscore_calibration.png}
     \vspace{-0.5cm}
-    \caption{The empirical distribution of z-scores for logit-locations (left) and log-fluxes (right) under the StarNet-WS variational posterior. 
+    \caption{The empirical distribution of z-scores for logit-locations (left) and log-fluxes (right) under the StarNet-WS variational posterior.
 }
     \label{fig:z-score_calibration}
 \end{figure}
@@ -197,8 +162,8 @@ The empirical z-score distributions are close to a standard Gaussian with some d
 %   \label{eq:optim_iband_flux},
 % \end{align}
 % where the log likelihood is given by the generative model from Section~\ref{sec:gen_model}.
-% The estimated $i$-band fluxes and the reported Hubble F606W-band fluxes $f_H^{(r)}$ define the ``true" colors, $2.5\log(f_H^{(i)}/f_H^{(r)})$. 
-% In the color magnitude diagram, DAOPHOT did not capture the full spectrum of colors; of all three methods, PCAT best captured the color spectrum. All three methods however, were able to capture the arm thing (TODO there is a name for this ... main sequence turnoff?) that branches off at low magnitudes. 
+% The estimated $i$-band fluxes and the reported Hubble F606W-band fluxes $f_H^{(r)}$ define the ``true" colors, $2.5\log(f_H^{(i)}/f_H^{(r)})$.
+% In the color magnitude diagram, DAOPHOT did not capture the full spectrum of colors; of all three methods, PCAT best captured the color spectrum. All three methods however, were able to capture the arm thing (TODO there is a name for this ... main sequence turnoff?) that branches off at low magnitudes.
 
 % \begin{figure}[ht]
 %     \centering
@@ -208,38 +173,21 @@ The empirical z-score distributions are close to a standard Gaussian with some d
 % \end{figure}
 
 
-Finally, we evaluate the quality of the wake-phase estimates for the PSF and background. Let $z_h$ denote the HST catalog, and given some model parameters $\phi$, let
-\begin{align}
-    \mathcal{L}^{Hubble}(\phi) := 
-    - \log \; p_\phi(x^{(r)} | z_h)
-    \label{eq:hubble_neg_loglik}
-\end{align}
-be the negative log-likelihood of the SDSS $r$-band image conditional on the HST catalog (recall that the Hubble absorption range most closely resembles the SDSS $r$-band).
-The log-likelihood of model parameters estimated by the wake phase is about two times larger than the log-likelihood of parameters estimated by SDSS~(Table~\ref{tab:chi-square-stats1}). 
-The largest improvement in log-likelihood came from the wake-estimated background, which was brighter than the SDSS background, suggesting that the SDSS background was too dim for this starfield. 
 
-\input{tables/chi_sq_stats.txt}
-
-Appendix~\ref{sec:test_m2} presents the results of StarNet, PCAT, and DAOPHOT on a neighboring $100 \times 100$ pixel subimage of M2. 
-The results remain qualitatively similar in that StarNet has the best F1 score of all methods. 
-Importantly, StarNet was applied to the new region without further wake-sleep optimization; StarNet produced a catalog on this new region in $\approx 30$ milliseconds. 
-On the other hand, PCAT required a new 30 minute run of MCMC. 
-
-
-% Figure~\ref{fig:loglik_table} displays the log-likelihood under the default SDSS estimates of the PSF and background compared with the estimates found using wake-sleep. 
+% Figure~\ref{fig:loglik_table} displays the log-likelihood under the default SDSS estimates of the PSF and background compared with the estimates found using wake-sleep.
 % The wake-sleep estimates improved the log-likelihood.
-% We also compared against the ``Hubble estimate" of the background and PSF, obtained by minimizing $- \log p_\phi(x | N_{H}, \ell_{H}, f_{H})$ for $\phi$ directly. 
+% We also compared against the ``Hubble estimate" of the background and PSF, obtained by minimizing $- \log p_\phi(x | N_{H}, \ell_{H}, f_{H})$ for $\phi$ directly.
 
-% The results suggest that the primary source of model misfit is the background. A significant increase in log-likelihood occurred by switching from the SDSS background to the Hubble-estimated background. 
-% But even using the Hubble-estimated background, switching from the SDSS PSF to our wake-sleep PSF improves the log-likelihood. 
+% The results suggest that the primary source of model misfit is the background. A significant increase in log-likelihood occurred by switching from the SDSS background to the Hubble-estimated background.
+% But even using the Hubble-estimated background, switching from the SDSS PSF to our wake-sleep PSF improves the log-likelihood.
 
 % \begin{figure}[ht]
 %     \centering
 %     \includegraphics[width=0.6\textwidth]{figures/loglik_table.png}
-%     \caption{Percent decrease in log-likelihood relative to the Hubble estimate of the PSF and background. 
-%     For each method, we evaluate the log-likelihood where the both PSF 
-%     and background are estimated (green); 
-%     we also show results where only the PSF is estimated (purple). 
+%     \caption{Percent decrease in log-likelihood relative to the Hubble estimate of the PSF and background.
+%     For each method, we evaluate the log-likelihood where the both PSF
+%     and background are estimated (green);
+%     we also show results where only the PSF is estimated (purple).
 %     }
 %     \label{fig:loglik_table}
 % \end{figure}
@@ -248,7 +196,7 @@ On the other hand, PCAT required a new 30 minute run of MCMC.
 % \caption{
 % Negative log-likelihood for SDSS, wake-sleep, and Hubble estimated model parameters. In the right column, we fix the background to the Hubble estimate, and examine negative log-likelihood as the PSF varies.}
 
-% The StarNet-based PSF did not differ from the SDSS PSF significantly. The greatest change was in the $r$-band PSF, where the SDSS PSF was most different from the Hubble-estimated PSF. 
+% The StarNet-based PSF did not differ from the SDSS PSF significantly. The greatest change was in the $r$-band PSF, where the SDSS PSF was most different from the Hubble-estimated PSF.
 
 % \begin{figure}[ht]
 %     \centering
@@ -268,4 +216,3 @@ On the other hand, PCAT required a new 30 minute run of MCMC.
 % In the middle column, ``model parameters" refer to both background and PSF.
 % In the right column, we fix the background to the Hubble estimate, and examine
 % chi-squared statistics as the PSF varies.}
-
