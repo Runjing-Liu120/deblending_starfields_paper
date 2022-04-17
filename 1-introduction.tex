@@ -27,7 +27,9 @@ First, it is an unsupervised problem without ground truth labeled data.
 Second, it is a problem with a sample size of one: there is only one night sky, which is imaged many times, and the collected survey images capture overlapping regions of it.
 Third, for blended fields, the properties of light sources are ambiguous; therefore, providing calibrated uncertainties for catalog construction is as important as making accurate predictions.
 Finally, the scale of the data is immense.
-The upcoming Rubin Observatory Legacy Survey of Space and Time (LSST), scheduled to begin data collection in 2022, is expected to produce 60 petabytes of astronomical images over its lifetime~\citep{LSSTabout}.
+The upcoming Rubin Observatory Legacy Survey of Space and Time (LSST),
+scheduled to begin full operations by 2024,
+is expected to produce 60 petabytes of astronomical images over its lifetime~\citep{LSSTabout}.
 
 As more powerful telescopes are developed, and their ability to detect more distant light sources improves,
 the density of light sources in the images they capture will only increase.
@@ -43,7 +45,7 @@ whose telescope resolution did not allow for differentiation between stars and g
 We will use the globular cluster M2, a region imaged by the Sloan Digital Sky Survey (SDSS)
 that is densely populated with stars,
 as a test bed for the accuracy of our approach.
-We then demonstrate the ability of our method to scale to large modern astronomical surveys
+We then demonstrate the ability of our method to scale to large, modern astronomical surveys
 by cataloging a subregion of the DECam survey.
 
 \bigbreak
@@ -146,7 +148,7 @@ On the $100 \times 100$ pixel region of M2,
 StarNet was more accurate than both the MCMC-based cataloger PCAT
 and traditional cataloging approaches (Section~\ref{sec:results_on_m2}).
 We then demonstrate the scalability of StarNet by cataloging a $2000\times4000$ pixel frame from the DECam survey:
-our method can produce scientifically relevant results on the order of minutes;-
+our method can produce scientifically relevant results on the order of minutes ---
 running MCMC on the same frame would take on the order of days.
 
 % while running $100,000$ times faster than the former (Section~\ref{sec:results_on_m2}).

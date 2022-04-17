@@ -20,26 +20,27 @@ The key difficulty in constructing stochastic gradients of the ELBO is that the
 integrating distribution depends on the optimization parameter $\eta$.
 We instead choose to optimize an expectation of the \textit{forward} KL divergence:
 \begin{align}
-    \mathcal{L}_{favi}(\eta) :=
+    \mathcal{L}_{fwd}(\eta) :=
     - \Expect_{x \sim p(x)}\Big[\KL(p(z | x) \| q_\eta(z | x))\Big]
     \label{eq:sleep_obj},
 \end{align}
 an objective that appears in the \textit{sleep phase} of the wake-sleep algorithm
 \citep{Hinton1995wake_sleep, bornschein2014reweighted,le2020revisiting},
 and was re-introduced by \cite{ambrogioni2019favi}, who called this technique
-of minimizing $\mathcal{L}_{FA}$ \textit{Forward Amortized Inference} (FAVI).
+of minimizing $\mathcal{L}_{favi}$ \textit{Forward Amortized Variational Inference}.
 
 Section~\ref{sec:sleep_details} details a simple gradient estimator for~\eqref{eq:sleep_obj} that does not require reparameterization or REINFORCE.
 
-There are two key differences between the FAVI objective~\eqref{eq:sleep_obj}
+There are two key differences between the expected forward KL objective~\eqref{eq:sleep_obj}
 and the ELBO~\eqref{eq:elbo}.
 First, recall that maximizing the ELBO is equivalent to minimizing
-$\KL(q\|p)$; the KL in the FAVI objective transposes the arguments.
-Second, the outer expectation over $p(x)$ also gives different meaning to the FAVI.
+$\KL(q\|p)$; the KL in $\mathcal{L}_{fwd}$ transposes the arguments.
+Second, the outer expectation over $p(x)$ in $\mathcal{L}_{fwd}$ also gives different meaning to objective.
 The ELBO objective seeks $\eta$ to minimize the $\KL$ between $q_\eta(z | x)$ and $p(z | x)$
 {\itshape for fixed, observed data $x$},
 in this case the $H\times W$ image.
-In contrast, the FAVI objective seeks to minimize the $\KL$ {\itshape on average over all possible data $x$},
+In contrast, the minimizing $\mathcal{L}_{fwd}$ seeks to minimize the $\KL$
+{\itshape on average over all possible data $x$},
 as weighted by $p(x)$.
 The target is no longer an approximate posterior for the observed data, but rather
 an approximate posterior that is ``good on average" over possible data under the model $p(x)$.
