@@ -57,37 +57,36 @@ For PCAT, 300 catalogs were sampled using MCMC; the metrics were computed for ea
 
 \begin{figure}[tb]
     \centering
-    \includegraphics[width=0.49\textwidth]{figures/m2_results/example_subimages_ws.png}
+    \includegraphics[width=0.49\textwidth]{figures/m2_results/example_subimages_starnet.png}
     \rulesep
     \includegraphics[width=0.49\textwidth]{figures/m2_results/example_subimages_pcat.png}
     % \vspace{-1cm}
     \caption{Estimated catalogs on four 10$\times$10 subimages from
     M2. Blue dots are stars from the HST catalog used as ground truth.
-    Starnet-WS, PCAT, and DAOPHOT estimated stars are shown as
+    Starnet, PCAT, and DAOPHOT estimated stars are shown as
     red, cyan, and orange crosses, respectively. }
     \label{fig:example_subimages}
 \end{figure}
 
-Fitting StarNet using wake-sleep (StarNet-WS) resulted in a catalog that outperforms DAOPHOT and PCAT in F1 score (Table~\ref{tab:summary_stats}).
-Figure~\ref{fig:example_subimages} shows the StarNet-WS catalog alongside PCAT, DAOPHOT, and HST catalogs.
-Fitting StarNet without the wake phase
-and using only the default SDSS background and PSF (StarNet-S) produced a catalog with a TPR similar to that of StarNet-WS but with a smaller PPV.
-PCAT estimated the most stars of all methods; it therefore had a large TPR but a small PPV.
-On the other hand, DAOPHOT estimated less than half the number of stars when compared to the other methods. It therefore had a large PPV but a small TPR.
-The StarNet-WS catalog had about the same PPV as DAOPHOT while having nearly the same TPR as PCAT.
+StarNet produced a catalog that outperforms DAOPHOT and PCAT in F1 score (Table~\ref{tab:summary_stats}).
+Figure~\ref{fig:example_subimages} shows the StarNet catalog alongside PCAT, DAOPHOT, and HST catalogs.
+DAOPHOT estimated less than half the number of stars when compared to the other methods.
+It therefore had a large PPV but a small TPR.
+The StarNet catalog had about the same TPR as PCAT while being ten points higher in PPV.
 
 Table~\ref{tab:summary_stats} also prints the number of stars inferred by each method.
-For probabilistic methods (StarNet and PCAT), we display the mean number of stars under the approximate posterior, along with the 5-th and 95-th quantiles.
+For probabilistic methods (StarNet and PCAT),
+ we display the mean number of stars under the approximate posterior, along with the 5-th and 95-th quantiles.
 There are 1114 stars in the HST catalog.
-Neither PCAT nor StarNet captured the true number of stars in their 90\% credible interval, though StarNet-WS came the closest.
-The StarNet credible intervals were three times wider than the PCAT intervals.
+Neither PCAT nor StarNet captured the true number of stars in their 90\% credible interval,
+but the StarNet credible intervals were three times wider than the PCAT intervals.
 The small PCAT credible intervals may be indicative of an MCMC sampler that failed to mix well.
 
+\input{tables/summary_stats_m2.tex}
 
-\input{tables/summary_stats_m2.txt}
-
-The improvement of StarNet-WS over PCAT in PPV was most pronounced for dim stars (Figure~\ref{fig:summary_stats}). The TPR for StarNet-WS was uniformly better than DAOPHOT across almost all magnitudes.
-Of all methods, StarNet-WS best approximated the HST flux distribution (Figure~\ref{fig:luminosity_fun_m2}).
+The improvement of StarNet over PCAT in PPV was most pronounced for dim stars (Figure~\ref{fig:summary_stats}).
+The TPR for StarNet was uniformly better than DAOPHOT across almost all magnitudes.
+Of all methods, StarNet best approximated the HST flux distribution (Figure~\ref{fig:luminosity_fun_m2}).
 % PCAT overestimated the number of dim stars with magnitudes greater than 21.
 % In contrast, DAOPHOT failed to find stars with magnitudes greater than $21$.
 
@@ -138,9 +137,9 @@ Of all methods, StarNet-WS best approximated the HST flux distribution (Figure~\
 % StarNet-WS returns a well-defined distribution over the set of all catalogs
 % and is thus able to capture uncertainties in catalog construction.
 % Samples from the StarNet-WS variational distribution are compared with samples from PCAT in Figure~\ref{fig:example_subimages_sampled}.
-To examine the uncertainty calibration of StarNet-WS, we evaluated the approximate posterior
+To examine the uncertainty calibration of StarNet, we evaluated the approximate posterior
 conditional on the true number of stars in the HST catalog.
-Then, each star in the StarNet-WS catalog was matched with exactly one Hubble star by finding the permutation of Hubble stars that had the largest log-likelihood under our variational distribution $q_\eta$.
+Then, each star in the StarNet catalog was matched with exactly one Hubble star by finding the permutation of Hubble stars that had the largest log-likelihood under our variational distribution $q_\eta$.
 For each star, we computed the z-score $(y - \hat \mu) / \hat \sigma$, where $y$ is the HST log-flux or
 logit-location; $\hat \mu$ and $\hat\sigma$ are the mean and the standard deviation, respectively, of the Gaussian variational distribution for the log-flux or logit-location.
 % If the uncertainties were perfectly calibrated, the distribution of these z-scores would be a standard Gaussian.
