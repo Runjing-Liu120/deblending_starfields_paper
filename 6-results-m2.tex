@@ -154,6 +154,35 @@ The empirical z-score distributions are close to a standard Gaussian with some d
     \label{fig:z-score_calibration}
 \end{figure}
 
+\subsubsection{Runtime}
+\label{sec:runtime}
+We ran ran SGD to minimize the expected forward KL
+for 400 epochs; at each epoch, 200 images were sampled from the generative model.
+Optimization was done with Adam~\citep{kingma2014adam}.
+On a single NVIDIA GeForce RTX 2080 Ti GPU,
+this fitting proceudre took about 50 minutes.
+
+After fitting the model and variational posterior,
+calculating the approximate posterior
+(that is, producing the distributional parameters of the variational approximation) for the $100 \times 100$ pixel image of M2 took $30$ milliseconds.
+By comparison, the reported runtime of PCAT, which uses MCMC, is 30 minutes on the same $100 \times 100$ pixel image~\citep{Feder_2019}.
+After the initial fit, StarNet provided nearly a $10^5$-fold speed increase.
+
+The speed at inference time (which excludes training time) gives StarNet the scaling characteristics necessary for processing large astronomical surveys.
+A single SDSS image is $1489 \times 2048$ pixels.
+Based on the reported 30-minute runtime of PCAT for a $100\times100$ pixel subimage, we project that
+the runtime to process the full image would be $30\text{ min} \times 14 \times 20 = 8400$ minutes, or almost six days.
+The SDSS survey consists of nearly one million images. Scaling PCAT to the entire SDSS survey would be infeasible.
+The upcoming LSST survey will be 300 times larger than SDSS.
+
+In contrast, StarNet only incurs a one-time fitting cost.
+After this initial fit,
+producing a catalog with the full $1489 \times 2048$ pixel image requires
+$30\text{ msec} \times 14 \times 20 = 8.4$ seconds. In practice,
+inference can be made even faster by batching the image tiles to run in parallel on a GPU.
+
+In the next subsection, we demonstrate the scaling characteristics on a frame from
+the DECAPS survey. 
 
 % Figure~\ref{fig:cmd_m2} displays the estimated color-magnitude diagrams. While the Hubble F606W-band corresponds roughly to the SDSS $r$-band, there is no such correspondence for the SDSS $i$-band. Thus, using the Hubble locations, we estimated the $i$-band fluxes using maximum likelihood: letting $x^{(i)}$ be the SDSS image in the $i$-band, $N_H$ the number of stars in the Hubble catalog and $\ell_H$ their locations, solve
 % \begin{align}
