@@ -8,7 +8,7 @@ the 3D distribution of interstellar dust~\citep{Green_2019_argonaut}.
 Catalogs of galaxy morphologies have been used to validate theoretical models of dark matter and dark energy~\citep{Abbott2018}.
 
 A light source, be it a star or a galaxy, produces a peak intensity of brightness in an image.
-When light sources are well separated, catalog construction is straightforward:
+When light sources are well separated, catalog construction is relatively straightforward:
 characteristics of each light source, such as flux, can be estimated by analyzing
 intensities at the peak and surrounding pixels.
 However, in images crowded with many light sources,
@@ -45,7 +45,7 @@ whose telescope resolution did not allow for differentiation between stars and g
 We will use the globular cluster M2, a region imaged by the Sloan Digital Sky Survey (SDSS)
 that is densely populated with stars,
 as a test bed for the accuracy of our approach.
-We then demonstrate the ability of our method to scale to large, modern astronomical surveys
+We also demonstrate the ability of our method to scale to large, modern astronomical surveys
 by cataloging a subregion of the DECam survey.
 
 \bigbreak
@@ -53,23 +53,25 @@ by cataloging a subregion of the DECam survey.
 \noindent{\textbf{From software pipelines to probabilistic cataloging}}
 
 Traditionally, most cataloging has been performed using software pipelines.
-These pipelines are algorithms that usually involve the following stages: locating the brightest peaks, estimating fluxes, and subtracting the estimated light source.
+These pipelines are algorithms that usually involve the following stages: locating the brightest peaks, estimating fluxes, and subtracting the estimated light sources.
 These stages may be performed iteratively.
 Pipelines do not normally produce statistically calibrated error estimates that propagate
 the uncertainty that accumulates in each of the steps.
-Failure to properly accumulate error at each step results in unreliable catalogs for images in which ambiguity exists in identifying sources and estimating their characteristics.
+Failure to properly accumulate error at each step results in unreliable point estimates
+for images in which ambiguity exists in identifying sources and estimating their characteristics.
 For example, PHOTO~\citep{lupton2001sdss}, the default cataloging pipeline used by SDSS, failed to produce a catalog on the globular cluster M2~\citep{Portillo_2017}.
 
 In contrast, {\itshape probabilistic} cataloging posits a statistical model consisting of a likelihood for the observed image given a catalog and a prior distribution over possible catalogs~\citep{Portillo_2017, Brewer_2013, Feder_2019}.
 Instead of deriving a single catalog, probabilistic cataloging produces a posterior distribution over the set of all possible catalogs.
 Uncertainties are quantified by the posterior distribution.
 For example, in an image with an ambiguously blended bright peak, some catalogs sampled from the posterior would contain multiple dim light sources while others would contain one bright source.
-The relative density the posterior distribution places on one explanation over another represents the statistical confidence in that explanation.
+The relative density that the posterior distribution places on one explanation
+relative to others another represents the statistical confidence in that explanation.
 Moreover, a distribution over the set of all catalogs induces a distribution on any estimate derived from a catalog. Therefore, calibrated uncertainties can be propagated to downstream analyses.
 
 Previous work on probabilistic cataloging employed Markov chain Monte Carlo (MCMC) to sample from the posterior distribution.
 The MCMC procedure in~\cite{Portillo_2017} and \cite{Feder_2019}
-was called PCAT, short for ``Probabilistic CATaloging."\footnote{
+is called PCAT, short for ``Probabilistic CATaloging."\footnote{
 We use ``probabilistic cataloging'' to refer to any method that produces a posterior over possible catalogs, whereas ``PCAT" refers specifically to the MCMC procedure in~\cite{Portillo_2017} and \cite{Feder_2019}. }
 A difficulty in any probabilistic cataloging approach is that the number of sources in a catalog is unknown and random, so the latent variable space is transdimensional. PCAT sampled transdimensional catalogs with reversible jump MCMC~\citep{Green95reversiblejump}, in which
 auxiliary variables are added to encode the ``birth" and ``death" of light sources in the Markov chain.
@@ -81,13 +83,16 @@ In any case, a $100\times 100$ pixel image covers only a $0.66 \times 0.66$ arcm
 For comparison, in one night, SDSS scans a region on the order of $100 \times 1000$ arcminutes.
 Extrapolating the 30-minute runtime, PCAT would take on the order of ten years to process a nightly SDSS run.
 
-As an alternative to MCMC, \cite{regier2019_celeste} produced an approximate posterior using variational inference.
-Variational inference (VI) considers a family of candidate approximate posteriors and employs numerical optimization to find the distribution in the family closest
+As an alternative to MCMC, \cite{regier2019_celeste} proposed to use variational inference (VI)
+to approximate the posterior.
+VI considers a family of candidate approximate posteriors and employs numerical optimization to find the distribution in the family closest
 in KL divergence to the exact posterior~\citep{Jordan_intro_vi, Wainwrite_graph_models_vi, Blei_2017_vi_review}.
 With a sufficiently constrained family of distributions, the VI optimization problem can be solved orders of magnitude faster than MCMC runs.
 
 However, \cite{regier2019_celeste} is limited in that the number of light sources in a given image is treated as known and fixed -- it had to be set using a preprocessing routine.
-They avoided the transdimensional latent variable space in order to have a tractable objective for numerical optimization.
+The authors avoided the transdimensional latent variable space induced by
+the unknown number of sources
+in order to have a tractable objective for numerical optimization.
 
 \bigbreak
 
@@ -108,10 +113,12 @@ For StarNet, the forward pass on
 a $100 \times 100$ pixel image takes $0.2$ seconds (vs.~30 minutes for inference using PCAT).
 Section~\ref{sec:var_inference} details the variational distribution and neural network architecture in StarNet.
 
-Finally, and critically, StarNet is fit using a \textit{forward} KL divergence
+Finally, and critically, StarNet is fit using an expected
+\textit{forward} Kullback–Leibler divergence
 between the approximate posterior $q$ and the exact posterior $p$,
-while traditional variational inference minimizes the a \textit{reverse}
-KL divergence~\citep{bishop2006pattern}.
+where the expectation is taken over the data distribution defined by the statistical model.
+In contrast, traditional variational inference minimizes the a \textit{reverse}
+KL divergence~\citep{bishop2006pattern}, evaluated at the observed data.
 The forward KL is minimized using stochastic gradient descent (SGD),
 which involves sampling {\itshape complete} data---images and their corresponding catalogs---from
 their joint likelihood and fitting the network in a supervised fashion.
@@ -137,7 +144,7 @@ and appears in the \textit{sleep phase} of the wake-sleep algorithm
 \citep{Hinton1995wake_sleep, bornschein2014reweighted,le2020revisiting}.
 However, to the best of our knowledge, this is the first instance of applyiing
 variational inference with a foward KL for scientific purposes.
-Specifically, we use wake-sleep for inference to find a latent space that is interpretable:
+Specifically, we use this inference techinique to find a latent space that is interpretable:
 it is the set of all possible astronomical catalogs.
 
 
@@ -146,7 +153,8 @@ and to a subregion of DECam, which imaged stars in the Milky Way.
 % We used the catalog reported in \cite{Sarajedini_2007}, which imaged M2 using the Hubble Space Telescope, as a ground truth to evaluate our performace.
 On the $100 \times 100$ pixel region of M2,
 StarNet was more accurate than both the MCMC-based cataloger PCAT
-and traditional cataloging approaches (Section~\ref{sec:results_on_m2}).
+and traditional cataloging approaches (Section~\ref{sec:results_on_m2}):
+though MCMC is asymptotically exact, on human timescales, it often suffers from incomplete mixing. 
 We then demonstrate the scalability of StarNet by cataloging a $2000\times4000$ pixel frame from the DECam survey:
 our method can produce scientifically relevant results on the order of minutes ---
 running MCMC on the same frame would take on the order of days.

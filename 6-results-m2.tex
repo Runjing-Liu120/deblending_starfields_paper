@@ -5,7 +5,7 @@ using the Hubble Space telescope (HST),
 which has greater resolution than the Sloan telescope.
 The resolution of the HST wide-field channel is 0.05 arcseconds per pixel versus
 0.4 arcseconds per pixel in SDSS \citep{hubble_about, sdss_about}.
-For this image, whe catalog from this Hubble survey (henceforth the ``HST catalog")
+For this image, the catalog from this Hubble survey (henceforth the ``HST catalog")
 serves as ground truth for validating our results.
 
 Then, we run StarNet on a frame from the DECam survey,
@@ -14,16 +14,18 @@ and demonstrate the ability of StarNet to scale to large astronomical surveys.
 \subsection{Results on the M2 globular cluster}
 \label{sec:results_on_m2}
 
-We first focus on the $100 \times 100$ pixel subimage of M2 that
+We first analyze the $100 \times 100$ pixel subimage of M2 that
 \cite{Portillo_2017} and \cite{Feder_2019} analyzed with PCAT.
 This subimage is located approximately two arcseconds from the heavily saturated core of the cluster;
-even in this subimage, the HST catalog contains over 1000 stars with F606W-band magnitudes less than 22.
+in this subimage, the HST catalog contains 1114 stars with F606W-band magnitudes less than 22.
 We include two bands in our model, the SDSS $r$-band and $i$-band.
 The SDSS $r$-band and the Hubble F606W band are centered at roughly the same wavelength,
-but the wavelength range of the Hubble F606W band is slightly broader.
+while the wavelength range of the Hubble F606W band is slightly broader.
 
-The cataloging accuracy of StarNet is compared with PCAT and DAOPHOT~\citep{stetson2987daophot}.
-DAOPHOT is an algorithmic routine for detecting stars in crowded starfields which does not use a generative model.
+We compare the cataloging accuracy of StarNet
+to the two alternatives PCAT and DAOPHOT.
+DAOPHOT is an algorithmic routine for detecting stars in crowded starfields
+which does not use a generative model~\citep{stetson2987daophot}.
 This software convolves the observed image with a Gaussian kernel and scans for peaks above a given threshold.
 The DAOPHOT catalog of M2 was reported in \cite{An_2008_m2}.
 
@@ -35,9 +37,10 @@ The DAOPHOT catalog of M2 was reported in \cite{An_2008_m2}.
 % Each sample from the (approximate) posterior returns a catalog, and each
 % sampled catalog may have different cardinally.
 
-To evaluate the three methods, the HST catalog was used as ground truth.
-We filtered the HST catalog to stars with magnitudes smaller than 22.5 in the Hubble F606W band,
-because stars with lower apparent brightness cannot be detected in SDSS images.
+To evaluate the three methods.
+We filtered the ground truth HST catalog to stars with magnitudes smaller than 22.5 in the Hubble F606W band,
+because none of the three methods were able to detect stars
+with lower apparent brightness in the SDSS image.
 
 
 Estimated catalogs are evaluated on three metrics: the true positive rate (TPR),
@@ -72,14 +75,17 @@ StarNet produced a catalog that outperforms DAOPHOT and PCAT in F1 score (Table~
 Figure~\ref{fig:example_subimages} shows the StarNet catalog alongside PCAT, DAOPHOT, and HST catalogs.
 DAOPHOT estimated less than half the number of stars when compared to the other methods.
 It therefore had a large PPV but a small TPR.
-The StarNet catalog had about the same TPR as PCAT while being ten points higher in PPV.
+The StarNet catalog had about the same TPR as PCAT while being ten percentage points higher in PPV.
 
-Table~\ref{tab:summary_stats} also prints the number of stars inferred by each method.
-For probabilistic methods (StarNet and PCAT),
- we display the mean number of stars under the approximate posterior, along with the 5-th and 95-th quantiles.
+Table~\ref{tab:summary_stats} also shows the number of stars inferred by each method.
 There are 1114 stars in the HST catalog.
-Neither PCAT nor StarNet captured the true number of stars in their 90\% credible interval,
-but the StarNet credible intervals were three times wider than the PCAT intervals.
+For probabilistic methods (StarNet and PCAT),
+we display the mean number of stars under the approximate posterior, along with the 5-th and 95-th quantiles.
+We compute the StarNet credible intervals by sampling from the variational posterior on each tile;
+recall that on each tile, the variational posterior on the number of stars is a categorical random variable.
+The the total number of inferred stars in the image is the sum of the number of star in each tile.
+StarNet credible intervals were three times wider than the PCAT intervals
+and closer to the ground truth.
 The small PCAT credible intervals may be indicative of an MCMC sampler that failed to mix well.
 
 \input{tables/summary_stats_m2.tex}
@@ -143,7 +149,7 @@ Then, each star in the StarNet catalog was matched with exactly one Hubble star 
 For each star, we computed the z-score $(y - \hat \mu) / \hat \sigma$, where $y$ is the HST log-flux or
 logit-location; $\hat \mu$ and $\hat\sigma$ are the mean and the standard deviation, respectively, of the Gaussian variational distribution for the log-flux or logit-location.
 % If the uncertainties were perfectly calibrated, the distribution of these z-scores would be a standard Gaussian.
-The empirical z-score distributions are close to a standard Gaussian with some discrepancy in the tails and some evidence of skewness, suggesting the uncertainties are not too mis-estimated (Figure~\ref{fig:z-score_calibration}).
+The empirical z-score distributions are close to a standard Gaussian with some discrepancy in the tails and some evidence of skewness, suggesting the uncertainties are well-estimated (Figure~\ref{fig:z-score_calibration}).
 
 \begin{figure}[tb]
     \centering
@@ -156,7 +162,7 @@ The empirical z-score distributions are close to a standard Gaussian with some d
 
 \subsubsection{Runtime}
 \label{sec:runtime}
-We ran ran SGD to minimize the expected forward KL
+We ran SGD to minimize the expected forward KL
 for 400 epochs; at each epoch, 200 images were sampled from the generative model.
 Optimization was done with Adam~\citep{kingma2014adam}.
 On a single NVIDIA GeForce RTX 2080 Ti GPU,
@@ -166,7 +172,7 @@ After fitting the model and variational posterior,
 calculating the approximate posterior
 (that is, producing the distributional parameters of the variational approximation) for the $100 \times 100$ pixel image of M2 took $30$ milliseconds.
 By comparison, the reported runtime of PCAT, which uses MCMC, is 30 minutes on the same $100 \times 100$ pixel image~\citep{Feder_2019}.
-After the initial fit, StarNet provided nearly a $10^5$-fold speed increase.
+Hence, after the initial fit, StarNet provided nearly a $10^5$-fold speed increase.
 
 The speed at inference time (which excludes training time) gives StarNet the scaling characteristics necessary for processing large astronomical surveys.
 A single SDSS image is $1489 \times 2048$ pixels.
@@ -175,14 +181,14 @@ the runtime to process the full image would be $30\text{ min} \times 14 \times 2
 The SDSS survey consists of nearly one million images. Scaling PCAT to the entire SDSS survey would be infeasible.
 The upcoming LSST survey will be 300 times larger than SDSS.
 
-In contrast, StarNet only incurs a one-time fitting cost.
+On the other hand, StarNet only incurs a one-time fitting cost.
 After this initial fit,
 producing a catalog with the full $1489 \times 2048$ pixel image requires
 $30\text{ msec} \times 14 \times 20 = 8.4$ seconds. In practice,
 inference can be made even faster by batching the image tiles to run in parallel on a GPU.
 
 In the next subsection, we demonstrate the scaling characteristics on a frame from
-the DECAPS survey. 
+the DECAPS survey.
 
 % Figure~\ref{fig:cmd_m2} displays the estimated color-magnitude diagrams. While the Hubble F606W-band corresponds roughly to the SDSS $r$-band, there is no such correspondence for the SDSS $i$-band. Thus, using the Hubble locations, we estimated the $i$-band fluxes using maximum likelihood: letting $x^{(i)}$ be the SDSS image in the $i$-band, $N_H$ the number of stars in the Hubble catalog and $\ell_H$ their locations, solve
 % \begin{align}
