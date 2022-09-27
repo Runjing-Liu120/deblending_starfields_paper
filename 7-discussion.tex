@@ -1,25 +1,27 @@
-StarNet employs variational inference and outperforms both an MCMC-based probabilistic cataloger and a non-model-based approach in terms of accuracy and runtime. 
-Under the framework of probabilistic modeling, 
+StarNet employs variational inference and outperforms both an MCMC-based probabilistic cataloger and a non-model-based
+procedure in terms of accuracy and runtime.
+Under the framework of probabilistic modeling,
 StarNet produces catalogs in which uncertainties are captured by a posterior over the set of all catalogs.
-Importantly, unlike MCMC, StarNet also has the capacity to scale probabilistic cataloging to process large astronomical surveys. 
+Importantly, unlike MCMC, StarNet also has the capacity to scale probabilistic cataloging to process large astronomical surveys.
 
-The quality of StarNet detections is the result of optimizing the forward KL, a different objective than the one traditionally used in variational inference. 
-Optimizing the forward KL allows the variational posterior to be fit on large amounts of {\itshape complete} data -- the image along with its latent catalog -- generated from the statistical model. 
-While labeled data from simulators has been used in other astronomy applications to train deep neural networks (see for example~\cite{Lanusse_2017_cmudeeplens} and \cite{huang2019finding}), StarNet is the first training procedure to employ simulated data in a statistical framework: the neural network specifies an approximate Bayesian posterior. 
+The quality of StarNet detections is the result of optimizing the forward KL, a different objective than the one traditionally used in variational inference.
+Optimizing the forward KL allows the variational posterior to be fit on large amounts of {\itshape complete} data -- the image along with its latent catalog -- generated from the statistical model.
+While labeled data from simulators has been used in other astronomy applications to train deep neural networks (see for example~\cite{Lanusse_2017_cmudeeplens} and \cite{huang2019finding}), StarNet is the first training procedure to employ simulated data in a statistical framework: the neural network specifies an approximate Bayesian posterior.
 
-This variational approach, unlike previous MCMC approaches, enables StarNet to estimate model parameters such as the PSF and sky background.
-While the current work focuses on PSF models, our methodology can be extended to more general sources such as galaxies. 
-Unsurprisingly, the current performance of StarNet is sub-optimal for cataloging regions of the sky that contain both stars and galaxies, due to model misfit (Appendix~\ref{sec:results_sparse_field}).  
+While the current work focuses on PSF models, our methodology can be extended to
+include more general sources such as galaxies.
+One promising direction is to use a deep generative model for galaxies~\citep{Regier2015ADG, Reiman_2019_gans_deblend, lanusse2020deep, Arcelin_2020}.
+Here, a neural network encodes a conditional likelihood of galaxy images given a low-dimensional galaxy representation,
+and we would estimate the the galaxy model by re-incoporating the ELBO objective ---
+the wake-sleep algorithm is a method that alternates between optimizing
+the expected forward KL (sleep phase) to
+infer catalogs and optimizing the ELBO (wake phase) to fit the galaxy model.
+% Unsurprisingly, the current performance of StarNet is sub-optimal for cataloging
+% regions of the
+% sky that contain both stars and galaxies, due to model misfit (Appendix~\ref{sec:results_sparse_field}).
 
-One promising direction is to use a deep generative model for galaxies~\citep{Regier2015ADG, Reiman_2019_gans_deblend, lanusse2020deep, Arcelin_2020}. 
-Here, a neural network encodes a conditional likelihood of galaxy images given a low-dimensional galaxy representation. 
-Using a neural network to encode a likelihood extends the flexibility of galaxy models beyond the simple models used here. 
-
-
-The statistical framework in this research lays the foundation for building flexible models to incorporate the cataloging of all celestial objects. 
-Future astronomical surveys will only expand in terms of the volume of data they are able to amass. 
-As telescopes peer deeper into space, fields will reveal more sources and images will become more crowded. 
-The uncertainties in crowded fields necessitate a probabilistic approach. 
-Our method holds the promise of providing  a scalable inference tool that can meet the challenges of future surveys. 
-
-
+The statistical framework in this research lays the foundation for building flexible models to incorporate the cataloging of all celestial objects.
+Future astronomical surveys will only expand in terms of the volume of data they are able to amass.
+As telescopes peer deeper into space, fields will reveal more sources and images will become more crowded.
+The uncertainties in crowded fields necessitate a probabilistic approach.
+Our method holds the promise of providing  a scalable inference tool that can meet the challenges of future surveys.

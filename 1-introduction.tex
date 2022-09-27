@@ -1,76 +1,98 @@
-Astronomical images record the arrival of photons from distant light sources. 
+Astronomical images record the arrival of photons from distant light sources.
 Astronomical catalogs are constructed from these images.
-Catalogs label light sources as stars, galaxies, or other objects; they also list the physical characteristics of light sources such as flux, color, and morphology. 
+Catalogs label light sources as stars, galaxies, or other objects;
+they also list the physical characteristics of light sources such as flux, color, and morphology.
 These catalogs are the starting point for many downstream analyses.
-For example, Bayestar used a catalog of stellar fluxes and colors to construct the 3D distribution of interstellar dust~\citep{Green_2019_argonaut}. 
-Catalogs of galaxy morphologies have been used to validate theoretical models of dark matter and dark energy~\citep{Abbott2018}. 
+For example, Bayestar used a catalog of stellar fluxes and colors to construct
+the 3D distribution of interstellar dust~\citep{Green_2019_argonaut}.
+Catalogs of galaxy morphologies have been used to validate theoretical models of dark matter and dark energy~\citep{Abbott2018}.
 
-A light source, be it a star or a galaxy, produces a peak intensity of brightness in an image. 
-When light sources are well separated, catalog construction is straightforward: characteristics of each light source, such as flux, can be estimated by analyzing intensities at the peak and surrounding pixels. 
-However, in images crowded with many light sources, observed intensities may result from the combined light of multiple sources.
-Source separation, or {\itshape deblending}, is the task of differentiating and characterizing individual light sources from a mixture of intensities on an image. 
-A key challenge in deblending is inferring whether an observed intensity is in fact blended, that is, whether it is composed of a single bright source or multiple dimmer sources. 
+A light source, be it a star or a galaxy, produces a peak intensity of brightness in an image.
+When light sources are well separated, catalog construction is relatively straightforward:
+characteristics of each light source, such as flux, can be estimated by analyzing
+intensities at the peak and surrounding pixels.
+However, in images crowded with many light sources,
+observed intensities may result from the combined light of multiple sources.
+Source separation, or {\itshape deblending}, is the task of differentiating and
+characterizing individual light sources from a mixture of intensities on an image.
+A key challenge in deblending is inferring whether an observed intensity is in fact blended,
+that is, whether it is composed of a single bright source or multiple dimmer sources.
 
-% In such settings, a key step in catalog construction is light source separation, or {\itshape deblending}, the process of 
-% Deblending first involves distinguishing whether a peak intensity corresponds to a single light source or multiple light sources. 
-% If multiple sources are detected, the properties of each light source are then inferred. 
+% In such settings, a key step in catalog construction is light source separation, or {\itshape deblending}, the process of
+% Deblending first involves distinguishing whether a peak intensity corresponds to a single light source or multiple light sources.
+% If multiple sources are detected, the properties of each light source are then inferred.
 
 Deblending is challenging for several reasons.
-First, it is an unsupervised problem without ground truth labeled data. 
+First, it is an unsupervised problem without ground truth labeled data.
 Second, it is a problem with a sample size of one: there is only one night sky, which is imaged many times, and the collected survey images capture overlapping regions of it.
 Third, for blended fields, the properties of light sources are ambiguous; therefore, providing calibrated uncertainties for catalog construction is as important as making accurate predictions.
-Finally, the scale of the data is immense. 
-The upcoming Rubin Observatory Legacy Survey of Space and Time (LSST), scheduled to begin data collection in 2022, is expected to produce 60 petabytes of astronomical images over its lifetime~\citep{LSSTabout}.
+Finally, the scale of the data is immense.
+The upcoming Rubin Observatory Legacy Survey of Space and Time (LSST),
+scheduled to begin full operations by 2024,
+is expected to produce 60 petabytes of astronomical images over its lifetime~\citep{LSSTabout}.
 
-As more powerful telescopes are developed, and their ability to detect more distant light sources improves, the density of light sources in the images they capture will only increase. 
-For instance, \cite{bosch2018hyper} estimates that 58\% of light sources are blended in images captured by the Subaru Telescope’s Hyper Suprime-Cam, and that percentage is expected to increase for LSST. 
-Therefore, developing a method that reliably characterizes light sources, even in cases of significant blending, 
-advances any astronomical research in which conclusions about the physical universe are derived from estimated catalogs. 
+As more powerful telescopes are developed, and their ability to detect more distant light sources improves,
+the density of light sources in the images they capture will only increase.
+For instance, \cite{bosch2018hyper} estimates that 58\% of light sources are blended in images captured by the
+Subaru Telescope’s Hyper Suprime-Cam, and that percentage is expected to increase for LSST.
+Therefore, developing a method that reliably characterizes light sources, even in cases of significant blending,
+advances any astronomical research in which conclusions about the physical universe are derived from estimated catalogs.
 
-We focus on cataloging applications where all light sources are well modeled as points without spatial extent. 
-Point-source-only models are applicable to surveys such as DECam~\citep{Schlafly_2018_DECam}, which imaged the center of the  Milky Way, and WISE~\citep{Wright_2010_WISESurvey}, whose telescope resolution did not allow for differentiation between stars and galaxies.
-In this work, we use the globular cluster M2, a region imaged by the Sloan Digital Sky Survey (SDSS) that is densely populated with stars, as a test bed for our method. 
+We focus on cataloging applications where all light sources are well modeled as points without spatial extent.
+Point-source-only models are applicable to surveys such as DECam~\citep{Schlafly_2018_DECam},
+which imaged the center of the  Milky Way, and WISE~\citep{Wright_2010_WISESurvey},
+whose telescope resolution did not allow for differentiation between stars and galaxies
+We will use the globular cluster M2, a region imaged by the Sloan Digital Sky Survey (SDSS)
+that is densely populated with stars,
+as a test bed for the accuracy of our approach.
+We also demonstrate the ability of our method to scale to large, modern astronomical surveys
+by cataloging a subregion of the DECam survey.
 
 \bigbreak
 
 \noindent{\textbf{From software pipelines to probabilistic cataloging}}
 
 Traditionally, most cataloging has been performed using software pipelines.
-These pipelines are algorithms that usually involve the following stages: locating the brightest peaks, estimating fluxes, and subtracting the estimated light source.
+These pipelines are algorithms that usually involve the following stages: locating the brightest peaks, estimating fluxes, and subtracting the estimated light sources.
 These stages may be performed iteratively.
-Pipelines do not normally produce statistically calibrated error estimates that propagate 
-the uncertainty that accumulates in each of the steps. 
-Failure to properly accumulate error at each step results in unreliable catalogs for images in which ambiguity exists in identifying sources and estimating their characteristics.
-For example, PHOTO~\citep{lupton2001sdss}, the default cataloging pipeline used by SDSS, failed to produce a catalog on the globular cluster M2~\citep{Portillo_2017}. 
+Pipelines do not normally produce statistically calibrated error estimates that propagate
+the uncertainty that accumulates in each of the steps.
+Failure to properly accumulate error at each step results in unreliable point estimates
+for images in which ambiguity exists in identifying sources and estimating their characteristics.
+For example, PHOTO~\citep{lupton2001sdss}, the default cataloging pipeline used by SDSS, failed to produce a catalog on the globular cluster M2~\citep{Portillo_2017}.
 
-In contrast, {\itshape probabilistic} cataloging posits a statistical model consisting of a likelihood for the observed image given a catalog and a prior distribution over possible catalogs~\citep{Portillo_2017, Brewer_2013, Feder_2019}. 
-Instead of deriving a single catalog, probabilistic cataloging produces a posterior distribution over the set of all possible catalogs. 
-Uncertainties are quantified by the posterior distribution. 
-For example, in an image with an ambiguously blended bright peak, some catalogs sampled from the posterior would contain multiple dim light sources while others would contain one bright source. 
-The relative density the posterior distribution places on one explanation over another represents the statistical confidence in that explanation. 
-Moreover, a distribution over the set of all catalogs induces a distribution on any estimate derived from a catalog. Therefore, calibrated uncertainties can be propagated to downstream analyses.  
+In contrast, {\itshape probabilistic} cataloging posits a statistical model consisting of a likelihood for the observed image given a catalog and a prior distribution over possible catalogs~\citep{Portillo_2017, Brewer_2013, Feder_2019}.
+Instead of deriving a single catalog, probabilistic cataloging produces a posterior distribution over the set of all possible catalogs.
+Uncertainties are quantified by the posterior distribution.
+For example, in an image with an ambiguously blended bright peak, some catalogs sampled from the posterior would contain multiple dim light sources while others would contain one bright source.
+The relative density that the posterior distribution places on one explanation
+relative to others another represents the statistical confidence in that explanation.
+Moreover, a distribution over the set of all catalogs induces a distribution on any estimate derived from a catalog. Therefore, calibrated uncertainties can be propagated to downstream analyses.
 
 Previous work on probabilistic cataloging employed Markov chain Monte Carlo (MCMC) to sample from the posterior distribution.
 The MCMC procedure in~\cite{Portillo_2017} and \cite{Feder_2019}
-was called PCAT, short for ``Probabilistic CATaloging."\footnote{
+is called PCAT, short for ``Probabilistic CATaloging."\footnote{
 We use ``probabilistic cataloging'' to refer to any method that produces a posterior over possible catalogs, whereas ``PCAT" refers specifically to the MCMC procedure in~\cite{Portillo_2017} and \cite{Feder_2019}. }
 A difficulty in any probabilistic cataloging approach is that the number of sources in a catalog is unknown and random, so the latent variable space is transdimensional. PCAT sampled transdimensional catalogs with reversible jump MCMC~\citep{Green95reversiblejump}, in which
 auxiliary variables are added to encode the ``birth" and ``death" of light sources in the Markov chain.
 
-The computational cost of MCMC for this model is problematic for large-scale astronomical surveys. 
-Early implementations of PCAT required a day to process a $100\times 100$ pixel image of the M2 globular cluster imaged by SDSS~\citep{Portillo_2017}. 
-More recent implementations running inexact MCMC brought the runtime down to 30  minutes~\citep{Feder_2019}.  
+The computational cost of MCMC for this model is problematic for large-scale astronomical surveys.
+Early implementations of PCAT required a day to process a $100\times 100$ pixel image of the M2 globular cluster imaged by SDSS~\citep{Portillo_2017}.
+More recent implementations running inexact MCMC brought the runtime down to 30  minutes~\citep{Feder_2019}.
 In any case, a $100\times 100$ pixel image covers only a $0.66 \times 0.66$ arcminute patch of the sky.
-For comparison, in one night, SDSS scans a region on the order of $100 \times 1000$ arcminutes. 
-Extrapolating the 30-minute runtime, PCAT would take on the order of ten years to process a nightly SDSS run. 
+For comparison, in one night, SDSS scans a region on the order of $100 \times 1000$ arcminutes.
+Extrapolating the 30-minute runtime, PCAT would take on the order of ten years to process a nightly SDSS run.
 
-As an alternative to MCMC, \cite{regier2019_celeste} produced an approximate posterior using variational inference.
-Variational inference (VI) considers a family of candidate approximate posteriors and employs numerical optimization to find the distribution in the family closest
-in KL divergence to the exact posterior~\citep{Jordan_intro_vi, Wainwrite_graph_models_vi, Blei_2017_vi_review}. 
-With a sufficiently constrained family of distributions, the VI optimization problem can be solved orders of magnitude faster than MCMC runs. 
+As an alternative to MCMC, \cite{regier2019_celeste} proposed to use variational inference (VI)
+to approximate the posterior.
+VI considers a family of candidate approximate posteriors and employs numerical optimization to find the distribution in the family closest
+in KL divergence to the exact posterior~\citep{Jordan_intro_vi, Wainwrite_graph_models_vi, Blei_2017_vi_review}.
+With a sufficiently constrained family of distributions, the VI optimization problem can be solved orders of magnitude faster than MCMC runs.
 
 However, \cite{regier2019_celeste} is limited in that the number of light sources in a given image is treated as known and fixed -- it had to be set using a preprocessing routine.
-They avoided the transdimensional latent variable space in order to have a tractable objective for numerical optimization. 
+The authors avoided the transdimensional latent variable space induced by
+the unknown number of sources
+in order to have a tractable objective for numerical optimization.
 
 \bigbreak
 
@@ -81,129 +103,154 @@ They avoided the transdimensional latent variable space in order to have a tract
 We propose {\itshape StarNet}, an approach to deblending that employs several recent VI innovations~\citep{zhang2019advances,le2020revisiting}.
 Unlike \cite{regier2019_celeste}, our VI approach is able to handle arbitrary probabilistic models, including a transdimensional model with an unknown number of sources. Section~\ref{sec:gen_model} introduces the statistical model, which is similar to the model used in PCAT.
 
-Secondly, again unlike~\cite{regier2019_celeste}, 
-we employ {\itshape amortization}, which enables StarNet to scale inference to large astronomical surveys. 
+Secondly, again unlike~\cite{regier2019_celeste},
+we employ {\itshape amortization}, which enables StarNet to scale inference to large astronomical surveys.
 In amortized variational inference, a neural network maps input images to an approximate posterior.
-Following a one-time cost to fit the neural network, inference 
+Following a one-time cost to fit the neural network, inference
 on new images requires just a single forward pass.
-Rapid inference is available without the need to re-run MCMC or numerically optimize VI for each new image. 
-For StarNet, the forward pass on 
+Rapid inference is available without the need to re-run MCMC or numerically optimize VI for each new image.
+For StarNet, the forward pass on
 a $100 \times 100$ pixel image takes $0.2$ seconds (vs.~30 minutes for inference using PCAT).
-Section~\ref{sec:var_inference} details the variational distribution and neural network architecture in StarNet. 
+Section~\ref{sec:var_inference} details the variational distribution and neural network architecture in StarNet.
 
-Finally, and critically, StarNet is fit using the wake-sleep algorithm~\citep{Hinton1995wake_sleep}, which does not target the same KL divergence traditionally used in  variational inference. Traditionally, variational inference minimizes the ``reverse" KL divergence between the approximate posterior $q$ and the exact posterior $p$.
-Reverse KL is defined as the $q$-weighted average difference between $\log q$ and $\log p$. 
-Wake-sleep instead fits the approximate posterior using the ``forward" KL divergence, which weights the difference between $\log p$ and $\log q$ by $p$.
-Section~\ref{sec:wake_sleep} details the wake-sleep procedure. 
+Finally, and critically, StarNet is fit using an expected
+\textit{forward} Kullback–Leibler divergence
+between the approximate posterior $q$ and the exact posterior $p$,
+where the expectation is taken over the data distribution defined by the statistical model.
+In contrast, traditional variational inference minimizes the a \textit{reverse}
+KL divergence~\citep{bishop2006pattern}, evaluated at the observed data.
+The forward KL is minimized using stochastic gradient descent (SGD),
+which involves sampling {\itshape complete} data---images and their corresponding catalogs---from
+their joint likelihood and fitting the network in a supervised fashion.
+Section~\ref{sec:wake_sleep} details our inference procedure.
 
-% The forward KL is minimized using stochastic gradient descent (SGD). 
-% At each iteration, catalogs are sampled from the prior distribution, then used to generate images from the likelihood model. 
-% The neural network is fit to map the generated images to distributions that place probability mass on their corresponding catalogs. Section~\ref{sec:wake_sleep} details the wake-sleep procedure. 
-
-In this application, optimizing the forward KL produces more reliable approximate posteriors than optimizing the traditional reverse KL (Section \ref{sec:elbo_sleep_compare}). 
-In particular, optimizing the forward KL involves sampling {\itshape complete} data---images and their corresponding catalogs---from their joint likelihood and fitting the network in a supervised fashion.
-Taking advantage of complete data allows the network to better avoid shallow local minima where the approximate posterior is far from the exact posterior in terms of KL divergence. 
-
-The wake-sleep algorithm has been used in previous research to train deep generative models~\citep{Hinton1995wake_sleep, bornschein2014reweighted, le2020revisiting}.
-However, to the best of our knowledge, this is the first application of wake-sleep for scientific purposes. 
-Specifically, we use wake-sleep for inference to find a latent space that is interpretable: it is the set of all possible astronomical catalogs.
+In this application, optimizing the forward KL produces more reliable approximate
+posteriors than optimizing the traditional reverse KL (Section \ref{sec:elbo_sleep_compare}).
+Taking advantage of complete data allows the network to better avoid shallow local minima
+where the approximate posterior is far from the exact posterior in terms of KL divergence.
 
 
-We applied StarNet to the M2 globular cluster as imaged by SDSS.
-% We used the catalog reported in \cite{Sarajedini_2007}, which imaged M2 using the Hubble Space Telescope, as a ground truth to evaluate our performace. 
-StarNet was more accurate than both the MCMC-based cataloger PCAT and traditional cataloging approaches while running $100,000$ times faster than the former (Section~\ref{sec:results_on_m2}).
+% Reverse KL is defined as the $q$-weighted average difference between $\log q$ and $\log p$,
+% while the forward KL weights the difference between $\log p$ and $\log q$ by $p$.
+% Section~\ref{sec:wake_sleep} details our inference procedure.
+
+% The forward KL is minimized using stochastic gradient descent (SGD).
+% At each iteration, catalogs are sampled from the prior distribution, then used to generate images from the likelihood model.
+% The neural network is fit to map the generated images to distributions that place probability mass on their corresponding catalogs. Section~\ref{sec:wake_sleep} details the wake-sleep procedure.
+
+The forward KL has been has been used in previous research to train deep generative
+models~\citep{ambrogioni2019favi,le2020revisiting},
+and appears in the \textit{sleep phase} of the wake-sleep algorithm
+\citep{Hinton1995wake_sleep, bornschein2014reweighted,le2020revisiting}.
+However, to the best of our knowledge, this is the first instance of applyiing
+variational inference with a foward KL for scientific purposes.
+Specifically, we use this inference techinique to find a latent space that is interpretable:
+it is the set of all possible astronomical catalogs.
+
+
+We applied StarNet to the M2 globular cluster as imaged by SDSS
+and to a subregion of DECam, which imaged stars in the Milky Way.
+% We used the catalog reported in \cite{Sarajedini_2007}, which imaged M2 using the Hubble Space Telescope, as a ground truth to evaluate our performace.
+On the $100 \times 100$ pixel region of M2,
+StarNet was more accurate than both the MCMC-based cataloger PCAT
+and traditional cataloging approaches (Section~\ref{sec:results_on_m2}):
+though MCMC is asymptotically exact, on human timescales, it often suffers from incomplete mixing. 
+We then demonstrate the scalability of StarNet by cataloging a $2000\times4000$ pixel frame from the DECam survey:
+our method can produce scientifically relevant results on the order of minutes ---
+running MCMC on the same frame would take on the order of days.
+
+% while running $100,000$ times faster than the former (Section~\ref{sec:results_on_m2}).
 % Although the MCMC posterior approximation converges to the exact posterior asymptotically, over finite horizons an MCMC sampler may not mix well. The sleep-phase objective from the Wake-Sleep algorithm allows StarNet to circumvent many of the challenges of nonconvex optimization
 % (Section~\ref{sec:discussion}).
 Code to reproduce our results is publicly available in a GitHub repository.\footnote{
-\url{https://github.com/Runjing-Liu120/DeblendingStarfields}. 
-} 
+\url{https://github.com/Runjing-Liu120/DeblendingStarfields}.
+}
 
-% However, in addition to greater speed, amortized inference may be better at nonconvex optimization: by learning a policy from many examples we learn a policy for avoiding shallow local minima. 
-
-
-
-% In particular, the usual stochastic gradients of the reverse KL 
-% were too high-variance to be used in in our application; 
-% in contrast, low-variance stochastic gradients of the forward KL are computationally cheap to compute. 
-
-
-% low-variance stochastic gradients of the forward KL are much cheaper to compute than stochastic gradients of the reverse KL. Moreover, we hypothesize that amortized inference may be better at nonconvex optimization: by learning a policy from many examples we learn a policy for avoiding shallow local minima. 
+% However, in addition to greater speed, amortized inference may be better at nonconvex optimization: by learning a policy from many examples we learn a policy for avoiding shallow local minima.
 
 
 
+% In particular, the usual stochastic gradients of the reverse KL
+% were too high-variance to be used in in our application;
+% in contrast, low-variance stochastic gradients of the forward KL are computationally cheap to compute.
 
 
-
-% The neural network outputs are not simply ``labels" for the input image 
+% low-variance stochastic gradients of the forward KL are much cheaper to compute than stochastic gradients of the reverse KL. Moreover, we hypothesize that amortized inference may be better at nonconvex optimization: by learning a policy from many examples we learn a policy for avoiding shallow local minima.
 
 
 
 
 
 
-% In traditional variational inference, the divergence between 
-% the variational posterior $q$ and the true posterior $p$ is 
-% measured by the ``reverse" KL divergence, defined as the 
+% The neural network outputs are not simply ``labels" for the input image
+
+
+
+
+
+
+% In traditional variational inference, the divergence between
+% the variational posterior $q$ and the true posterior $p$ is
+% measured by the ``reverse" KL divergence, defined as the
 % $q$-weighted average difference between $\log q$ and $\log p$. In other words, the reverse KL divergence
-% is defined by an expectation with integrating distribution $q$. 
+% is defined by an expectation with integrating distribution $q$.
 
-% In simple models, for example when $p$ and $q$ are appropriate classes of exponential families, 
-% the expectation over $q$ can be written explicitly as a function of the parameters of $q$. Therefore, the minimizer of the KL can be solved either in closed form or by employing deterministic optimization~\cite{Blei_2017_vi_review}. 
+% In simple models, for example when $p$ and $q$ are appropriate classes of exponential families,
+% the expectation over $q$ can be written explicitly as a function of the parameters of $q$. Therefore, the minimizer of the KL can be solved either in closed form or by employing deterministic optimization~\cite{Blei_2017_vi_review}.
 
-% In our setting of amortized variational inference, the parameters of $q$ are neural network weights. When analytic expectations are unavailable, as in our case, 
-% sampling methods have been employed in conjunction with modern auto-differentiation tools to compute stochastic gradients. Optimization is done with stochastic gradient descent. Examples include black-box variational inference (BBVI)~\cite{ranganath2013black} 
-% and automatic-differentiation variational inference (ADVI)~\cite{kucukelbir2016automatic}. The latter 
-% is closely related to the reparameterization trick \cite{kingma2013autoencoding, rezende2014stochastic} proposed to train deep generative models using the KL objective. 
-% These approaches all sample latent variables from $q$ and produce an unbiased estimate 
-% for the gradient of the KL. 
+% In our setting of amortized variational inference, the parameters of $q$ are neural network weights. When analytic expectations are unavailable, as in our case,
+% sampling methods have been employed in conjunction with modern auto-differentiation tools to compute stochastic gradients. Optimization is done with stochastic gradient descent. Examples include black-box variational inference (BBVI)~\cite{ranganath2013black}
+% and automatic-differentiation variational inference (ADVI)~\cite{kucukelbir2016automatic}. The latter
+% is closely related to the reparameterization trick \cite{kingma2013autoencoding, rezende2014stochastic} proposed to train deep generative models using the KL objective.
+% These approaches all sample latent variables from $q$ and produce an unbiased estimate
+% for the gradient of the KL.
 
-% However, the reparameterization trick does not apply when any latent variables are discrete, in our case, the number of stars. The REINFORCE estimator~\cite{Williams1992reinforce}, which BBVI adapts, produces an unbiased stochastic gradient for both continuous and discrete latent variables. However, the REINFORCE estimator often suffers from high variance in practice, and so the resulting stochastic optimization is slow. 
+% However, the reparameterization trick does not apply when any latent variables are discrete, in our case, the number of stars. The REINFORCE estimator~\cite{Williams1992reinforce}, which BBVI adapts, produces an unbiased stochastic gradient for both continuous and discrete latent variables. However, the REINFORCE estimator often suffers from high variance in practice, and so the resulting stochastic optimization is slow.
 
-% The key difficulty is that the objective function is 
+% The key difficulty is that the objective function is
 % an expectation with integrating distribution on $q$, the  distribution to be optimized. To avoid this issue, the {\itshape wake-sleep} algorithm considers the ``forward" KL divergence, defined as the
-% $p$-weighted average difference between $\log p$ and $\log q$;  in other words, the expectation is taken over $p$. To make the forward KL divergence tractable, a second average is taken over possible data. In other words, the neural network is trained so that {\itshape on average over possible input images $x$}, the 
-% variational distribution returned by the neural network is close to the true posterior in forward KL divergence. 
+% $p$-weighted average difference between $\log p$ and $\log q$;  in other words, the expectation is taken over $p$. To make the forward KL divergence tractable, a second average is taken over possible data. In other words, the neural network is trained so that {\itshape on average over possible input images $x$}, the
+% variational distribution returned by the neural network is close to the true posterior in forward KL divergence.
 
-% Low-variance stochastic gradients are easy to compute using the wake-sleep algorithm, and we show that these low-variance gradients result in faster optimization than using the REINFORCE gradient estimator. 
-% However, in addition to greater speed, amortized inference may be better at nonconvex optimization: by learning a policy from many examples we learn a policy for avoiding shallow local minima. 
+% Low-variance stochastic gradients are easy to compute using the wake-sleep algorithm, and we show that these low-variance gradients result in faster optimization than using the REINFORCE gradient estimator.
+% However, in addition to greater speed, amortized inference may be better at nonconvex optimization: by learning a policy from many examples we learn a policy for avoiding shallow local minima.
 
 
 
-% In simple models, for example when both $p$ and $q$ are related exponential families, the expectation can be written explicitly as a function of the parameters of $q$~\cite{Blei_2017_vi_review}. Therefore, the KL can be minimized either in closed form, or by using deterministic optimization. However, in our case, the parameters of $q$ are neural network weights. In this setting, ~\cite{rezende2014stochastic,kingma2013autoencoding} propose 
-% stochastic optimization, where an unbiased gradient of the KL divergence is computed from samples of $q$. 
+% In simple models, for example when both $p$ and $q$ are related exponential families, the expectation can be written explicitly as a function of the parameters of $q$~\cite{Blei_2017_vi_review}. Therefore, the KL can be minimized either in closed form, or by using deterministic optimization. However, in our case, the parameters of $q$ are neural network weights. In this setting, ~\cite{rezende2014stochastic,kingma2013autoencoding} propose
+% stochastic optimization, where an unbiased gradient of the KL divergence is computed from samples of $q$.
 
 
 
 
 
 % One limitation of neural networks is the large amount of data needed for training.
-% In astronomy, knowledge of the physical system  often give rise to reasonably realistic simulators for data. For example, simulators were used in \cite{Lanusse_2017_cmudeeplens} trained neural networks to detect Einstein rings, 
+% In astronomy, knowledge of the physical system  often give rise to reasonably realistic simulators for data. For example, simulators were used in \cite{Lanusse_2017_cmudeeplens} trained neural networks to detect Einstein rings,
 % a rare object found in astronomical surveys and used to study dark matter; the neural network in \cite{Hezaveh_2017_nn_lensing_nature} also returned
-% morphological parameters for each Einstein ring. 
-% In both cases, because the training data was generated from a simulator, the ground truth labels (ring exists or not; the ring morphology) are known. The network is trained in a supervised fashion. Using simulated data is especially useful because the network can be trained on essentially unlimited data -- the bottleneck is the limit on computational resources, not the availability of training data. 
+% morphological parameters for each Einstein ring.
+% In both cases, because the training data was generated from a simulator, the ground truth labels (ring exists or not; the ring morphology) are known. The network is trained in a supervised fashion. Using simulated data is especially useful because the network can be trained on essentially unlimited data -- the bottleneck is the limit on computational resources, not the availability of training data.
 
-% In our work, we also make use of simulated data to train our neural network. However, we introduce the simulated data in the context of a statistical model. We do so using the wake-sleep algorithm~\cite{Hinton1995wake_sleep}. 
-% The neural network outputs are not simply ``labels" for the input image; rather, we are able to interpret the output as specifying an approximate Bayesian posterior in the context of a well-defined statistical model. 
+% In our work, we also make use of simulated data to train our neural network. However, we introduce the simulated data in the context of a statistical model. We do so using the wake-sleep algorithm~\cite{Hinton1995wake_sleep}.
+% The neural network outputs are not simply ``labels" for the input image; rather, we are able to interpret the output as specifying an approximate Bayesian posterior in the context of a well-defined statistical model.
 
-% In summary, we leverage the predictive power and computational efficiency of neural networks to do 
-% inference in the framework of a statistical model. 
-% We also employ simulated data in our training procedure in a statistically principled way. In Section~\ref{sec:results}, we compare the catalog obtained from our variational posterior with the catalog derived from MCMC; we also compare with traditional cataloging approaches.  
+% In summary, we leverage the predictive power and computational efficiency of neural networks to do
+% inference in the framework of a statistical model.
+% We also employ simulated data in our training procedure in a statistically principled way. In Section~\ref{sec:results}, we compare the catalog obtained from our variational posterior with the catalog derived from MCMC; we also compare with traditional cataloging approaches.
 
 % detect Einstein rings; \cite{Hezaveh_2017_nn_lensing_nature} used
-% neural networks to infer morphological characteristics of the Einstein rings; 
-% in the context of deblending, 
-% \cite{Reiman_2019_gans_deblend} used 
-% GANS to separate two overlapping galaxies. 
+% neural networks to infer morphological characteristics of the Einstein rings;
+% in the context of deblending,
+% \cite{Reiman_2019_gans_deblend} used
+% GANS to separate two overlapping galaxies.
 
 % Several factors contribute to the success of neural networks. Firstly, neural networks are computationally efficient; multiple images can be easily evaluated in parallel on a GPU.
-% Secondly, a well-trained neural network is able to generalize beyond the data on which is was trained. This combined with computational efficiency is extremely beneficial for sky surveys: after training a neural network on a subset of the survey, the remaining images in the survey can be evaluated quickly in batches using only forward-passes through the network. 
+% Secondly, a well-trained neural network is able to generalize beyond the data on which is was trained. This combined with computational efficiency is extremely beneficial for sky surveys: after training a neural network on a subset of the survey, the remaining images in the survey can be evaluated quickly in batches using only forward-passes through the network.
 
 % In this paper, we combine the flexibility of neural networks with a formal statistical model. This enables the neural network output to be interpreted in a statistically principled way: the output of our neural network will be a distribution that approximates the Bayesian posterior.
 
-% Secondly, we train the neural network using {\itshape wake-sleep} training. This allows our neural network to be trained using unlimited simulated data. Using simulated data to train neural networks is common practice is astronomy (see for example~\cite{Lanusse_2017_cmudeeplens, huang2019finding}). However, we also make the connection with a formal statistical model 
-% and introduce the simulated data in a principled way. TODO: yikes ... this paragraph is terrible and needs work. 
+% Secondly, we train the neural network using {\itshape wake-sleep} training. This allows our neural network to be trained using unlimited simulated data. Using simulated data to train neural networks is common practice is astronomy (see for example~\cite{Lanusse_2017_cmudeeplens, huang2019finding}). However, we also make the connection with a formal statistical model
+% and introduce the simulated data in a principled way. TODO: yikes ... this paragraph is terrible and needs work.
 
-% In Section~\ref{sec:gen_model} we introduce 
-% the generative model. Section~\ref{sec:var_inference} details the variational distribution and discuss training of the neural network. Section~\ref{sec:related_work} makes connections with previous cataloging software. In Section~\ref{sec:results}, we compare 
-% our variational inference procedure with MCMC as well as more traditional cataloging software pipelines. Section 6 concludes. 
-
+% In Section~\ref{sec:gen_model} we introduce
+% the generative model. Section~\ref{sec:var_inference} details the variational distribution and discuss training of the neural network. Section~\ref{sec:related_work} makes connections with previous cataloging software. In Section~\ref{sec:results}, we compare
+% our variational inference procedure with MCMC as well as more traditional cataloging software pipelines. Section 6 concludes.

@@ -46,25 +46,25 @@
 
 \title{Variational Inference for Deblending Crowded Starfields}
 
-\author{\name Runjing Liu 
+\author{\name Runjing Liu
     \email runjing\_liu@berkeley.edu \\
     \addr Department of Statistics\\
     University of California\\
     Berkeley, CA 94720, USA
     \AND
-    \name Jon D. McAuliffe 
+    \name Jon D. McAuliffe
     \email jon@stat.berkeley.edu \\
-    \addr 
+    \addr
     The Voleon Group \\
     Berkeley, CA 94704, USA \\
     and\\
     Department of Statistics\\
     University of California\\
-    Berkeley, CA 94720, USA 
+    Berkeley, CA 94720, USA
     \AND
     \name Jeffrey Regier
     \email regier@umich.edu \\
-    \addr 
+    \addr
     Department of Statistics \\
     University of Michigan \\
     Ann Arbor, MI 48109
@@ -92,21 +92,23 @@
 \label{sec:gen_model}
 \input{2-generative_model}
 
-\section{Variational inference}
+\section{The variational distribution}
 \label{sec:var_inference}
 \input{3-var_inference}
 
-\section{The wake-sleep algorithm}
+\section{The expected foward KL}
 \label{sec:wake_sleep}
 \input{4a-wake_sleep}
 \input{4b-variational_em}
 \input{4c-sleep_details}
 
-\section{Empirical comparison of ELBO and sleep objectives}
+\section{Empirical comparison of KL objectives}
 \input{5-results-synth_data}
 
-\section{Results on the M2 globular cluster}
+\section{Results on astronomical surveys}
 \input{6-results-m2}
+\input{6a-results-decaps}
+
 
 \section{Conclusion}
 \label{sec:discussion}
@@ -126,8 +128,8 @@
 % this makes figure number start with A.#
 \renewcommand\thefigure{A.\arabic{figure}}
 \renewcommand\thetable{A.\arabic{table}}
-\setcounter{figure}{0}    
-\setcounter{table}{0}    
+\setcounter{figure}{0}
+\setcounter{table}{0}
 
 
 \section{Evaluating the variational distribution}
@@ -138,9 +140,12 @@
 \label{sec:reparam_details}
 \input{A1-reparam_details}
 
-\section{Results on a test M2 image}
-\label{sec:test_m2}
-\input{A2-m2_test_image}
+% \section{Results on a test M2 image}
+% \label{sec:test_m2}
+% \input{A2-m2_test_image}
+\section{Experiments on synthetic data}
+\input{A5-synthetic_tests}
+
 
 
 \section{Sensitivity to prior parameters}

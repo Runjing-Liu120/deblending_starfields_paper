@@ -1,72 +1,84 @@
-% In mean-field variational inference, the ELBO~\eqref{eq:elbo} is often optimized by coordinate ascent in the parameters of the variational distribution. 
-% The coordinate ascent updates can be derived in closed form in the special case of exponential family models that are conditionally conjugate~\citep{Blei_2017_vi_review}. 
+% In mean-field variational inference, the ELBO~\eqref{eq:elbo} is often optimized by coordinate ascent in the parameters of the variational distribution.
+% The coordinate ascent updates can be derived in closed form in the special case of exponential family models that are conditionally conjugate~\citep{Blei_2017_vi_review}.
 
-Procedures such as black-box variational inference (BBVI)~\citep{ranganath2013black} and 
+Procedures such as black-box variational inference (BBVI)~\citep{ranganath2013black} and
 automatic-differentiation variational inference (ADVI)~\citep{kucukelbir2016automatic}
-optimize the ELBO  without the need for 
-deriving analytic expressions for the expectation over $q_\eta$.  
-% Examples of such ``automatic" procedures include 
-%and automatic-differentiation variational inference (ADVI)~\citep{kucukelbir2016automatic}. 
-These approaches all employ stochastic gradient descent (SGD); 
-they sample latent variables from $q_\eta$ and produce an unbiased estimate for the gradient of the ELBO by taking advantage of modern automatic differentiation tools. 
-ADVI is closely related to the reparameterization trick \citep{kingma2013autoencoding, rezende2014stochastic}, which is often used to fit variational autoencoders and applies when the latent variables are continuous. 
+optimize the ELBO  without the need for
+deriving analytic expressions for the expectation over $q_\eta$.
+% Examples of such ``automatic" procedures include
+%and automatic-differentiation variational inference (ADVI)~\citep{kucukelbir2016automatic}.
+These approaches all employ stochastic gradient descent (SGD);
+they sample latent variables from $q_\eta$ and produce an unbiased estimate for the gradient of the ELBO by taking advantage of modern automatic differentiation tools.
+ADVI is closely related to the reparameterization trick \citep{kingma2013autoencoding, rezende2014stochastic}, which is often used to fit variational autoencoders and applies when the latent variables are continuous.
 
 In our model, the number of stars $N$ is discrete.
 As an alternative, the REINFORCE estimator~\citep{Williams1992reinforce} produces an unbiased stochastic gradient for both continuous and discrete latent variables.
-However, REINFORCE gradients without additional modification often suffer from high variance in practice, resulting in slow convergence of stochastic optimization. We find this to be true in our empirical study.  (Section~\ref{sec:elbo_sleep_compare}). 
-% See Appendix~\ref{sec:reparam_details} for details concerning both the reparameterization and REINFORCE estimators. 
+However, REINFORCE gradients without additional modification often suffer from high variance in practice, resulting in slow convergence of stochastic optimization. We find this to be true in our empirical study.  (Section~\ref{sec:elbo_sleep_compare}).
+% See Appendix~\ref{sec:reparam_details} for details concerning both the reparameterization and REINFORCE estimators.
 
-The key difficulty in constructing stochastic gradients of the ELBO is that the integrating distribution depends on the optimization parameter $\eta$. 
-The {\itshape wake-sleep} algorithm, originally proposed by~\cite{Hinton1995wake_sleep}, replaces the 
-ELBO objective with 
+The key difficulty in constructing stochastic gradients of the ELBO is that the
+integrating distribution depends on the optimization parameter $\eta$.
+We instead choose to optimize an expectation of the \textit{forward} KL divergence:
 \begin{align}
-    \mathcal{L}_{sleep}(\eta) := 
+    \mathcal{L}_{fwd}(\eta) :=
     - \Expect_{x \sim p(x)}\Big[\KL(p(z | x) \| q_\eta(z | x))\Big]
     \label{eq:sleep_obj},
 \end{align}
-known as the {\itshape sleep objective}.  Section~\ref{sec:sleep_details} details a simple gradient estimator for~\eqref{eq:sleep_obj} that does not require reparameterization or REINFORCE. 
+an objective that appears in the \textit{sleep phase} of the wake-sleep algorithm
+\citep{Hinton1995wake_sleep, bornschein2014reweighted,le2020revisiting},
+and was re-introduced by \cite{ambrogioni2019favi}, who called this technique
+of minimizing $\mathcal{L}_{favi}$ \textit{Forward Amortized Variational Inference}.
 
-There are two key differences between the sleep objective~\eqref{eq:sleep_obj} and the ELBO~\eqref{eq:elbo}. 
-First, recall that maximizing the ELBO is equivalent to minimizing 
-$\KL(q\|p)$; in the sleep objective, the KL arguments are transposed. Second, the outer expectation over $p(x)$ also gives different meaning to the sleep objective. The ELBO objective seeks $\eta$ to minimize the $\KL$ between $q_\eta(z | x)$ and $p(z | x)$ {\itshape for fixed, observed data $x$},
+Section~\ref{sec:sleep_details} details a simple gradient estimator for~\eqref{eq:sleep_obj} that does not require reparameterization or REINFORCE.
+
+There are two key differences between the expected forward KL objective~\eqref{eq:sleep_obj}
+and the ELBO~\eqref{eq:elbo}.
+First, recall that maximizing the ELBO is equivalent to minimizing
+$\KL(q\|p)$; the KL in $\mathcal{L}_{fwd}$ transposes the arguments.
+Second, the outer expectation over $p(x)$ in $\mathcal{L}_{fwd}$ also gives different meaning to objective.
+The ELBO objective seeks $\eta$ to minimize the $\KL$ between $q_\eta(z | x)$ and $p(z | x)$
+{\itshape for fixed, observed data $x$},
 in this case the $H\times W$ image.
-In contrast, the sleep objective seeks to minimize the $\KL$ {\itshape on average over all possible data $x$}, as weighted by $p(x)$. 
-The target is no longer an approximate posterior for the observed data, but rather an approximate posterior that is ``good on average" over possible data under the model $p(x)$.
+In contrast, the minimizing $\mathcal{L}_{fwd}$ seeks to minimize the $\KL$
+{\itshape on average over all possible data $x$},
+as weighted by $p(x)$.
+The target is no longer an approximate posterior for the observed data, but rather
+an approximate posterior that is ``good on average" over possible data under the model $p(x)$.
 
-Therefore, it is imperative that the model $p(x)$ approximates the true underlying data-generating mechanism well. 
-Thus, the wake-sleep algorithm also incorporates a ``wake phase" to estimate model parameters.
-In our application, these model parameters include PSF parameters $\pi$ and background parameters $\beta$. Define 
-$\phi:=(\pi, \beta)$, and denote the dependence of the generative model on $\phi$ using subscripts, $p_\phi$. 
-
-To estimate model parameters, one would ideally optimize the marginal log-likelihood $\log p_\phi(x)$.
-However, since $\log p_\phi(x)$ is intractable, the wake-phase optimizes for $\phi$ using the ELBO~\eqref{eq:elbo}
-as a surrogate for the intractable log-likelihood. 
-The ELBO is a lower bound of
-$\log p_\phi(x)$; 
-it is equal to $\log p_\phi(x)$ when $q_\eta(z | x)$ 
-= $p_\phi(z | x)$. 
-
-The {\itshape wake-sleep} algorithm alternates between the two objectives: 
-\begin{align}
-    \text{{\bf Sleep phase: }} & 
-    \eta_{t} = \argmax_{\eta} -\Expect_{x \sim p_\phi(x)}\Big[\KL(p_{\phi_{t-1}}(z | x) \| q_\eta(z | x))\Big]
-    \label{eq:sleep_phase_summary}; 
-    \\
-    \text{{\bf Wake phase: }} & \phi_{t} = \argmax_{\phi}\; \Expect_{q_{\eta_t}(z | x)}\Big[\log p_{\phi}(x, z) - \log q_{\eta_t}(z | x)\Big],
-    \label{eq:wake_phase_summary}
-\end{align} 
-for iterations $t = 1, ..., T$. 
-
-Stochastic gradients of the expectation in the wake-phase are simple to compute. Because the integrating distribution does not depend on the optimization parameter $\phi$ in the wake phase, unbiased stochastic gradients are simply computed as 
-\begin{align}
-    \nabla_\phi \log p_\phi(x, z) \quad \text{ for } z\sim q_\eta. 
-    \label{eq:mstep_grad}
-\end{align}
-Section~\ref{sec:sleep_details} shows that a similarly simple gradient estimator exists for the sleep objective.
-
+% Therefore, it is imperative that the model $p(x)$ approximates the true underlying data-generating mechanism well.
+% Thus, the wake-sleep algorithm also incorporates a ``wake phase" to estimate model parameters.
+% In our application, these model parameters include PSF parameters $\pi$ and background parameters $\beta$. Define
+% $\phi:=(\pi, \beta)$, and denote the dependence of the generative model on $\phi$ using subscripts, $p_\phi$.
+%
+% To estimate model parameters, one would ideally optimize the marginal log-likelihood $\log p_\phi(x)$.
+% However, since $\log p_\phi(x)$ is intractable, the wake-phase optimizes for $\phi$ using the ELBO~\eqref{eq:elbo}
+% as a surrogate for the intractable log-likelihood.
+% The ELBO is a lower bound of
+% $\log p_\phi(x)$;
+% it is equal to $\log p_\phi(x)$ when $q_\eta(z | x)$
+% = $p_\phi(z | x)$.
+%
+% The {\itshape wake-sleep} algorithm alternates between the two objectives:
+% \begin{align}
+%     \text{{\bf Sleep phase: }} &
+%     \eta_{t} = \argmax_{\eta} -\Expect_{x \sim p_\phi(x)}\Big[\KL(p_{\phi_{t-1}}(z | x) \| q_\eta(z | x))\Big]
+%     \label{eq:sleep_phase_summary};
+%     \\
+%     \text{{\bf Wake phase: }} & \phi_{t} = \argmax_{\phi}\; \Expect_{q_{\eta_t}(z | x)}\Big[\log p_{\phi}(x, z) - \log q_{\eta_t}(z | x)\Big],
+%     \label{eq:wake_phase_summary}
+% \end{align}
+% for iterations $t = 1, ..., T$.
+%
+% Stochastic gradients of the expectation in the wake-phase are simple to compute. Because the integrating distribution does not depend on the optimization parameter $\phi$ in the wake phase, unbiased stochastic gradients are simply computed as
+% \begin{align}
+%     \nabla_\phi \log p_\phi(x, z) \quad \text{ for } z\sim q_\eta.
+%     \label{eq:mstep_grad}
+% \end{align}
+% Section~\ref{sec:sleep_details} shows that a similarly simple gradient estimator exists for the sleep objective.
+%
 
 % While the E-step~\eqref{eq:e_step} is not conducive to simple gradient estimators, we will see in Section~\ref{sec:sleep_details} that the sleep phase objective
-% results in a similarly straightforward gradient estimator as in~\eqref{eq:mstep_grad}. 
-% In Section~\ref{sec:estep_sleep_compare}, 
+% results in a similarly straightforward gradient estimator as in~\eqref{eq:mstep_grad}.
+% In Section~\ref{sec:estep_sleep_compare},
 % we compare optimizing the E-step with optimizing the sleep phase. In our application of localizing stars,
-% the ELBO objective in the E-step suffers from poor local optima where the variational distribution is far from the true posterior in KL divergence; the sleep phase objective appears to better avoid these local optima. 
+% the ELBO objective in the E-step suffers from poor local optima where the variational distribution is far from the true posterior in KL divergence; the sleep phase objective appears to better avoid these local optima.

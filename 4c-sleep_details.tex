@@ -1,11 +1,10 @@
-\subsection{Decomposing the sleep objective}
+\subsection{Decomposing the expected forward KL}
 \label{sec:sleep_details}
-In this subsection, we decompose the sleep objective in~\eqref{eq:sleep_obj} for closer study.
-We take $\phi$ as fixed in this section and drop the explicit dependence of $p$ on $\phi$.
+In this subsection, we decompose the expected forward KL objective $\mathcal{L}_{fwd}$ for closer study.
 
-First, observe that optimizing the sleep objective does not require computing the intractable term $p(x)$:
+First, observe that optimizing $\mathcal{L}_{fwd}$ does not require computing the intractable term $p(x)$:
 \begin{align}
-\argmax_\eta\; \mathcal{L}_{sleep}(\eta)
+\argmax_\eta\; \mathcal{L}_{fwd}(\eta)
     & = \argmin_{\eta} \; \mathbb{E}_{x \sim p(x)}\Big[ \mathrm{KL}(p(z | x) \| q_\eta(z | x)\Big] \\
   &=\argmin_{\eta} \; \mathbb E_{p(x)}\Big[\mathbb E_{p(z | x)}\Big(\log p(z | x) - \log q_\eta(z | x) \Big)\Big]\\
 %&=\argmin_{\eta} \; \mathbb E_{p(x)}\Big[\mathbb E_{p(z | x)}\Big( - \log q_\eta(z | x) \Big)\Big]\\
@@ -18,7 +17,7 @@ Thus, unbiased stochastic gradients can be obtained simply as
     g = -\nabla_\eta \log q_\eta(z | x) \quad \text{ for } (x, z)\sim p(x, z).
 \end{align}
 
-In other words, at each iteration of SGD, the sleep phase simulates {\itshape complete} data $(x,z)$ from the generative model and evaluates the loss $-\log q_\eta(z | x)$.
+In other words, at each iteration of SGD, we simulate {\itshape complete} data $(x,z)$ from the generative model and evaluate the loss $-\log q_\eta(z | x)$.
 Here, ``complete data" refers to the image along with its catalog.
 This loss encourages the neural network to map an image $x$ to a distribution $q_{\eta}(\cdot | x)$ that places large mass on the image's catalog $z$.
 
@@ -57,7 +56,11 @@ balanced by the scaling of the error $(y - \hat\mu)^2$ in the first term.
 % $\sigma_{n,i}$ is also outputted by the neural network, representing uncertainty -- the second term encourages small uncertainties, but this is
 % balanced by the scaling of the error $(y_{n,i} - \mu_{n,i})^2$ in the first term.
 
-The losses in~\eqref{eq:cross_entropy_loss} and~\eqref{eq:gaussian_sleep_loss} show that the sleep objective results in a supervised learning problem on complete data sampled from our generative model: the objective function for the number of stars is the usual cross-entropy loss for classification, while the objective function for log-fluxes and logit-locations are $L_2$ losses in the mean parameters.
+The losses in~\eqref{eq:cross_entropy_loss} and~\eqref{eq:gaussian_sleep_loss} show that the
+expected forward KL objective results in a supervised learning problem on complete data
+sampled from our generative model:
+the objective function for the number of stars is the usual cross-entropy loss for classification,
+while the objective function for log-fluxes and logit-locations are $L_2$ losses in the mean parameters.
 
 
 % In Section~\ref{sec:estep_sleep_compare}, we will see the benefits of using complete data and optimizing $q_\eta$ using the losses~\eqref{eq:cross_entropy_loss} and \eqref{eq:gaussian_sleep_loss}  rather than the traditional ELBO.

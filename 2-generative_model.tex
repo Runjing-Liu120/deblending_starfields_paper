@@ -1,20 +1,20 @@
 In crowded starfields, such as globular clusters and the Milky Way, the vast majority of light sources are stars.
-An astronomical image records the number of photons that reached a telescope and arrived at each pixel. 
+An astronomical image records the number of photons that reached a telescope and arrived at each pixel.
 Typically, photons must pass through one of several filters, each selecting photons from a specified band of wavelengths, before being recorded.
 
-For a given $H \times W$ pixel image with $B$ filter bands, our goal is to infer a catalog of 
-stars. 
-The catalog specifies the number of stars 
-in an image; for each such star, the catalog 
+For a given $H \times W$ pixel image with $B$ filter bands, our goal is to infer a catalog of
+stars.
+The catalog specifies the number of stars
+in an image; for each such star, the catalog
 records its location and its flux, or brightness,
-in each band. 
-The space of latent variables 
+in each band.
+The space of latent variables
 $\mathcal{Z}$ is the collection of all possible catalogs of the form
 \[z := \{N, (\ell_i, f_{i,1}, ..., f_{i,B})_{i = 1}^N\},\]
 where the number of stars in the catalog
 is $N\in\mathbb{N}$;
-the location of the $i$th star is $\ell_i \in \Reals^2$; and 
-the flux of the $i$th star in the $b$th band is $f_{i, b}\in\Reals^+$. 
+the location of the $i$th star is $\ell_i \in \Reals^2$; and
+the flux of the $i$th star in the $b$th band is $f_{i, b}\in\Reals^+$.
 
 A Bayesian approach requires specification of a prior over catalog space $\mathcal{Z}$ and a likelihood for the observed images. Our likelihood and prior, detailed below, are similar to previous approaches~\citep{Brewer_2013, Portillo_2017, Feder_2019}.
 
@@ -27,61 +27,60 @@ The prior over $\mathcal{Z}$ is a marked spatial Poisson process. To sample the 
 where $\mu$ is a hyperparameter specifying the average number of sources per pixel.
 Next, draw locations
 \begin{align}
-  \ell_1, ..., \ell_N | N &\stackrel{iid}{\sim} \text{Uniform}([0, H] \times [0, W]). 
+  \ell_1, ..., \ell_N | N &\stackrel{iid}{\sim} \text{Uniform}([0, H] \times [0, W]).
  \end{align}
 The fluxes in the first band are from a power law distribution with slope $\alpha$:
 \begin{align}
-    f_{1, 1}, ..., f_{N,1} | N & 
-    \stackrel{iid}{\sim} \text{Pareto}(f_{min}, \alpha) 
+    f_{1, 1}, ..., f_{N,1} | N &
+    \stackrel{iid}{\sim} \text{Pareto}(f_{min}, \alpha)
     \label{eq:flux_prior}.
 \end{align}
 Fluxes in other bands are described relative to the first band. Like~\cite{Feder_2019}, we define the log-ratio of flux relative to the first band as ``color." Colors are drawn from a Gaussian distribution
 \begin{align}
-  c_{1, b}, ..., c_{N,b} | N  & 
+  c_{1, b}, ..., c_{N,b} | N  &
       \stackrel{iid}{\sim} \mathcal{N}(\mu_c, \sigma^2_c), \quad b = 2, ..., B.
 \end{align}
 Given the flux in the first band $f_{i,1}$ and color $c_{i,b}$,
 the flux in band $b$ is  $f_{i,b} = f_{i,1} \times 10^{c_{i,b} / 2.5}$.
 
-Also like~\cite{Feder_2019}, we set the power law slope $\alpha = 0.5$ and use a standard Gaussian for the color prior ($\mu_c = 0$, $\sigma^2_c = 1$). 
-Appendix~\ref{sec:prior_sensitivity} evaluates the 
-sensitivity of the resulting catalog to choices of the prior parameters. 
+Also like~\cite{Feder_2019}, we set the power law slope $\alpha = 0.5$ and use a standard Gaussian for the color prior ($\mu_c = 0$, $\sigma^2_c = 1$).
+Appendix~\ref{sec:prior_sensitivity} evaluates the
+sensitivity of the resulting catalog to choices of the prior parameters.
 
 \subsection{The likelihood}
-Let $x_{hw}^b$ denote the observed number of photoelectrons at pixel $(h,w)$ in band $b$. 
-For each band, at every pixel, the expected number of photoelectron arrivals is $\lambda^b_{hw}(z)$, a deterministic function of the catalog $z$. Motivated by the Poissonian nature of photon arrivals and 
-the large photon arrival rate in SDSS and LSST images, 
+Let $x_{hw}^b$ denote the observed number of photoelectrons at pixel $(h,w)$ in band $b$.
+For each band, at every pixel, the expected number of photoelectron arrivals is $\lambda^b_{hw}(z)$, a deterministic function of the catalog $z$. Motivated by the Poissonian nature of photon arrivals and
+the large photon arrival rate in SDSS and LSST images,
 observations are drawn as
 \begin{align}
   x_{hw}^b | z \overset{ind}{\sim} \mathcal{N}(\lambda^b_{hw}, \lambda^b_{hw}),
-  \quad 
+  \quad
   b = 1, ..., B; \;
-  h = 1,..., H; \; 
+  h = 1,..., H; \;
   w = 1, ..., W, \\
- \text{where } \quad \lambda^b_{hw} = I^{b}(h, w) + \sum_{i = 1}^N f_{i,b} \mathcal{P}^b\big(h - \ell_{i, 1}, w - \ell_{i, 2}\big).
+ \text{where } \quad
+ \lambda^b_{hw} = I_b + \sum_{i = 1}^N f_{i,b} \mathcal{P}_b\big(h - \ell_{i, 1}, w - \ell_{i, 2}\big).
   \label{eq:expected_intensity}
 \end{align}
-Here, $\mathcal{P}^b$ is the point spread function (PSF) for band $b$ and $I^{b}$ is the background intensity. The PSF is a function 
-$\mathcal{P}^b : \Reals \times \Reals \mapsto \Reals^+$,
-describing the appearance of a stellar point source at any 2D position of the image (but ignoring pixelation). 
+Here, $\mathcal{P}_b$ is the point spread function (PSF) for band $b$ and $I_b$ is the background intensity.
+The PSF is a function
+$\mathcal{P}+b : \Reals \times \Reals \mapsto \Reals^+$,
+describing the appearance of a stellar point source at any 2D position of the image (but ignoring pixelation).
 Our PSF model is a weighted average between a Gaussian ``core" and a power-law ``wing," as described in~\cite{Xin2018psf}. For each band, the PSF has the form
 
 \begin{align}
-    \mathcal{P}(u,v) = 
-    \frac{\exp(\frac{-(u^2 + v^2)}{2\sigma_1^2}) + 
-    \zeta \exp(\frac{-(u^2 + v^2)}{2\sigma_2^2}) + 
+    \mathcal{P}(u,v) =
+    \frac{\exp(\frac{-(u^2 + v^2)}{2\sigma_1^2}) +
+    \zeta \exp(\frac{-(u^2 + v^2)}{2\sigma_2^2}) +
     \rho(1 + \frac{v^2 + u^2}{\gamma\sigma^2_P})^{-\gamma/2} }{1 + \zeta + \rho}.
 \end{align}
-The PSF parameters vary by band. Let the collection of PSF parameters across all bands be denoted $\pi := (\sigma_{1}^{(b)}, \sigma_{2}^{(b)}, \sigma_{P}^{(b)}, \gamma^{(b)}, \zeta^{(b)}, \rho^{(b)})_{b=1}^B$.
-
-The background intensity at pixel $(h,w)$ is modeled with an affine function: 
-\begin{align}
-    I^{b}(h,w) = \beta_0^{b} + \beta_1^{b} \times h + \beta_2^{b} \times w.
-\end{align}
-The background parameters $(\beta^b_0, \beta^b_1, \beta^b_1)$ are specific to the band. 
-
-StarNet estimates these parameters jointly with the approximate posterior (Section~\ref{sec:wake_sleep}). 
-Prior work on probabilistic cataloging relied 
-on estimates from the SDSS software pipeline and found the PSF estimates to be suboptimal in crowded starfields~\citep{Feder_2019}. 
+The PSF parameters are allowed to vary by band.
+In our applications to SDSS and DECam data, we use estimates of the background
+and PSF obtained from a pre-processing pipeline and were
+sourced along with the raw image.
 
 
+% pipeline and found the PSF estimates to be suboptimal in crowded starfields~\citep{Feder_2019}.
+% StarNet estimates these parameters jointly with the approximate posterior (Section~\ref{sec:wake_sleep}).
+% Prior work on probabilistic cataloging relied
+% on estimates from the SDSS software pipeline and found the PSF estimates to be suboptimal in crowded starfields~\citep{Feder_2019}.
