@@ -116,7 +116,7 @@ Section~\ref{sec:var_inference} details the variational distribution and neural 
 Finally, and critically, StarNet is fit using an expected
 \textit{forward} Kullback–Leibler divergence
 between the approximate posterior $q$ and the exact posterior $p$,
-where the expectation is taken over the data distribution defined by the statistical model.
+where the expectation is taken over the data distribution defined by the statistical model. 
 In contrast, traditional variational inference minimizes the a \textit{reverse}
 KL divergence~\citep{bishop2006pattern}, evaluated at the observed data.
 The forward KL is minimized using stochastic gradient descent (SGD),
@@ -141,11 +141,18 @@ where the approximate posterior is far from the exact posterior in terms of KL d
 The forward KL has been has been used in previous research to train deep generative
 models~\citep{ambrogioni2019favi,le2020revisiting},
 and appears in the \textit{sleep phase} of the wake-sleep algorithm
-\citep{Hinton1995wake_sleep, bornschein2014reweighted,le2020revisiting}.
-However, to the best of our knowledge, this is the first instance of applyiing
-variational inference with a foward KL for scientific purposes.
-Specifically, we use this inference techinique to find a latent space that is interpretable:
-it is the set of all possible astronomical catalogs.
+\citep{Hinton1995wake_sleep, bornschein2014reweighted,le2020revisiting}. 
+This approach is an example of simulation-based inference, 
+which has found applications in particle physics, where theory can provide realistic simulations \citep{Cranmer_2020}. For example,~\cite{Baydin2019} use simulation-based inference to model
+time-series data of particle paths at the Large Hadron Collider, 
+and they use the forward KL objective to fit a recurrent neural network, 
+whose output are proposals to an MCMC sampling scheme. 
+To the best of our knowledge, this instance of applying variational inference with a forward KL to do inference over a transdimensional 
+latent space of sets. 
+
+% However, to the best of our knowledge, this is the first instance of applying variational inference with a foward KL for scientific purposes.
+% Specifically, we use this inference techinique to find a latent space that is interpretable:
+% it is the set of all possible astronomical catalogs.
 
 
 We applied StarNet to the M2 globular cluster as imaged by SDSS
@@ -153,7 +160,7 @@ and to a subregion of DECam, which imaged stars in the Milky Way.
 % We used the catalog reported in \cite{Sarajedini_2007}, which imaged M2 using the Hubble Space Telescope, as a ground truth to evaluate our performace.
 On the $100 \times 100$ pixel region of M2,
 StarNet was more accurate than both the MCMC-based cataloger PCAT
-and traditional cataloging approaches (Section~\ref{sec:results_on_m2}):
+and traditional cataloging approaches (Section~\ref{sec:results_on_m2}) in several metrics:
 though MCMC is asymptotically exact, on human timescales, it often suffers from incomplete mixing. 
 We then demonstrate the scalability of StarNet by cataloging a $2000\times4000$ pixel frame from the DECam survey:
 our method can produce scientifically relevant results on the order of minutes ---

@@ -66,7 +66,7 @@ For PCAT, 300 catalogs were sampled using MCMC; the metrics were computed for ea
     % \vspace{-1cm}
     \caption{Estimated catalogs on four 10$\times$10 subimages from
     M2. Blue dots are stars from the HST catalog used as ground truth.
-    Starnet, PCAT, and DAOPHOT estimated stars are shown as
+    StarNet, PCAT, and DAOPHOT estimated stars are shown as
     red, cyan, and orange crosses, respectively. }
     \label{fig:example_subimages}
 \end{figure}
@@ -81,9 +81,9 @@ Table~\ref{tab:summary_stats} also shows the number of stars inferred by each me
 There are 1114 stars in the HST catalog.
 For probabilistic methods (StarNet and PCAT),
 we display the mean number of stars under the approximate posterior, along with the 5-th and 95-th quantiles.
-We compute the StarNet credible intervals by sampling from the variational posterior on each tile;
-recall that on each tile, the variational posterior on the number of stars is a categorical random variable.
-The the total number of inferred stars in the image is the sum of the number of star in each tile.
+We compute the StarNet credible intervals by sampling from the variational posterior. 
+Recall that on each tile, the variational posterior on the number of stars is a categorical random variable; 
+to construct a distribution for the number of stars on the whole image, we first sample from the per-tile categorical distribution, then sum over all tiles. 
 StarNet credible intervals were three times wider than the PCAT intervals
 and closer to the ground truth.
 The small PCAT credible intervals may be indicative of an MCMC sampler that failed to mix well.
@@ -124,7 +124,7 @@ Of all methods, StarNet best approximated the HST flux distribution (Figure~\ref
     \vspace{-0.4cm}
     \caption{Flux distributions for the $r$-band observations of M2.
     The flux distribution of the HST catalog in grey.
-    Estimated distributions by DAOPHOT, PCAT, and StarNet-WS catalogs overlaid.
+    Estimated distributions by DAOPHOT, PCAT, and StarNet catalogs overlaid.
     For PCAT, the flux distribution is from a single catalog sample. }
     \label{fig:luminosity_fun_m2}
 \end{figure}
@@ -155,7 +155,7 @@ The empirical z-score distributions are close to a standard Gaussian with some d
     \centering
     \includegraphics[width=0.99\textwidth]{figures/m2_results/zscore_calibration.png}
     \vspace{-0.5cm}
-    \caption{The empirical distribution of z-scores for logit-locations (left) and log-fluxes (right) under the StarNet-WS variational posterior.
+    \caption{The empirical distribution of z-scores for logit-locations (left) and log-fluxes (right) under the StarNet variational posterior.
 }
     \label{fig:z-score_calibration}
 \end{figure}

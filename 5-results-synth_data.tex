@@ -27,7 +27,7 @@ The prior on the number of stars was set to Poisson with mean $\mu = 4$.
 
 Figure~\ref{fig:optim_path}~(top row) charts the test ELBO~\eqref{eq:elbo_on_test}
 as the optimization proceeds in our three approaches.
-The first approach optimizes the ELBO with SGD and the REINFORCE gradient estimator.
+The first approach optimizes the ELBO with SGD and a REINFORCE plus control-variate gradient estimator.
 This optimization did not converge, likely due to the high variance of the REINFORCE estimator (Figure~\ref{fig:optim_path}a).
 For a lower variance gradient estimator, the second approach employed the reparameterized gradient. To employ this gradient estimator, we analytically integrated the ELBO with respect to the number of stars $N$ to remove the discrete random variable.
 See Appendix~\ref{sec:reparam_details} for details about the gradient estimators.
@@ -67,9 +67,9 @@ $\mathcal{L}_{fwd}$ is shown in~Figure~\ref{fig:optim_path}(f).
     \includegraphics[width=0.9\textwidth]{figures/elbo_vs_sleep/optim_path_detect_compare.png}
     \end{subfigure}
     \vspace{-1.5cm}
-    \caption{(Top row) The ELBO as the optimization progresses for six random restarts.
-    (Bottom row) In red, modal locations from ELBO-optimized and FAVI-optimized variational posteriors, for one of the six restarts.
-    In blue, the true locations. TODO fix figure titles}
+    \caption{(Top row) The negative ELBO as the optimization progresses for six random restarts.
+    (Bottom row) In red, modal locations from ELBO-optimized and $\mathcal{L}_{fwd}$-optimized variational posteriors, for one of the six restarts.
+    In blue, the true locations. }
     \label{fig:optim_path}
 \end{figure}
 
@@ -88,11 +88,17 @@ $\mathcal{L}_{fwd}$ is shown in~Figure~\ref{fig:optim_path}(f).
     To move an estimated location to a correct location,
     the optimization path must traverse a region where the negative ELBO is larger than the current configuration.
     In contrast, the expected forward KL objective is quadratic in the estimated location,
-    and the gradient does not vanish. TODO fix figure titles }
+    and the gradient does not vanish. }
     \label{fig:local_optima_cartoon}
 \end{figure}
 
-% Also, note that low-variance gradients of the ELBO for this simple example were constructed by analytically integrating out $N$.
+Finally, note that low-variance gradients of the ELBO for this simple example were constructed by analytically integrating out $N$, 
+and this was only possible because the image consisted of only four tiles. 
+For each tile, the variational distribution has support over only 0, 1, or 2 stars.
+Since the variational distribution factorizes over the four tiles, integrating $N$ is a summation of $3^4 = 81$ terms.
+On larger images with more tiles, analytically integrating $N$ would be computationally infeasible,
+and the simple reparameterization trick would not apply as it does in this small illustrative example.
+
 % On a larger images where $N$ is on the order of $\sim1000$ (e.g. on M2), analytically integrating out $N$ would be infeasible.
 
 % Only then could the reparameterization trick be applied to the ELBO, as the remaining latent variables are continuous.

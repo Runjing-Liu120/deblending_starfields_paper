@@ -20,8 +20,8 @@ of two stars in the image.
         \includegraphics[width=\textwidth]{figures/deblending/summary_statistics.png}
     \end{subfigure}
     \caption{(Top row) Simulated images with two stars separated by distance $\delta$ in pixels.
-    True locations are in blue. Red are detections from the starnet MAP estimate.
-    In these examples, Starnet correctly identified the two stars separated by distance $\delta \geq 1.2$,
+    True locations are in blue. Red x's are detections from the StarNet MAP estimate.
+    In these examples, StarNet correctly identified the two stars separated by distance $\delta \geq 1.2$,
     but only estimated one star when $\delta \leq 1$.
     (Bottom left) The probability that $N$, the number of sources in the image, equals two
     under the variational posterior, as $\delta$ varies.
@@ -31,13 +31,12 @@ of two stars in the image.
 
 \subsection{Coverage of credible intervals}
 
-We have seen that on M2, the StarNet 95\% credible interval failed
-to contain the ground truth number of stars (Section~\ref{sec:results_on_m2}).
-On M2, we attribute this to model mis-specification, specifically due to a poorly
+We have seen that on M2, the StarNet 95\% credible interval did not contain the ground truth number of stars (Section~\ref{sec:results_on_m2}).
+On M2, we attribute this to model mis-specification, specifically due to an imperfectly
 estimated background.
 
 We check the coverage of StarNet credible intervals on synthetic data
-to rule out any issues with model mis-specification.
+to reveal any issues other than model mis-specification that may explain these results.
 On synthetic data, StarNet again overestimates the number of stars.
 On a single simulated image sampled from the prior,
 the true number of stars ($N = 1195$),
@@ -49,7 +48,7 @@ the approximate posterior distribution (Figure~\ref{fig:starnet_density}).
     \centering
     \includegraphics[width=0.6\textwidth]{./figures/coverage/starnet_histogram.png}
     \vspace{-0.4cm}
-    \caption{Distribution of 5000 samples of the number of sources from the starnet approximate posterior.
+    \caption{Distribution of 5000 samples of the number of sources from the StarNet approximate posterior.
     The true number of sources demarcated in red. }
     \label{fig:starnet_density}
 \end{figure}
@@ -76,7 +75,7 @@ then the StarNet approximate posterior has much closer to correct coverage (Figu
     \centering
     \includegraphics[width=0.8\textwidth]{./figures/coverage/edges_example.png}
     \vspace{-0.4cm}
-    \caption{The expected number of sources under the starnet approximate posterior as a function of distance from the edge (in pixels).
+    \caption{The expected number of sources under the StarNet approximate posterior as a function of distance from the edge (in pixels).
     On the left, we place a star on the left-most edge, and move its location $\delta$ pixels to the right.
     On the right, we place a star on the top-left corner, and move its location $\delta$ pixels towards the bottom-right corner.}
     \label{fig:starnet_edges}

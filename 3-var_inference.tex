@@ -265,9 +265,14 @@ because the width of the PSF is larger in these images.
 % \end{align}
 % The same neural network is evaluated for all tiles $(s,t)$.
 In amortized inference, the variational parameters $\eta$ to be optimized are neural network weights.
-The architecture consists of several convolutional layers followed by several fully connected layers (Figure~\ref{fig:starnet_arch}).
+The architecture consists of a convolutional layer followed by several residual network layers (which themselves contain convolutions), before ending with several fully connected layers (Figure~\ref{fig:starnet_arch}).
 This architecture has been successful on image classification challenges such as ImageNet~\citep{imagenet2015}.
-The optimization of the architecture for this specific application is left for future work.
+We tuned the architecture using Optuna, automatic hyper-parameter optimization package \citep{optuna_2019}. 
+Our search included the number of convolution layers, 
+the number of fully-connected layers,
+the number of channels in the convolution layers, and the size of the fully-connected layers. 
+See Appendix~\ref{sec:supp_nn_archetecture} for further details 
+concerning the parameters of our neural network architecture. 
 % our focus in this paper is the application of neural networks to provide a variational posterior for cataloging starfields, not the network architecture per se.
 
 
@@ -275,11 +280,12 @@ The optimization of the architecture for this specific application is left for f
 
 \begin{figure}[!tb]
     \centering
-    % \includegraphics[width=0.4\textwidth]{figures/starnet_archetecture2.png}
-    \includegraphics[width=\textwidth]{figures/vi_figures/starnet_archetecture5.png}
+    \includegraphics[width=\textwidth]{figures/vi_figures/starnet_archetecture8.png}
     \vspace{-1.cm}
     \caption{The neural network architecture. The input is a $20\times 20$ padded tile, and the network returns distributional parameters corresponding to sources located in the $10\times 10$ tile outlined in white.
     In this example, there are two sources located in the $10\times10$ tile.
+    Further details concerning the residual network blocks (in blue), see 
+    Appendix~\ref{sec:supp_nn_archetecture}.
     }
     \label{fig:starnet_arch}
 \end{figure}

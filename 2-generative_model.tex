@@ -44,6 +44,11 @@ Given the flux in the first band $f_{i,1}$ and color $c_{i,b}$,
 the flux in band $b$ is  $f_{i,b} = f_{i,1} \times 10^{c_{i,b} / 2.5}$.
 
 Also like~\cite{Feder_2019}, we set the power law slope $\alpha = 0.5$ and use a standard Gaussian for the color prior ($\mu_c = 0$, $\sigma^2_c = 1$).
+
+Rather than having a hierarchical structure, 
+the prior parameters are fixed in this model. 
+The goal is to produce a posterior on catalogs for a
+specific image, not to model the population over many images. 
 Appendix~\ref{sec:prior_sensitivity} evaluates the
 sensitivity of the resulting catalog to choices of the prior parameters.
 

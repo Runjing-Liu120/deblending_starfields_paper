@@ -49,6 +49,8 @@ Unbiased gradients are computed as
 The reparameterized gradient includes gradient information $\nabla_z f_\eta(z)$ while the REINFORCE gradient does not. Taking into account the structure of $f$ through its gradient lowers the variance of reparameterized gradient in comparison to the REINFORCE gradient.
 However, if $z$ contains discrete components, there cannot be a differentiable mapping $h_\eta$, and the reparameterization trick will not apply.
 
+TODO need to talk about the fact that we use a baseline. 
+
 \subsection{Gradients for our ELBO vs sleep experiment}
 In Section~\ref{sec:elbo_sleep_compare}, we used a combination of reparameterized and REINFORCE gradients.
 Let $N$ be the discrete component of $z$ (the number of stars) and $y$ be the continuous components (the locations and fluxes).
@@ -98,5 +100,11 @@ g(z) = \sum_{n=1}^{4^{N_{max}}}\nabla_y f_\eta(n, y)\Big|_{y = h_\eta(w)}
 Gradients of this form produced the optimization path in Figure~\ref{fig:optim_path}(b).
 No REINFORCE estimates were required. 
 
+Notice that to compute these re-parameterized gradients we require 
+a summation of $(S \times T)^{N_{max}}$ terms 
+(recall from the main text that $S \times T$ is the total number 
+of tiles in an image). 
+For large images --- i.e. those requiring many tiles --- 
+computing re-parameterized gradients would be infeasible. 
 
 % for $N\sim q_\eta(N)$ and $w\sim F$. Because the variational distribution on locations and fluxes are transformation of Gaussians (recall locations are logit-normal and fluxes log-normal), we take $F$ to be the standard Gaussian, while $h(\cdot ; \eta)$ shifts and scales the standard Gaussian according the the parameters returned by the neural network and applies the appropriate transformation.
