@@ -1,5 +1,24 @@
-First, we validate StarNet using an SDSS image of the Messier 2 (M2) globular cluster,
-a crowded starfield found in field 136 of camera column 2 in run 2583.
+We evaluate StarNet on two distinct surveys. First, we catalog the SDSS image of the Messier 2 (M2) globular cluster. 
+Here, we are able to compare against an MCMC-based probabilistic cataloger, PCAT, as well as an algorithmic cataloging routine, DAOPHOT.
+We evaluate the catalog quality by validating against data collected from 
+the Hubble Space telescope
+
+Then, we run StarNet on an image of our own Milky Way taken by the DECam survey,
+and demonstrate the ability of StarNet to scale to large astronomical surveys.
+
+\subsection{Results on the M2 globular cluster}
+\label{sec:results_on_m2}
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/m2_results/m2_regions.png}
+    \vspace{-1cm}
+    \caption{The M2 globular cluster as imaged by SDSS. In blue is $100 \times 100$ subregion 
+    cataloged by PCAT in \cite{Feder_2019}. }
+    \label{fig:m2_region}
+\end{figure}
+
+The M2 globular cluster is a crowded starfield found in field 136 of camera column 2 in run 2583 of the SDSS survey. 
 M2 was also imaged in the ACS Globular Cluster Survey~\citep{Sarajedini_2007}
 using the Hubble Space telescope (HST),
 which has greater resolution than the Sloan telescope.
@@ -8,16 +27,10 @@ The resolution of the HST wide-field channel is 0.05 arcseconds per pixel versus
 For this image, the catalog from this Hubble survey (henceforth the ``HST catalog")
 serves as ground truth for validating our results.
 
-Then, we run StarNet on a frame from the DECam survey,
-and demonstrate the ability of StarNet to scale to large astronomical surveys.
-
-\subsection{Results on the M2 globular cluster}
-\label{sec:results_on_m2}
-
 We first analyze the $100 \times 100$ pixel subimage of M2 that
 \cite{Portillo_2017} and \cite{Feder_2019} analyzed with PCAT.
-This subimage is located approximately two arcseconds from the heavily saturated core of the cluster;
-in this subimage, the HST catalog contains 1114 stars with F606W-band magnitudes less than 22.
+This subimage is located outside the heavily saturated core of the cluster (Figure~\ref{fig:m2_region}). 
+However, in this subimage alone, the HST catalog contains 1114 stars with F606W-band magnitudes less than 22.
 We include two bands in our model, the SDSS $r$-band and $i$-band.
 The SDSS $r$-band and the Hubble F606W band are centered at roughly the same wavelength,
 while the wavelength range of the Hubble F606W band is slightly broader.
@@ -158,6 +171,25 @@ The empirical z-score distributions are close to a standard Gaussian with some d
     \caption{The empirical distribution of z-scores for logit-locations (left) and log-fluxes (right) under the StarNet variational posterior.
 }
     \label{fig:z-score_calibration}
+\end{figure}
+
+Finally, we catalog the entire M2 globular cluster, 
+contained in a $1000 \times 1000$-pixel image (Figure~\ref{fig:m2_region}). We produce a color-magnitude diagram on this entire region. 
+Restricting to only a $100\times100$ subimage 
+does not reveal the second cluster of red (TODO)
+stars that appear in the Hubble catalog. 
+This cluster becomes salient after we filter to
+high-confidence stars in the catalog, defined as stars with posterior standard deviation on the flux less than one. 
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.99\textwidth]{figures/m2_results/m2_cmd.png}
+    \vspace{-0.5cm}
+    \caption{Color-magnitude diagrams from StarNet and Hubble. From left the right: color-magnitude diagram constructed from the same $100\times100$ subimage considered by PCAT; 
+    the StarNet catalog constructed from the entire $1000 \times 1000$ image of M2; 
+    the StarNet catalog then filtered to stars with posterior standard deviation on the flux less than one; the Hubble catalog. 
+}
+    \label{fig:m2_cmd}
 \end{figure}
 
 \subsubsection{Runtime}

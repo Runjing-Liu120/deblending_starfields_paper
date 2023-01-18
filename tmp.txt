@@ -1,0 +1,9 @@
+First, we validate StarNet using an SDSS image of the Messier 2 (M2) globular cluster,
+a crowded starfield found in field 136 of camera column 2 in run 2583.
+M2 was also imaged in the ACS Globular Cluster Survey~\citep{Sarajedini_2007}
+using the Hubble Space telescope (HST),
+which has greater resolution than the Sloan telescope.
+The resolution of the HST wide-field channel is 0.05 arcseconds per pixel versus
+0.4 arcseconds per pixel in SDSS \citep{hubble_about, sdss_about}.
+For this image, the catalog from this Hubble survey (henceforth the ``HST catalog")
+serves as ground truth for validating our results.
