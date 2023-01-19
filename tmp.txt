@@ -7,3 +7,23 @@ The resolution of the HST wide-field channel is 0.05 arcseconds per pixel versus
 0.4 arcseconds per pixel in SDSS \citep{hubble_about, sdss_about}.
 For this image, the catalog from this Hubble survey (henceforth the ``HST catalog")
 serves as ground truth for validating our results.
+
+
+
+To examine the uncertainty calibration of StarNet, we evaluated the approximate posterior
+conditional on the true number of stars in the HST catalog.
+Then, each star in the StarNet catalog was matched with exactly one Hubble star by finding the permutation of Hubble stars that had the largest log-likelihood under our variational distribution $q_\eta$.
+For each star, we computed the z-score $(y - \hat \mu) / \hat \sigma$, where $y$ is the HST log-flux or
+logit-location; $\hat \mu$ and $\hat\sigma$ are the mean and the standard deviation, respectively, of the Gaussian variational distribution for the log-flux or logit-location.
+% If the uncertainties were perfectly calibrated, the distribution of these z-scores would be a standard Gaussian.
+The empirical z-score distributions are close to a standard Gaussian with some discrepancy in the tails and some evidence of skewness, suggesting the uncertainties are well-estimated (Figure~\ref{fig:z-score_calibration}).
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.99\textwidth]{figures/m2_results/zscore_calibration.png}
+    \vspace{-0.5cm}
+    \caption{The empirical distribution of z-scores for logit-locations (left) and log-fluxes (right) under the StarNet variational posterior.
+}
+    \label{fig:z-score_calibration}
+\end{figure}
+
