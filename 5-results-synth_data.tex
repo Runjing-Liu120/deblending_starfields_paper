@@ -8,17 +8,18 @@
 A simple example demonstrates that there exist shallow local optima in the ELBO
 where the fitted approximate posterior is far in KL divergence from the exact posterior.
 These local optima result in unreliable catalogs.
-The expected forward KL, by taking advantage of complete data, appears to better avoid these local optima.
+The expected forward KL, by taking advantage of complete data, appears to have a more favorable optimization landscape.
 The simulated $20\times20$ single-band image $x_{test}$ is shown in Figure~\ref{fig:optim_path}(d).
 
-We compare three approaches to deblending. The first two approaches directly optimize the test ELBO,
+We compare three approaches to deblending. The first two approaches directly optimize the ELBO,
 \begin{align}
-\mathcal{L}_{elbo}(\eta; x_{test}) = \Expect_{q_{\eta}(z | x_{test})}\Big[\log p(x_{test}, z) - \log q_{\eta}(z | x_{test})\Big],
+\mathcal{L}_{elbo}(\eta; x) = \Expect_{q_{\eta}(z \mid x)}\Big[\log p(x, z) - \log q_{\eta}(z \mid x)\Big],
 \label{eq:elbo_on_test}
 \end{align}
-while the third approach minimizes the expected forward KL~\eqref{eq:sleep_obj}.
-In each case, $q_\eta$ is the inference network from Section~\ref{sec:nn_archetecture};
-the input to the network is a $10\times 10$ tile with no padding.
+evaluated at $x = x_{test}$. 
+The third approach minimizes the expected forward KL~\eqref{eq:sleep_obj}.
+In each case, $q_\eta$ is the inference network from Section~\ref{sec:nn_architecture}.
+The input to the network is a $10\times 10$ tile with no padding.
 
 Note that the expected forward KL does not depend on $x_{test}$.
 Optimizing $\mathcal{L}_{fwd}$ only requires sampling catalogs from the prior
@@ -26,34 +27,36 @@ and simulating images conditional on each catalog.
 The prior on the number of stars was set to Poisson with mean $\mu = 4$.
 
 Figure~\ref{fig:optim_path}~(top row) charts the test ELBO~\eqref{eq:elbo_on_test}
-as the optimization proceeds in our three approaches.
-The first approach optimizes the ELBO with SGD and a REINFORCE plus control-variate gradient estimator.
-This optimization did not converge, likely due to the high variance of the REINFORCE estimator (Figure~\ref{fig:optim_path}a).
-For a lower variance gradient estimator, the second approach employed the reparameterized gradient. To employ this gradient estimator, we analytically integrated the ELBO with respect to the number of stars $N$ to remove the discrete random variable.
+as optimization proceeds in our three approaches.
+The first approach optimizes the ELBO with SGD and a REINFORCE plus control-variate gradient estimator~\citep{ranganath2013black}.
+The path of the ELBO objective in this first approach is irregular, likely due to the high variance of the REINFORCE gradient estimator, 
+and the optimization does not appear to converge (Figure~\ref{fig:optim_path}a).
+For a lower-variance gradient estimator, the second approach employed the reparameterized gradient. To employ this gradient estimator, we analytically integrated the ELBO with respect to the number of stars $N$ to remove the discrete random variable.
 See Appendix~\ref{sec:reparam_details} for details about the gradient estimators.
 Using reparameterized gradients instead of REINFORCE gradients enabled the optimization to converge to stationary points (Figure~\ref{fig:optim_path}b).
 However, for two randomly initialized restarts,
-the optimization found local optima where the negative ELBO is higher than other restarts.
+the optimization found local optima where the negative ELBO is notably higher than other restarts.
 
-In contrast, optimizing the expected forward KL consistently converged to
-a similar ELBO across all restarts and appeared to avoid shallow local optima (Figure~\ref{fig:optim_path}c).
-Recall that $\mathcal{L}_{fwd}$ does not directly optimize the test ELBO.
-However, the test ELBO increases nonetheless, because the variational posterior
-better approximates the exact posterior as the optimization proceeds.
-
-Shallow local optima in the ELBO result in unreliable catalogs.
+These shallow local optima in the ELBO result in unreliable catalogs.
 The bottom row of Figure~\ref{fig:optim_path} displays the estimated locations, defined as the mode of the fitted variational distribution.
 Figure~\ref{fig:optim_path}(e) shows these locations after converging to a shallow local optimum.
-Here, the upper left tile was correctly estimated to have two stars, though both estimated stars were placed at the same location.
-For correct detections, one of the locations should be placed on the second star.
-However, in order to move one of the estimated locations to the second star, the optimization path must traverse a region where the log-likelihood is lower than the current configuration (Figure~\ref{fig:local_optima_cartoon}).
+Here, the upper left tile was correctly estimated to have two stars, but both estimated stars were incorrectly placed at the same location.
+(One of the locations should be placed on the second star.)
+To move one of the estimated locations to the second star, the optimization path must traverse a region where the log-likelihood is lower than the current configuration (Figure~\ref{fig:local_optima_cartoon}).
 The displayed configuration is a local optimum where the gradient with respect to its locations is approximately zero.
-In contrast, the variational distribution fit with the forward LK
-consistently placed its mode around the four true stars.
+
+One the other hand, using
+the expected forward KL does not directly optimize the test ELBO.
+However, the test ELBO increases nonetheless, because the variational posterior
+better approximates the exact posterior as the optimization proceeds.
+Optimizing $\mathcal{L}_{fwd}$ consistently converged to
+a similar ELBO across all restarts and avoided shallow local optima (Figure~\ref{fig:optim_path}c).
 The expected forward KL is quadratic in the logit-location estimate
-$\mu_\ell$ (Equation~\ref{eq:gaussian_sleep_loss}),
+$\mu_\ell$ (\ref{eq:gaussian_sleep_loss}),
 and the gradient does not vanish.
-An example of correct detection after fitting with
+By avoiding shallow local optima, the variational distribution fit with the forward KL
+always placed its mode on the four true stars in our trials.
+An example of successful detection by fitting with
 $\mathcal{L}_{fwd}$ is shown in~Figure~\ref{fig:optim_path}(f).
 
 \begin{figure}[!htb]
@@ -97,7 +100,7 @@ and this was only possible because the image consisted of only four tiles.
 For each tile, the variational distribution has support over only 0, 1, or 2 stars.
 Since the variational distribution factorizes over the four tiles, integrating $N$ is a summation of $3^4 = 81$ terms.
 On larger images with more tiles, analytically integrating $N$ would be computationally infeasible,
-and the simple reparameterization trick would not apply as it does in this small illustrative example.
+and the standard reparameterization trick would not apply as it does in this small illustrative example.
 
 % On a larger images where $N$ is on the order of $\sim1000$ (e.g. on M2), analytically integrating out $N$ would be infeasible.
 

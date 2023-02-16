@@ -1,41 +1,42 @@
 \subsection{Decomposing the expected forward KL}
 \label{sec:sleep_details}
-In this subsection, we decompose the expected forward KL objective $\mathcal{L}_{fwd}$ for closer study.
+In this subsection, we decompose the expected forward KL objective $\mathcal{L}_{fwd}$ 
+to obtain an unbiased stochastic gradient for stochastic gradient descent. 
 
 First, observe that optimizing $\mathcal{L}_{fwd}$ does not require computing the intractable term $p(x)$:
 \begin{align}
 \argmax_\eta\; \mathcal{L}_{fwd}(\eta)
-    & = \argmin_{\eta} \; \mathbb{E}_{x \sim p(x)}\Big[ \mathrm{KL}(p(z | x) \| q_\eta(z | x)\Big] \\
-  &=\argmin_{\eta} \; \mathbb E_{p(x)}\Big[\mathbb E_{p(z | x)}\Big(\log p(z | x) - \log q_\eta(z | x) \Big)\Big]\\
-%&=\argmin_{\eta} \; \mathbb E_{p(x)}\Big[\mathbb E_{p(z | x)}\Big( - \log q_\eta(z | x) \Big)\Big]\\
-&=\argmin_{\eta} \; \mathbb E_{p(x, z)}\Big[- \log q_\eta(z | x) \Big]\label{eq:sleep_loss_simple}.
+    & = \argmin_{\eta} \; \mathbb{E}_{x \sim p(x)}\Big[ \mathrm{KL}(p(z \mid x) \| q_\eta(z \mid x)\Big] \\
+  &=\argmin_{\eta} \; \mathbb E_{p(x)}\Big[\mathbb E_{p(z \mid x)}\Big(\log p(z \mid x) - \log q_\eta(z \mid x) \Big)\Big]\\
+%&=\argmin_{\eta} \; \mathbb E_{p(x)}\Big[\mathbb E_{p(z \mid x)}\Big( - \log q_\eta(z \mid x) \Big)\Big]\\
+&=\argmin_{\eta} \; \mathbb E_{p(x, z)}\Big[- \log q_\eta(z \mid x) \Big]\label{eq:sleep_loss_simple}.
 \end{align}
-Crucially, the integrating distribution, $p(x,z)$, does not depend on the optimization parameter $\eta$.
+Notice the integrating distribution $p(x,z)$ does not depend on the optimization parameter $\eta$.
 % In the ELBO, the integrating distribution is $q_\eta$, resulting in the need for reparameterization or other adjustments to compute stochastic gradients.
-Thus, unbiased stochastic gradients can be obtained simply as
+Thus, unbiased stochastic gradients can be obtained as
 \begin{align}
-    g = -\nabla_\eta \log q_\eta(z | x) \quad \text{ for } (x, z)\sim p(x, z).
+    g = -\nabla_\eta \log q_\eta(z \mid x) \quad \text{ for } (x, z)\sim p(x, z).
 \end{align}
 
-In other words, at each iteration of SGD, we simulate {\itshape complete} data $(x,z)$ from the generative model and evaluate the loss $-\log q_\eta(z | x)$.
+In other words, at each iteration of SGD, we simulate complete data $(x,z)$ from the generative model and evaluate the loss $-\log q_\eta(z \mid x)$.
 Here, ``complete data" refers to the image along with its catalog.
-This loss encourages the neural network to map an image $x$ to a distribution $q_{\eta}(\cdot | x)$ that places large mass on the image's catalog $z$.
+This loss encourages the neural network to map an image $x$ to a distribution $q_{\eta}(\cdot \mid x)$ that places large mass on the image's catalog $z$.
 
-We decompose the loss $-\log q_\eta(z | x)$ further.
-Recall that $q_\eta$ fully factorizes over tile latent variables, and thus $-\log q_\eta(z | x)$ is a summation over all tile latent variables.
-To evaluate $-\log q_\eta(z | x)$ for some $(x,z)\sim p$, first convert $z$ to its tile parameterization $(\tilde N^{(s,t)}, \tilde \ell^{(s,t)}, \tilde f^{(s,t)})_{s=1,t=1}^{(S,T)}$, as detailed in Appendix~\ref{sec:eval_var_distr}.
-On each tile $(s,t)$, the variational distribution on the number of stars $\tilde N^{(s,t)}$ is categorical with probability vector $\omega^{(s,t)}\in\Delta^{N_{max}}$ (recall Section~\ref{sec:distr_on_tiles}).
+We decompose the loss $-\log q_\eta(z \mid x)$ further.
+Recall that $q_\eta$ fully factorizes over tile latent variables, and thus $-\log q_\eta(z \mid x)$ is a summation over all tile latent variables.
+To evaluate $-\log q_\eta(z \mid x)$ for some $(x,z)\sim p$, first convert $z$ to its tile parameterization $(\tilde N^{(s,t)}, \tilde \ell^{(s,t)}, \tilde f^{(s,t)})_{s=1,t=1}^{(S,T)}$, as detailed in Appendix~\ref{sec:eval_var_distr}.
+For each tile $(s,t)$, the variational distribution on the number of stars $\tilde N^{(s,t)}$ is categorical with probability vector $\omega^{(s,t)}\in\Delta^{N_{max}}$ (recall Section~\ref{sec:distr_on_tiles}).
 The loss function for the number of stars becomes
 \begin{align}
-    - \log q_\eta(\tilde N^{(s,t)} | x) = -\sum_{n = 0}^{\tilde N_{max}} 1\{\tilde N^{(s,t)} = n\} \log \omega^{(s,t)}_n.
+    - \log q_\eta(\tilde N^{(s,t)} \mid x) = -\sum_{n = 0}^{\tilde N_{max}} 1\{\tilde N^{(s,t)} = n\} \log \omega^{(s,t)}_n.
     \label{eq:cross_entropy_loss}
 \end{align}
 The vector $\omega^{(s,t)}$ is the output of the neural network, and \eqref{eq:cross_entropy_loss} is the usual cross-entropy loss for a multi-class classification problem.
 
-Next, recall that location coordinates are logit-normal and fluxes are log-normal in the variational distribution.
-Let $y$ generically denote either the logit-location or log-flux for a star in the sampled catalog $z$; let $(\hat\mu, \hat\sigma^2)$ be the Guassian mean and variance returned by the neural network. Then the loss for these latent variables is,
+Next, recall that in the variational distribution location coordinates are logit-normal and fluxes are log-normal.
+Let $y$ generically denote either the logit-location or log-flux for a star in the sampled catalog $z$; let $(\hat\mu, \hat\sigma^2)$ be the Gaussian mean and variance returned by the neural network. Then the loss for these latent variables is,
 \begin{align}
-    -\log q_\eta(y | x) =
+    -\log q_\eta(y \mid x) =
         \frac{1}{2\hat\sigma^2}(y - \hat\mu)^2
          + \frac{1}{2}\log(2\pi\hat\sigma^2).
          \label{eq:gaussian_sleep_loss}
@@ -47,7 +48,7 @@ balanced by the scaling of the error $(y - \hat\mu)^2$ in the first term.
 % only the $N = N^{(s,t)}$-th row of the triangular
 % array of latent variables $\tilde \ell^{(s,t)}$ and $\tilde f^{(s,t)}$ needs to be evaluated. Therefore, the losses in the last two terms of~\eqref{eq:sleep_loss_decomp} are of the form
 % \begin{align}
-%     -\log q_\eta(y | x) = -\sum_{i = 1}^{\tilde N^{(s,t)}} \log q_\eta(y_{\tilde N^{(s,t)},i} | x).
+%     -\log q_\eta(y \mid x) = -\sum_{i = 1}^{\tilde N^{(s,t)}} \log q_\eta(y_{\tilde N^{(s,t)},i} \mid x).
 % \end{align}
 
 % To interpret~\eqref{eq:gaussian_sleep_loss}, observe that

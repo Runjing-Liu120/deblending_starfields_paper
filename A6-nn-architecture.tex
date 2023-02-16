@@ -16,7 +16,7 @@ The first convolutional layer (green block, Figure~\ref{fig:starnet_arch}) has 1
 All convolutional layers inside residual block 1, as well as the convolutional layers on the top row of residual block 2 (Figure~\ref{fig:conv_blocks}) also have the same parameters. 
 Only the convolutional layers on the bottom row of residual block 2 are different:they still have output channels of dimension 17, 
 but use a kernel size of one, and a stride of 2. 
-Inside the residual blocks, the dropout layers have dropuout probability of 0.11399. 
+Inside the residual blocks, the dropout layers have dropout probability of 0.11399. 
 
 In the final fully connected block (red, \ref{fig:starnet_arch}) have latent dimension 185, and a dropout probability of 0.013123. 
 

@@ -1,0 +1,29 @@
+
+Our optimization procedure uses stochastic optimization. 
+We evaluate the sensitivity of our StarNet M2 performance metrics to ten random refits (Table~\ref{tab:refits}. 
+The F1 score over the refits range
+between 50\% and 55\%. Our comparisons 
+to the performance of other methods, PCAT and DAOPHOT, 
+are unaffected by random reruns. 
+
+\begin{table}
+\centering
+\caption{Performance metrics on M2 for ten random refits of StarNet. }
+\label{tab:refits}
+\begin{tabular}{lrrr}
+\toprule
+ &       TPR &       PPV &        F1 \\
+\midrule
+0 &  0.513465 &  0.551985 &  0.532029 \\
+1 &  0.524237 &  0.519514 &  0.521865 \\
+2 &  0.526032 &  0.574879 &  0.549372 \\
+3 &  0.527828 &  0.485235 &  0.505636 \\
+4 &  0.529623 &  0.519280 &  0.524401 \\
+5 &  0.526032 &  0.530078 &  0.528048 \\
+6 &  0.548474 &  0.544194 &  0.546326 \\
+ 7 &  0.509874 &  0.538745 &  0.523912 \\
+8 &  0.534111 &  0.522998 &  0.528496 \\
+9 &  0.526032 &  0.481540 &  0.502804 \\
+\bottomrule
+\end{tabular}
+\end{table}

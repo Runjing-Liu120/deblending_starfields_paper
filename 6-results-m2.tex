@@ -1,10 +1,9 @@
-We evaluate StarNet on two distinct surveys. First, we catalog the SDSS image of the Messier 2 (M2) globular cluster. 
-Here, we are able to compare against an MCMC-based probabilistic cataloger, PCAT, as well as an algorithmic cataloging routine, DAOPHOT.
+We evaluate StarNet on two distinct surveys. First, we catalog an SDSS image of the Messier 2 (M2) globular cluster. 
 We evaluate the catalog quality by validating against data collected from 
-the Hubble Space telescope
+the Hubble Space telescope, which we use as a ground truth. 
 
-Then, we run StarNet on an image of our own Milky Way taken by the DECam survey,
-and demonstrate the ability of StarNet to scale to large astronomical surveys.
+Then, we run StarNet on a high-resolution DECam image of the galactic plane of the Milky Way. 
+We demonstrate the ability of StarNet to scale to larger astronomical surveys.
 
 \subsection{Results on the M2 globular cluster}
 \label{sec:results_on_m2}
@@ -13,32 +12,32 @@ and demonstrate the ability of StarNet to scale to large astronomical surveys.
     \centering
     \includegraphics[width=0.7\textwidth]{figures/m2_results/m2_regions.png}
     \vspace{-1cm}
-    \caption{The M2 globular cluster as imaged by SDSS. In blue is $100 \times 100$ subregion 
+    \caption{The M2 globular cluster as imaged by SDSS. In white is $100 \times 100$ subregion 
     cataloged by PCAT in \cite{Feder_2019}. }
     \label{fig:m2_region}
 \end{figure}
 
 The M2 globular cluster is a crowded starfield found in field 136 of camera column 2 in run 2583 of the SDSS survey. 
 M2 was also imaged in the ACS Globular Cluster Survey~\citep{Sarajedini_2007}
-using the Hubble Space telescope (HST),
-which has greater resolution than the Sloan telescope.
+using the Hubble Space Telescope (HST),
+which has greater resolution than the SDSS telescope.
 The resolution of the HST wide-field channel is 0.05 arcseconds per pixel versus
-0.4 arcseconds per pixel in SDSS \citep{hubble_about, sdss_about}.
-For this image, the catalog from this Hubble survey (henceforth the ``HST catalog")
+0.40 arcseconds per pixel in SDSS \citep{hubble_about, sdss_about}.
+For this image, the catalog from the HST survey (henceforth the ``HST catalog")
 serves as ground truth for validating our results.
 
 We first analyze the $100 \times 100$ pixel subimage of M2 that
-\cite{Portillo_2017} and \cite{Feder_2019} analyzed with PCAT.
-This subimage is located outside the heavily saturated core of the cluster (Figure~\ref{fig:m2_region}). 
-However, in this subimage alone, the HST catalog contains 1114 stars with F606W-band magnitudes less than 22.
+\cite{Portillo_2017} and \cite{Feder_2019} analyzed with their MCMC-based approach, PCAT.
+This subimage shows a region located outside the heavily saturated core of the cluster (Figure~\ref{fig:m2_region}). 
+Nonetheless, in this subimage the HST catalog contains 1114 stars with F606W-band magnitudes less than 22.
 We include two bands in our model, the SDSS $r$-band and $i$-band.
 The SDSS $r$-band and the Hubble F606W band are centered at roughly the same wavelength,
 while the wavelength range of the Hubble F606W band is slightly broader.
 
 We compare the cataloging accuracy of StarNet
-to the two alternatives PCAT and DAOPHOT.
-DAOPHOT is an algorithmic routine for detecting stars in crowded starfields
-which does not use a generative model~\citep{stetson2987daophot}.
+against PCAT, the aforementioned MCMC-based approach which uses the same generative model as StarNet, 
+and DAOPHOT, an algorithmic routine for detecting stars in crowded starfields
+which does not use a probabilistic model~\citep{stetson2987daophot}.
 This software convolves the observed image with a Gaussian kernel and scans for peaks above a given threshold.
 The DAOPHOT catalog of M2 was reported in \cite{An_2008_m2}.
 
@@ -50,20 +49,20 @@ The DAOPHOT catalog of M2 was reported in \cite{An_2008_m2}.
 % Each sample from the (approximate) posterior returns a catalog, and each
 % sampled catalog may have different cardinally.
 
-To evaluate the three methods.
-We filtered the ground truth HST catalog to stars with magnitudes smaller than 22.5 in the Hubble F606W band,
+To evaluate the three methods, we filtered the ground truth HST catalog to stars with magnitudes smaller than 22.5 in the Hubble F606W band,
 because none of the three methods were able to detect stars
 with lower apparent brightness in the SDSS image.
 
 
-Estimated catalogs are evaluated on three metrics: the true positive rate (TPR),
-the positive predicted value (PPV), and the F1 score.
-The TPR is the proportion of stars in the HST catalog matched with a star in the estimated catalog;
-the PPV is the proportion of stars in the estimated catalog matched with a star in the HST catalog.
+Estimated catalogs are evaluated on three metrics: the true positive rate (TPR), or recall;
+the positive predictive value (PPV), or precision;
+and the F1 score.
+The TPR is the proportion of true stars in the HST catalog matched with a predicted star in the estimated catalog.
+The PPV is the proportion of predicted stars in the estimated catalog matched with a true star in the HST catalog.
 The F1 score summarizes the two metrics as the harmonic mean of the PPV and the TPR.
 
-Like \cite{Portillo_2017} and \cite{Feder_2019}, a ``match" between an estimated star
-and an HST star is defined as follows: (1) the estimated location and the HST location are within 0.5 SDSS pixels,
+Like \cite{Portillo_2017} and \cite{Feder_2019}, we define a ``match" between an estimated star
+and an HST star as follows: (1) the estimated location and the HST location are within 0.5 SDSS pixels,
 and (2) the estimated SDSS $r$-band flux and the HST F606W band flux are within half a magnitude.
 % The slack in magnitude accounts for the fact that the wavelength range of the HST F606W band is slightly broader than the SDSS $r$-band (though they are centered at roughly the same wavelength).
 
@@ -85,25 +84,24 @@ For PCAT, 300 catalogs were sampled using MCMC; the metrics were computed for ea
 \end{figure}
 
 StarNet produced a catalog that outperforms DAOPHOT and PCAT in F1 score (Table~\ref{tab:summary_stats}).
-Figure~\ref{fig:example_subimages} shows the StarNet catalog alongside PCAT, DAOPHOT, and HST catalogs.
+Figure~\ref{fig:example_subimages} compares the StarNet catalog to the PCAT, DAOPHOT, and HST catalogs.
 DAOPHOT estimated less than half the number of stars when compared to the other methods.
 It therefore had a large PPV but a small TPR.
-The StarNet catalog had about the same TPR as PCAT while being ten percentage points higher in PPV.
+The StarNet catalog had similar TPR as PCAT while have 11\% higher PPV.
 
-The improvement of StarNet over PCAT in PPV was most pronounced for dim stars (Figure~\ref{fig:summary_stats}).
-The TPR for StarNet was uniformly better than DAOPHOT across almost all magnitudes.
+The improvement of StarNet over PCAT in PPV was most pronounced for the brightest stars (Figure~\ref{fig:summary_stats}).
+The TPR for StarNet was uniformly better than DAOPHOT across all magnitudes.
 Of all methods, StarNet best approximated the HST flux distribution (Figure~\ref{fig:luminosity_fun_m2}).
 
 Table~\ref{tab:summary_stats} also shows the number of stars inferred by each method.
 There are 1114 stars in the HST catalog.
 For probabilistic methods (StarNet and PCAT),
-we display the mean number of stars under the approximate posterior, along with the 5-th and 95-th quantiles.
-We compute the StarNet credible intervals by sampling from the variational posterior. 
+we display the mean number of stars under the approximate posterior, along with the 5th and 95th percentiles.
+We compute the StarNet posterior quantiles by sampling from the variational posterior. 
 Recall that on each tile, the variational posterior on the number of stars is a categorical random variable; 
 to construct a distribution for the number of stars on the whole image, we first sample from the per-tile categorical distribution, then sum over all tiles. 
-StarNet credible intervals were three times wider than the PCAT intervals
-and closer to the ground truth.
-The small PCAT credible intervals may be indicative of an MCMC sampler that failed to mix well.
+StarNet posterior intervals were three times wider than the PCAT intervals.
+The small PCAT intervals may indicate that the MCMC sampler failed to mix well.
 
 \input{tables/summary_stats_m2.tex}
 
@@ -137,8 +135,8 @@ The small PCAT credible intervals may be indicative of an MCMC sampler that fail
     \includegraphics[width=0.99\textwidth]{figures/m2_results/luminosity_fun.png}
     \vspace{-0.4cm}
     \caption{Flux distributions for the $r$-band observations of M2.
-    The flux distribution of the HST catalog in grey.
-    Estimated distributions by DAOPHOT, PCAT, and StarNet catalogs overlaid.
+    The flux distribution of the HST catalog is in grey.
+    Estimated distributions from DAOPHOT, PCAT, and StarNet catalogs are overlaid.
     For PCAT, the flux distribution is from a single catalog sample. }
     \label{fig:luminosity_fun_m2}
 \end{figure}
@@ -158,62 +156,44 @@ The small PCAT credible intervals may be indicative of an MCMC sampler that fail
 % and is thus able to capture uncertainties in catalog construction.
 % Samples from the StarNet-WS variational distribution are compared with samples from PCAT in Figure~\ref{fig:example_subimages_sampled}.
 
-To conclude, 
+In a subsequent experiment, 
 we go beyond the $100\times100$ subimage
-cataloged by \cite{Feder_2019}, and 
+cataloged by \cite{Feder_2019} and 
 catalog the entire M2 globular cluster 
 contained in a $1000 \times 1000$-pixel image (Figure~\ref{fig:m2_region}). 
 We produce a color-magnitude diagram on this entire region (Figure~\ref{fig:m2_cmd}). 
-Most of the cataloged stars lie on the 
-main sequence of stars, but
-we distinctly 
-also see a second cluster of stars 
-with a shift in color --- corresponding to 
-a collection of red giants. 
-It becomes particularly salient after we filter to
-high-confidence stars in the StarNet catalog, defined as stars with posterior standard deviation on the flux less than one. 
+On the entire region, a second cluster, 
+shifted to the right in color, 
+appears in addition to the main sequence of stars.
+This second cluster, corresponding to a collection of red giants, 
+is undetectable without the ability of StarNet to 
+scale to larger images. 
+
+However, 
+the patterns are less definite in the StarNet color-magnitude diagram than in Hubble color magnitude diagram.
+There is more spread in the StarNet color estimates, particularly at faint magnitudes. 
+This is due to the superior resolution of the Hubble telescope; near the heavily saturated core of the M2 cluster, stars are near impossible to deblend in the SDSS image, and our performance suffers (TODO). 
+
+
+% Most of the cataloged stars lie on the 
+% main sequence of stars, but
+% we also see a second cluster of stars 
+% with a shift in color. These correspond to 
+% a collection of red giants. 
 
 
 \begin{figure}[tb]
     \centering
     \includegraphics[width=0.99\textwidth]{figures/m2_results/m2_cmd.png}
     \vspace{-0.5cm}
-    \caption{Color-magnitude diagrams from StarNet and Hubble. From left the right: color-magnitude diagram constructed from the same $100\times100$ subimage cataloged in \cite{Feder_2019}; 
-    the StarNet catalog constructed from the entire $1000 \times 1000$ image of M2; 
-    the StarNet catalog then filtered to stars with posterior standard deviation on the flux less than one; the Hubble catalog. 
+    \caption{Color-magnitude diagrams from StarNet and Hubble. From left the right: color-magnitude diagrams constructed from: the same $100\times100$ subimage as was cataloged in \cite{Feder_2019}; 
+    the StarNet catalog derived from the entire $1000 \times 1000$ image of M2; 
+    that StarNet catalog, filtered to stars with posterior SD(flux) $< 1$; the Hubble catalog. 
+    TODO fix x-axes for hubble. also maybe remove starnet 100x 100. 
 }
     \label{fig:m2_cmd}
 \end{figure}
 
-\subsubsection{Runtime}
-\label{sec:runtime}
-We ran SGD to minimize the expected forward KL
-for 400 epochs; at each epoch, 200 images were sampled from the generative model.
-Optimization was done with Adam~\citep{kingma2014adam}.
-On a single NVIDIA GeForce RTX 2080 Ti GPU,
-this fitting proceudre took about 50 minutes.
-
-After fitting the model and variational posterior,
-calculating the approximate posterior
-(that is, producing the distributional parameters of the variational approximation) for the $100 \times 100$ pixel image of M2 took $30$ milliseconds.
-By comparison, the reported runtime of PCAT, which uses MCMC, is 30 minutes on the same $100 \times 100$ pixel image~\citep{Feder_2019}.
-Hence, after the initial fit, StarNet provided nearly a $10^5$-fold speed increase.
-
-The speed at inference time (which excludes training time) gives StarNet the scaling characteristics necessary for processing large astronomical surveys.
-A single SDSS image is $1489 \times 2048$ pixels.
-Based on the reported 30-minute runtime of PCAT for a $100\times100$ pixel subimage, we project that
-the runtime to process the full image would be $30\text{ min} \times 14 \times 20 = 8400$ minutes, or almost six days.
-The SDSS survey consists of nearly one million images. Scaling PCAT to the entire SDSS survey would be infeasible.
-The upcoming LSST survey will be 300 times larger than SDSS.
-
-On the other hand, StarNet only incurs a one-time fitting cost.
-After this initial fit,
-producing a catalog with the full $1489 \times 2048$ pixel image requires
-$30\text{ msec} \times 14 \times 20 = 8.4$ seconds. In practice,
-inference can be made even faster by batching the image tiles to run in parallel on a GPU.
-
-In the next subsection, we demonstrate the scaling characteristics on a frame from
-the DECAPS survey.
 
 % Figure~\ref{fig:cmd_m2} displays the estimated color-magnitude diagrams. While the Hubble F606W-band corresponds roughly to the SDSS $r$-band, there is no such correspondence for the SDSS $i$-band. Thus, using the Hubble locations, we estimated the $i$-band fluxes using maximum likelihood: letting $x^{(i)}$ be the SDSS image in the $i$-band, $N_H$ the number of stars in the Hubble catalog and $\ell_H$ their locations, solve
 % \begin{align}

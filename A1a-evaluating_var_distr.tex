@@ -1,8 +1,8 @@
 The sleep phase optimization requires evaluating
-$q_\eta(z | x)$ for a given catalog
+$q_\eta(z \mid x)$ for a given catalog
 \[z = \{N, (\ell_i, f_{i,1}, ..., f_{i,B})_{i = 1}^N\}.\]
 By~\eqref{eq:pull_back_of_q}, 
-it suffices to evaluate $\tilde q_\eta(\tau^{-1}(z) | x)$, 
+it suffices to evaluate $\tilde q_\eta(\tau^{-1}(z) \mid x)$, 
 where $\tau$ is the mapping from tile latent variables $\tilde z$ to the catalog $z$ as described in Section~\ref{sec:factorization}, 
 and $\tilde q_\eta$ is the distribution on tile latent variables. 
 
@@ -31,25 +31,25 @@ product
 after marginalization.
 On each tile $(x,t)$,
 \begin{align}
-    \tilde q_\eta\big(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)} | x\big) &= 
-    \tilde q_\eta(\tilde N^{(s,t)} | x) 
+    \tilde q_\eta\big(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)} \mid x\big) &= 
+    \tilde q_\eta(\tilde N^{(s,t)} \mid x) 
     \prod_{n = 1}^{N_{max}}\prod_{i = 1}^{n}
-    \tilde q_\eta\big(\tilde \ell_{n,i}^{(s, t)} | x\big)
-    \tilde q_\eta\big(\tilde f_{n,i}^{(s, t)} | x\big) \\
-    &= \tilde q_\eta(\tilde N^{(s,t)} | x) 
+    \tilde q_\eta\big(\tilde \ell_{n,i}^{(s, t)} \mid x\big)
+    \tilde q_\eta\big(\tilde f_{n,i}^{(s, t)} \mid x\big) \\
+    &= \tilde q_\eta(\tilde N^{(s,t)} \mid x) 
     \prod_{i = 1}^{\tilde N^{(s,t)}}
-    \tilde q_\eta\big(\tilde \ell_{\tilde N^{(s,t)},i}^{(s, t)} | x\big)
-    \tilde q_\eta\big(\tilde f_{\tilde N^{(s,t)},i}^{(s, t)} | x\big).
+    \tilde q_\eta\big(\tilde \ell_{\tilde N^{(s,t)},i}^{(s, t)} \mid x\big)
+    \tilde q_\eta\big(\tilde f_{\tilde N^{(s,t)},i}^{(s, t)} \mid x\big).
 \end{align}
 
-% Applying this observation and combining~\eqref{eq:factorize_within_patch} and ~\eqref{eq:factorize_patches}, $\tilde q(\tau^{-1}(z) | x)$ becomes
+% Applying this observation and combining~\eqref{eq:factorize_within_patch} and ~\eqref{eq:factorize_patches}, $\tilde q(\tau^{-1}(z) \mid x)$ becomes
 % \begin{align}
-%     \tilde q(\tau^{-1}(z) | x) = \prod_{s=1}^S\prod_{t=1}^T
+%     \tilde q(\tau^{-1}(z) \mid x) = \prod_{s=1}^S\prod_{t=1}^T
 %     \Big\{
-%     \tilde q_\eta(\tilde N^{(s,t)} | x) 
+%     \tilde q_\eta(\tilde N^{(s,t)} \mid x) 
 %     \prod_{i = 1}^{\tilde N^{(s,t)}}
-%     \tilde q_\eta\big(\tilde \ell_{\tilde N^{(s,t)},i}^{(s, t)} | x\big)
-%     \tilde q_\eta\big(\tilde f_{\tilde N^{(s,t)},i}^{(s, t)} | x\big)
+%     \tilde q_\eta\big(\tilde \ell_{\tilde N^{(s,t)},i}^{(s, t)} \mid x\big)
+%     \tilde q_\eta\big(\tilde f_{\tilde N^{(s,t)},i}^{(s, t)} \mid x\big)
 %     \Big\}.
 % \end{align}
 In words, given a catalog $z$,

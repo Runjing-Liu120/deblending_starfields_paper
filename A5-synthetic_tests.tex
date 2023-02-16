@@ -1,15 +1,14 @@
 
-We present the results on two sets of experiments on synthetic data.
+We present results on two sets of synthetic data experiments.
 
 \subsection{Deblending two stars}
 
-We set up a simple experiment to study the
-ability of StarNet to deblend two stars.
+We set up an experiment to study the
+ability of StarNet to deblend two simulated stars.
 On a $20\times20$ pixel image,
 we simulate two stars of equal flux at distance $\delta$ pixels apart, and
 examine the approximate posterior produced by StarNet (Figure~\ref{fig:deblending_fig}).
-When stars are separated by 1.5 pixels, StarNet assigns nearly 100\% probability
-of two stars in the image.
+The threshold of near-perfect deblending is a distance of $\delta = 1.5$ pixels. 
 
 \begin{figure}[tb]
     \centering
@@ -20,8 +19,8 @@ of two stars in the image.
         \includegraphics[width=\textwidth]{figures/deblending/summary_statistics.png}
     \end{subfigure}
     \caption{(Top row) Simulated images with two stars separated by distance $\delta$ in pixels.
-    True locations are in blue. Red x's are detections from the StarNet MAP estimate.
-    In these examples, StarNet correctly identified the two stars separated by distance $\delta \geq 1.2$,
+    True locations are in blue. StarNet MAP locations in red. 
+    In these examples, the StarNet MAP catalog correctly contains two stars when separated by $\delta \geq 1.2$,
     but only estimated one star when $\delta \leq 1$.
     (Bottom left) The probability that $N$, the number of sources in the image, equals two
     under the variational posterior, as $\delta$ varies.
@@ -31,15 +30,14 @@ of two stars in the image.
 
 \subsection{Coverage of credible intervals}
 
-We have seen that on M2, the StarNet 95\% credible interval did not contain the ground truth number of stars (Section~\ref{sec:results_on_m2}).
+We have seen that on M2, the StarNet 95\% posterior interval did not contain the ground truth number of stars (Section~\ref{sec:results_on_m2}).
 On M2, we attribute this to model mis-specification, specifically due to an imperfectly
 estimated background.
 
-We check the coverage of StarNet credible intervals on synthetic data
+We check the coverage of StarNet posterior intervals on synthetic data
 to reveal any issues other than model mis-specification that may explain these results.
-On synthetic data, StarNet again overestimates the number of stars.
-On a single simulated image sampled from the prior,
-the true number of stars ($N = 1195$),
+We sample a single $100\times100$ pixel image from the generative model. 
+On this sampled image, the true number of stars, $N = 1195$,
 is still considerably smaller than the 0.01-th percentile of
 the approximate posterior distribution (Figure~\ref{fig:starnet_density}).
 
@@ -53,23 +51,25 @@ the approximate posterior distribution (Figure~\ref{fig:starnet_density}).
     \label{fig:starnet_density}
 \end{figure}
 
-We attribute this over-estimation due to the spatial independence of the apprximate posterior.
+We attribute this over-estimation to the spatial independence of the approximate posterior.
 Specifically, StarNet \textit{overestimates} the number of sources close to tile boundaries.
-Heuristically, for a tile containing
+Heuristically, for a
 a source located in the interior of the tile
 within $\epsilon$ of a boundary (but still far from a corner),
 StarNet should assign a probability of $\frac{1}{2}$ for
 having one source, and a probability $\frac{1}{2}$ for having none, as $\epsilon \rightarrow 0$.
 Should this be the case, then over the entire image, which consist of many tiles,
-a source on the edge is correctly accounted for: it has a 50-50 chance of being assigned to one tile or another
-in the approximate posterior, and the expected number of sources sum to one.
+a source on a tile boundary is correctly accounted for: it has a 50-50 chance of being assigned to one tile or another
+in the approximate posterior, and this source contributes 
+a count of one to the posterior expectation on the number of stars. 
 
 However, we observe empirically that as a source approaches the edge of a tile,
-the probability that $N = 1$ approaches a number
+the posterior probability that $N = 1$ approaches a number
 slightly \textit{larger} than $\frac{1}{2}$ (Figure~\ref{fig:starnet_edges}).
-Therefore, the approximate posterior overestimates the expected number of sources in the full entire image.
-If we were to simulate images with the constraint that sources are at least 0.1-pixels from the edge,
-then the StarNet approximate posterior has much closer to correct coverage (Figure~\ref{fig:coverage_good})
+Therefore, the approximate posterior overestimates the expected number of sources in the full image.
+
+To illustrate the effect of tiles, we simulate images with the constraint that all sources are at least 0.1-pixels from all tile edges. 
+In this case, then the StarNet approximate posterior has much closer to correct coverage (Figure~\ref{fig:coverage_good})
 
 \begin{figure}[tb]
     \centering
@@ -83,12 +83,11 @@ then the StarNet approximate posterior has much closer to correct coverage (Figu
 
 \begin{figure}[tb]
     \centering
-    \includegraphics[width=0.8\textwidth]{./figures/coverage/good_coverage.png}
+    \includegraphics[width=0.5\textwidth]{./figures/coverage/good_coverage.png}
     \vspace{-0.4cm}
     \caption{Coverage test in simulated $100\times100$ images where all true stars are constrained to be 0.1-pixels away from any tile
     boundary.
-    We simulate 1000 images from the prior and generative model, and for each image, we compute a $1 - \alpha$-level credible
-    interval for the number of stars by taking the $\alpha/2$ and $1 -\alpha/2$-th percentiles of StarNet 5000 samples.
-    For each $\alpha$, we plot the observed coverage against the target $1 - \alpha$-level coverage. }
+    We simulate 1000 images from the prior and generative model, and for each image, we compute a $(1 - \alpha)$-level posterior interval for the number of stars by taking the $\frac{\alpha}{2}$ and $(1 -\frac{\alpha}{2})$-th percentiles of 5000 StarNet posterior samples.
+    For each $\alpha$, we plot the observed coverage against the target $(1 - \alpha)$-level coverage. }
     \label{fig:coverage_good}
 \end{figure}

@@ -2,73 +2,53 @@
 We examine the sensitivity of StarNet to prior parameters $\mu$ and $\alpha$ on the image M2. 
 Recall $\mu$ is the prior mean number of stars per pixel~\eqref{eq:n_prior};
 $\alpha$ is the power law slope on the $r$-band fluxes~\eqref{eq:flux_prior}. 
-In the results of Section~\ref{sec:results_on_m2}, $\mu=0.15$ and  $\alpha = 0.5$. 
+In the results of Section~\ref{sec:results_on_m2}, $\mu=0.12$ and  $\alpha = 0.5$. 
 
-The model appears reasonably robust. 
-As expected, as $\mu$ increases the TPR increases while the PPV decreases  -- the prior encourages more detections (Figure~\ref{fig:mu_sensitivity}). 
+The model is robust to these prior choices. 
+Over a  range of $\mu$ between 0.08, corresponding to 
+an prior average of 800 stars on a $100\times100$ image, 
+and 0.20, corresponding to 2000 stars, 
+the F1-score remains steady between 0.49 and 0.51 (Table~\ref{tab:mu_sensitivity}). 
+Similar results hold when $\alpha$ varies between 
+0.25 and 1.0. 
 
-\begin{figure}[ht]
-\begin{subfigure}{\textwidth}
+\begin{table}[!tb]
 \centering
-\includegraphics[width = \textwidth]{figures/prior_sensitivity/prior_mu_sensitivty.png}
-\end{subfigure}
-\begin{subfigure}{\textwidth}
-\begin{center}
-\begin{tabular}{rrr}
+\caption{Performance metrics on M2 as a function of 
+the prior parameter $\mu$. 
+The smallest $\mu$, $\mu = 0.08$ corresponds to 
+an prior average of 800 stars on a $100\times100$ image, 
+while the largest, $\mu = 0.2$, corresponds to 2000 stars. }
+\label{tab:mu_sensitivity}
+\begin{tabular}{l|ccc}
 \toprule
-     mu &   TPR &   PPV \\
+$\mu$ &   TPR &   PPV &  F1 score \\
 \midrule
- 0.10 &  0.46 &  0.66 \\
- 0.15 &  0.51 &  0.60 \\
- 0.20 &  0.51 &  0.49 \\
+0.08 &  0.47 &  0.53 & 0.50 \\
+0.10 &  0.49 &  0.53 & 0.51 \\
+0.12 &  0.53 &  0.48 & 0.50 \\
+0.14 &  0.50 &  0.46 & 0.48 \\
+0.16 &  0.51 &  0.48 & 0.50 \\
+0.20 &  0.51 &  0.48 & 0.49 \\
 \bottomrule
 \end{tabular}
-\par\vspace{0pt}
-\end{center}
-\end{subfigure}\hfill
-\caption{Sensitivity of performance metrics to Poisson mean parameter on number of stars ($\mu$ in Equation \ref{eq:n_prior}). }
-\label{fig:mu_sensitivity}
-\end{figure}
+\end{table}
 
-As $\alpha$ increases, StarNet estimates more dim sources: the prior distribution on fluxes places more mass near $f_{min}$ (Figure~\ref{fig:flux_priors}). 
 
-\begin{figure}[tb]
-    \centering
-    \includegraphics[width = 0.6\textwidth]{figures/prior_sensitivity/prior_fluxes.png}
-    \caption{The prior density of $r$-band magnitude for various power law slopes $\alpha$.}
-    \label{fig:flux_priors}
-\end{figure}
-
-While the TPR increases across $\alpha$ values, the PPV suffers at $\alpha = 0.75$ (Figure~\ref{fig:alpha_sensitivity}).
-At $\alpha = 0.75$, we see that the TPR improves at dimmer sources at the expense of brighter sources, suggesting that the brigher sources become over-split. 
-The stronger prior on dimmer stars also manifests in the flux distribution of the resulting StarNet catalog (Figure~\ref{fig:cdf_sensitivity}). 
-
-\begin{figure}[tb]
-\begin{subfigure}{\textwidth}
+\begin{table}[!tb]
 \centering
-\includegraphics[width = \textwidth]{figures/prior_sensitivity/prior_alpha_sensitivity.png}
-\end{subfigure}
-\begin{subfigure}{\textwidth}
-\begin{center}
-\begin{tabular}{rrr}
+\caption{Performance metrics on M2 as a function of 
+the prior parameter $\alpha$. }
+\label{tab:alpha_sensitivity}
+\begin{tabular}{l|ccc}
 \toprule
- alpha &   TPR &   PPV \\
+$\alpha$ &   TPR &   PPV &  F1 score \\
 \midrule
-  0.25 &  0.46 &  0.60 \\
-  0.50 &  0.51 &  0.60 \\
-  0.75 &  0.52 &  0.54 \\
+0.25 &  0.47 &  0.54 & 0.51 \\
+0.50 &  0.53 &  0.48 & 0.50 \\
+0.75 &  0.56 &  0.45 & 0.50 \\
+1.00 &  0.55 &  0.47 & 0.51 \\
 \bottomrule
 \end{tabular}
-\par\vspace{0pt}
-\end{center}
-\end{subfigure}\hfill
-\caption{Sensitivity of performance metrics to flux prior parameter $\alpha$. }
-\label{fig:alpha_sensitivity}
-\end{figure}
+\end{table}
 
-\begin{figure}
-    \centering
-    \includegraphics[width = 0.6\textwidth]{figures/prior_sensitivity/sensitivity_cdf_fluxes.png}
-    \caption{Sensitivity of estimated flux distribution to flux prior parameter $\alpha$.}
-    \label{fig:cdf_sensitivity}
-\end{figure}

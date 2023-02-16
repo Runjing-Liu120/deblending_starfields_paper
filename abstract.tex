@@ -1,5 +1,5 @@
-In the image data collected by astronomical surveys, stars and galaxies often overlap.
-Deblending is the task of distinguishing and characterizing individual light sources from survey images.
+In images collected by astronomical surveys, stars and galaxies often overlap visually.
+Deblending is the task of distinguishing and characterizing individual light sources in survey images.
 We propose StarNet, a fully Bayesian method to deblend sources in astronomical images of crowded star fields.
 StarNet leverages recent advances in variational inference,
 including amortized variational distributions and
@@ -7,5 +7,8 @@ an optimization objective targeting the forward KL divergence.
 % Wake-sleep, which minimizes forward KL divergence,
 % has significant benefits compared to traditional variational inference,
 % which minimizes a reverse KL divergence.
-In our experiments with SDSS images of the M2 globular cluster, StarNet is substantially more accurate than two competing methods: Probablistic Cataloging (PCAT), a method that uses MCMC for inference, and a software pipeline employed by SDSS for deblending (DAOPHOT).
-In addition, StarNet is as much as $100,000$ times faster than PCAT, exhibiting the scaling characteristics necessary to perform fully Bayesian inference on modern astronomical surveys.
+In our experiments with SDSS images of the M2 globular cluster, StarNet is substantially more accurate than two competing methods: Probablistic Cataloging (PCAT), a method that uses MCMC for inference, and DAOPHOT, a software pipeline employed by SDSS for deblending.
+In addition, the amortized approach to inference 
+gives StarNet the scaling characteristics necessary to perform fully Bayesian inference on modern astronomical surveys.
+
+% In addition, StarNet is as much as $100$ times faster than PCAT, exhibiting the scaling characteristics necessary to perform fully Bayesian inference on modern astronomical surveys.

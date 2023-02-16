@@ -1,4 +1,4 @@
-In crowded starfields, such as globular clusters and the Milky Way, the vast majority of light sources are stars.
+In crowded starfields such as globular clusters and the galactic plane of the Milky Way, the vast majority of light sources are stars.
 An astronomical image records the number of photons that reached a telescope and arrived at each pixel.
 Typically, photons must pass through one of several filters, each selecting photons from a specified band of wavelengths, before being recorded.
 
@@ -6,17 +6,18 @@ For a given $H \times W$ pixel image with $B$ filter bands, our goal is to infer
 stars.
 The catalog specifies the number of stars
 in an image; for each such star, the catalog
-records its location and its flux, or brightness,
+records its location and its flux (brightness)
 in each band.
 The space of latent variables
 $\mathcal{Z}$ is the collection of all possible catalogs of the form
 \[z := \{N, (\ell_i, f_{i,1}, ..., f_{i,B})_{i = 1}^N\},\]
 where the number of stars in the catalog
 is $N\in\mathbb{N}$;
-the location of the $i$th star is $\ell_i \in \Reals^2$; and
-the flux of the $i$th star in the $b$th band is $f_{i, b}\in\Reals^+$.
+the location of star $i$ is $\ell_i \in \Reals^2$; and
+the flux of the star $i$ in band $b$ is $f_{i, b}\in\Reals^+$.
 
-A Bayesian approach requires specification of a prior over catalog space $\mathcal{Z}$ and a likelihood for the observed images. Our likelihood and prior, detailed below, are similar to previous approaches~\citep{Brewer_2013, Portillo_2017, Feder_2019}.
+A Bayesian approach requires specification of a prior over catalog space $\mathcal{Z}$ and a likelihood for the observed images. Our likelihood and prior, detailed below, are similar to previous approaches~\citep{Brewer_2013, Portillo_2017, Feder_2019}, 
+which facilitates the comparisons of inference algorithms in isolation of model differences. 
 
 \subsection{The prior}
 The prior over $\mathcal{Z}$ is a marked spatial Poisson process. To sample the prior, first draw the number of stars contained in the $H\times W$ image as
@@ -27,27 +28,27 @@ The prior over $\mathcal{Z}$ is a marked spatial Poisson process. To sample the 
 where $\mu$ is a hyperparameter specifying the average number of sources per pixel.
 Next, draw locations
 \begin{align}
-  \ell_1, ..., \ell_N | N &\stackrel{iid}{\sim} \text{Uniform}([0, H] \times [0, W]).
+  \ell_1, ..., \ell_N \mid N &\stackrel{iid}{\sim} \text{Uniform}([0, H] \times [0, W]).
  \end{align}
 The fluxes in the first band are from a power law distribution with slope $\alpha$:
 \begin{align}
-    f_{1, 1}, ..., f_{N,1} | N &
+    f_{1, 1}, ..., f_{N,1} \mid N &
     \stackrel{iid}{\sim} \text{Pareto}(f_{min}, \alpha)
     \label{eq:flux_prior}.
 \end{align}
 Fluxes in other bands are described relative to the first band. Like~\cite{Feder_2019}, we define the log-ratio of flux relative to the first band as ``color." Colors are drawn from a Gaussian distribution
 \begin{align}
-  c_{1, b}, ..., c_{N,b} | N  &
+  c_{1, b}, ..., c_{N,b} \mid N  &
       \stackrel{iid}{\sim} \mathcal{N}(\mu_c, \sigma^2_c), \quad b = 2, ..., B.
 \end{align}
 Given the flux in the first band $f_{i,1}$ and color $c_{i,b}$,
 the flux in band $b$ is  $f_{i,b} = f_{i,1} \times 10^{c_{i,b} / 2.5}$.
 
-Also like~\cite{Feder_2019}, we set the power law slope $\alpha = 0.5$ and use a standard Gaussian for the color prior ($\mu_c = 0$, $\sigma^2_c = 1$).
+We set the power law slope $\alpha = 0.5$ and use a standard Gaussian for the color prior ($\mu_c = 0$, $\sigma^2_c = 1$), as in \cite{Feder_2019}.
 
 Rather than having a hierarchical structure, 
-the prior parameters are fixed in this model. 
-The goal is to produce a posterior on catalogs for a
+the prior parameters are fixed in this model:
+our goal is to produce a posterior on catalogs for a
 specific image, not to model the population over many images. 
 Appendix~\ref{sec:prior_sensitivity} evaluates the
 sensitivity of the resulting catalog to choices of the prior parameters.
@@ -56,9 +57,9 @@ sensitivity of the resulting catalog to choices of the prior parameters.
 Let $x_{hw}^b$ denote the observed number of photoelectrons at pixel $(h,w)$ in band $b$.
 For each band, at every pixel, the expected number of photoelectron arrivals is $\lambda^b_{hw}(z)$, a deterministic function of the catalog $z$. Motivated by the Poissonian nature of photon arrivals and
 the large photon arrival rate in SDSS and LSST images,
-observations are drawn as
+observed pixel intensities are drawn as
 \begin{align}
-  x_{hw}^b | z \overset{ind}{\sim} \mathcal{N}(\lambda^b_{hw}, \lambda^b_{hw}),
+  x_{hw}^b \mid z \overset{ind}{\sim} \mathcal{N}(\lambda^b_{hw}, \lambda^b_{hw}),
   \quad
   b = 1, ..., B; \;
   h = 1,..., H; \;
@@ -69,8 +70,8 @@ observations are drawn as
 \end{align}
 Here, $\mathcal{P}_b$ is the point spread function (PSF) for band $b$ and $I_b$ is the background intensity.
 The PSF is a function
-$\mathcal{P}+b : \Reals \times \Reals \mapsto \Reals^+$,
-describing the appearance of a stellar point source at any 2D position of the image (but ignoring pixelation).
+$\mathcal{P}_b : \Reals \times \Reals \mapsto \Reals^+$,
+describing the appearance of a stellar point source at any 2D position of the image.
 Our PSF model is a weighted average between a Gaussian ``core" and a power-law ``wing," as described in~\cite{Xin2018psf}. For each band, the PSF has the form
 
 \begin{align}
@@ -81,8 +82,7 @@ Our PSF model is a weighted average between a Gaussian ``core" and a power-law `
 \end{align}
 The PSF parameters are allowed to vary by band.
 In our applications to SDSS and DECam data, we use estimates of the background
-and PSF obtained from a pre-processing pipeline and were
-sourced along with the raw image.
+and PSF obtained from a pre-processing pipeline that are distributed by these surveys along with the images.
 
 
 % pipeline and found the PSF estimates to be suboptimal in crowded starfields~\citep{Feder_2019}.
