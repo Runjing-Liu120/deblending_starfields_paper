@@ -3,20 +3,22 @@ The initial $100\times100$ subregion of M2 considered in our main paper was loca
 We evaluate StarNet on two other subregions of M2.
 The first is another $100\times100$ pixel subregion of similar density as the original;
 the second is in the center of globular cluster
-(Figure~\ref{fig:m2_test_regions})
+(Figure~\ref{fig:m2_test_regions}).
 
+The performance metrics on the center of the globular cluster 
+suggest that deblending in this region is nearly impossible --- there are $15,000$ stars in this $100\times100$ subregion, 
+averaging to more than one star per pixel. 
 
-% \begin{figure}[tb]
-%     \centering
-%     \includegraphics[width=0.99\textwidth]{figures/m2_results/m2_cmd.png}
-%     \vspace{-0.5cm}
-%     \caption{Color-magnitude diagrams from StarNet and Hubble. From left the right: color-magnitude diagrams constructed from: the same $100\times100$ subimage as was cataloged in \cite{Feder_2019}; 
-%     the StarNet catalog derived from the entire $1000 \times 1000$ image of M2; 
-%     that StarNet catalog, filtered to stars with posterior SD(flux) $< 1$; the Hubble catalog. 
-%     TODO fix x-axes for hubble. also maybe remove starnet 100x 100. 
-% }
-%     \label{fig:m2_test_regions}
-% \end{figure}
+In all the considered regions, our comparison with DAOPHOT is unchanged, and we continue to outperform DAOPHOT in F1 score. 
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/m2_results/test_images.png}
+    \vspace{-0.5cm}
+    \caption{Subregions of M2 for the performance metrics in Table~\ref{tab:summary_stats_m2test}. The subregion labeled "A" was cataloged in the main text. 
+}
+    \label{fig:m2_test_regions}
+\end{figure}
 
 \input{tables/summary_stats_m2test}
 

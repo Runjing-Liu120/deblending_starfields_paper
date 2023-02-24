@@ -20,7 +20,7 @@ Thus, unbiased stochastic gradients can be obtained as
 
 In other words, at each iteration of SGD, we simulate complete data $(x,z)$ from the generative model and evaluate the loss $-\log q_\eta(z \mid x)$.
 Here, ``complete data" refers to the image along with its catalog.
-This loss encourages the neural network to map an image $x$ to a distribution $q_{\eta}(\cdot \mid x)$ that places large mass on the image's catalog $z$.
+This loss encourages the neural network to map an image $x$ to a distribution $q_{\eta}(\cdot \mid x)$ that places large density on the image's catalog $z$.
 
 We decompose the loss $-\log q_\eta(z \mid x)$ further.
 Recall that $q_\eta$ fully factorizes over tile latent variables, and thus $-\log q_\eta(z \mid x)$ is a summation over all tile latent variables.

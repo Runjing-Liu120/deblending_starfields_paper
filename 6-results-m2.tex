@@ -49,7 +49,8 @@ The DAOPHOT catalog of M2 was reported in \cite{An_2008_m2}.
 % Each sample from the (approximate) posterior returns a catalog, and each
 % sampled catalog may have different cardinally.
 
-To evaluate the three methods, we filtered the ground truth HST catalog to stars with magnitudes smaller than 22.5 in the Hubble F606W band,
+To evaluate the three methods, we filtered the ground truth HST catalog to stars with magnitudes smaller than 22.5 in the Hubble F606W band
+(note that smaller magnitude corresponds to brighter stars),
 because none of the three methods were able to detect stars
 with lower apparent brightness in the SDSS image.
 
@@ -162,9 +163,11 @@ cataloged by \cite{Feder_2019} and
 catalog the entire M2 globular cluster 
 contained in a $1000 \times 1000$-pixel image (Figure~\ref{fig:m2_region}). 
 We produce a color-magnitude diagram on this entire region (Figure~\ref{fig:m2_cmd}). 
-On the entire region, a second cluster, 
+On the entire region, a second distinct cluster, 
 shifted to the right in color, 
 appears in addition to the main sequence of stars.
+The second cluster becomes more apparent after we filter to high-confidence stars in the StarNet catalog, 
+defined as stars with flux posterior standard deviation less than one. 
 This second cluster, corresponding to a collection of red giants, 
 is undetectable without the ability of StarNet to 
 scale to larger images. 
@@ -172,7 +175,7 @@ scale to larger images.
 However, 
 the patterns are less definite in the StarNet color-magnitude diagram than in Hubble color magnitude diagram.
 There is more spread in the StarNet color estimates, particularly at faint magnitudes. 
-This is due to the superior resolution of the Hubble telescope; near the heavily saturated core of the M2 cluster, stars are near impossible to deblend in the SDSS image, and our performance suffers (TODO). 
+This is due to the superior resolution of the Hubble telescope; near the heavily saturated core of the M2 cluster, stars are near impossible to deblend in the SDSS image, and our performance suffers (Appendix~\ref{sec:test_m2}). 
 
 
 % Most of the cataloged stars lie on the 
@@ -186,10 +189,9 @@ This is due to the superior resolution of the Hubble telescope; near the heavily
     \centering
     \includegraphics[width=0.99\textwidth]{figures/m2_results/m2_cmd.png}
     \vspace{-0.5cm}
-    \caption{Color-magnitude diagrams from StarNet and Hubble. From left the right: color-magnitude diagrams constructed from: the same $100\times100$ subimage as was cataloged in \cite{Feder_2019}; 
+    \caption{Color-magnitude diagrams from StarNet and Hubble. From left to right, color-magnitude diagrams constructed from: the same $100\times100$ subimage as was cataloged in \cite{Feder_2019}; 
     the StarNet catalog derived from the entire $1000 \times 1000$ image of M2; 
     that StarNet catalog, filtered to stars with posterior SD(flux) $< 1$; the Hubble catalog. 
-    TODO fix x-axes for hubble. also maybe remove starnet 100x 100. 
 }
     \label{fig:m2_cmd}
 \end{figure}

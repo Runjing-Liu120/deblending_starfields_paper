@@ -264,6 +264,14 @@ We tuned the architecture using Optuna, an automatic hyper-parameter optimizatio
 Our search included the number of convolution layers, 
 the number of fully connected layers,
 the number of channels in the convolution layers, and the size of the fully connected layers. 
+
+An input to the network is a padded tile, which consists of $B$ color bands. 
+We also append an additional ``band" to the input, which 
+is a one-hot encoding with
+ones for pixels inside the tile, and zeros outside. 
+We do this because the network is only responsible for inferring sources inside each tile, and this additional band gives
+the network access to a feature which encodes the tile interior. 
+
 See Appendix~\ref{sec:supp_nn_architecture} for further details 
 concerning the parameters of our neural network architecture. 
 % our focus in this paper is the application of neural networks to provide a variational posterior for cataloging starfields, not the network architecture per se.
@@ -273,10 +281,12 @@ concerning the parameters of our neural network architecture.
 
 \begin{figure}[!tb]
     \centering
-    \includegraphics[width=\textwidth]{figures/vi_figures/starnet_architecture8.png}
+    \includegraphics[width=\textwidth]{figures_vg/starnet_archetecture9.png}
     \vspace{-1.cm}
-    \caption{The neural network architecture. The DECam input is a $20\times 20$ padded tile, and the network returns distributional parameters corresponding to sources located in the $10\times 10$ tile outlined in white.
+    \caption{The neural network architecture. The DECam input is a two-band $20\times 20$ padded tile, 
+    and the network returns distributional parameters corresponding to sources located in the $10\times 10$ tile outlined in white.
     In this example, there are two sources located in the $10\times10$ tile.
+    The additional input band is a one-hot encoding with ones for pixels inside the tile, and zeros outside. 
     For further details concerning the residual network blocks (in blue), see 
     Appendix~\ref{sec:supp_nn_architecture}.
     }

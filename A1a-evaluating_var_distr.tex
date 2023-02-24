@@ -15,7 +15,7 @@ The number of stars $\tilde N^{(s,t)}$ is simply the count of the locations that
 \tilde N^{(s,t)} = \sum_{i=1}^N 
 \mathbf 1 \Big\{\ell_i\in [Rs, R(s+1)] \times [Rt, R(t+1)]\Big\},
 \end{align}
-where $\mathbf{1}\{\cdot\}$ is the indicator function, equal to one if true and zero if false.
+where $\mathbf{1}\{\cdot\}$ is the indicator function, equal to one its predicate is true if true and zero otherwise.
 
 Now, consider $\tilde\ell^{(s, t)}$ and $\tilde f^{(s, t)}$, the triangular array of locations and fluxes on tile $(s,t)$. 
 For each $(s,t)$, the $\tilde N^{(s,t)}$-th row 
@@ -60,7 +60,7 @@ of stars falling in each tile.
 
 The last technical detail is computing 
 a given row of a triangular array. 
-Because catalogs are {\itshape sets},
+Because catalogs are sets,
 each star in the tile must 
 be matched with corresponding variational parameters. 
 Let $(\tilde \ell_i, \tilde f_i)_{i = 1}^n$ generically denote the tile latent variables in the $n$-th row of a triangular array, on some tile. 
