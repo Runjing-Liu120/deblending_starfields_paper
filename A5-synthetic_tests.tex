@@ -8,7 +8,9 @@ ability of StarNet to deblend two simulated stars.
 On a $20\times20$ pixel image,
 we simulate two stars of equal flux at distance $\delta$ pixels apart, and
 examine the approximate posterior produced by StarNet (Figure~\ref{fig:deblending_fig}).
-The threshold of near-perfect deblending is a distance of $\delta = 1.5$ pixels. 
+We generate the stars with the DECaPS PSF, which 
+has a full width at half maximum (FWHM) of 4.2 pixels. 
+The threshold of near-perfect deblending is a distance of $\delta = 1.5$ pixels, which is less than two PSF-widths apart. 
 
 \begin{figure}[tb]
     \centering
@@ -44,7 +46,7 @@ the approximate posterior distribution (Figure~\ref{fig:starnet_density}).
 
 \begin{figure}[tb]
     \centering
-    \includegraphics[width=0.6\textwidth]{./figures/coverage/starnet_histogram.png}
+    \includegraphics[width=0.45\textwidth]{./figures/coverage/starnet_histogram.png}
     \vspace{-0.4cm}
     \caption{Distribution of 5000 samples of the number of sources from the StarNet approximate posterior.
     The true number of sources demarcated in red. }
@@ -91,3 +93,12 @@ In this case, then the StarNet approximate posterior has much closer to correct 
     For each $\alpha$, we plot the observed coverage against the target $(1 - \alpha)$-level coverage. }
     \label{fig:coverage_good}
 \end{figure}
+
+\subsection{Effects of padding}
+We re-run the experiment described in the subsection above, 
+simulating sources closer and closer to the tile edge, 
+but with less padding on the tiles. 
+The experiments above used the M2 network parameters, 
+which uses $2\times 2$ tiles and three pixels of padding. 
+With only one pixel of padding, sources become even more 
+over-estimated on tile edges (Figure TODO). 
