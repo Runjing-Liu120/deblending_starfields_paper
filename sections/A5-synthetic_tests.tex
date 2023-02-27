@@ -1,3 +1,4 @@
+\section{Experiments on synthetic data}
 
 We present results on two sets of synthetic data experiments.
 
@@ -9,8 +10,10 @@ On a $20\times20$ pixel image,
 we simulate two stars of equal flux at distance $\delta$ pixels apart, and
 examine the approximate posterior produced by StarNet (Figure~\ref{fig:deblending_fig}).
 We generate the stars with the DECaPS PSF, which 
-has a full width at half maximum (FWHM) of 4.2 pixels. 
-The threshold of near-perfect deblending is a distance of $\delta = 1.5$ pixels, which is less than two PSF-widths apart. 
+has a full width at half maximum 
+(defined as twice the radius at which the PSF is half its peak brightness) of 4.2 pixels. 
+The threshold of near-perfect deblending is a distance of $\delta = 1.5$ pixels, which is less than half the PSF 
+full width at half maximum. 
 
 \begin{figure}[tb]
     \centering
@@ -47,7 +50,7 @@ the approximate posterior distribution (Figure~\ref{fig:starnet_density}).
 \begin{figure}[tb]
     \centering
     \includegraphics[width=0.45\textwidth]{./figures/coverage/starnet_histogram.png}
-    \vspace{-0.4cm}
+    %\vspace{-0.4cm}
     \caption{Distribution of 5000 samples of the number of sources from the StarNet approximate posterior.
     The true number of sources demarcated in red. }
     \label{fig:starnet_density}
@@ -76,7 +79,7 @@ In this case, then the StarNet approximate posterior has much closer to correct 
 \begin{figure}[tb]
     \centering
     \includegraphics[width=0.8\textwidth]{./figures_vg/coverage/edges_example.eps}
-    \vspace{-0.4cm}
+    %\vspace{-0.4cm}
     \caption{The expected number of sources under the StarNet approximate posterior as a function of distance from the edge (in pixels).
     On the left, we place a star on the left-most edge, and move its location $\delta$ pixels to the right.
     On the right, we place a star on the top-left corner, and move its location $\delta$ pixels towards the bottom-right corner.}
@@ -86,7 +89,7 @@ In this case, then the StarNet approximate posterior has much closer to correct 
 \begin{figure}[tb]
     \centering
     \includegraphics[width=0.5\textwidth]{./figures/coverage/good_coverage.png}
-    \vspace{-0.4cm}
+    %\vspace{-0.4cm}
     \caption{Coverage test in simulated $100\times100$ images where all true stars are constrained to be 0.1-pixels away from any tile
     boundary.
     We simulate 1000 images from the prior and generative model, and for each image, we compute a $(1 - \alpha)$-level posterior interval for the number of stars by taking the $\frac{\alpha}{2}$ and $(1 -\frac{\alpha}{2})$-th percentiles of 5000 StarNet posterior samples.
@@ -95,10 +98,25 @@ In this case, then the StarNet approximate posterior has much closer to correct 
 \end{figure}
 
 \subsection{Effects of padding}
-We re-run the experiment described in the subsection above, 
-simulating sources closer and closer to the tile edge, 
-but with less padding on the tiles. 
-The experiments above used the M2 network parameters, 
+We study the effect of padding the input 
+tiles to the StarNet neural network architecture. 
+We re-visit the investigation of tile boundary effects 
+described in the subsection above, where 
+we simulate a source closer and closer to the tile boundary. 
+The experiments above used the M2 network, 
 which uses $2\times 2$ tiles and three pixels of padding. 
 With only one pixel of padding, sources become even more 
-over-estimated on tile edges (Figure TODO). 
+over-estimated on tile edges (Figure~\ref{fig:starnet_edges_lesspad}). 
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.8\textwidth]{./figures_vg/coverage/edges_example_lesspad.eps}
+    %\vspace{-0.4cm}
+    \caption{The same experimental setup as Figure~\ref{fig:starnet_edges}, but we 
+    study the effect of padding input tiles. 
+    In dashed blue, the posterior when 
+    StarNet uses three pixels of padding. 
+    In solid orange, the posterior when only one pixel of padding is used.
+    }
+    \label{fig:starnet_edges_lesspad}
+\end{figure}

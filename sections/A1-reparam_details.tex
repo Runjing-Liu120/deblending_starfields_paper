@@ -1,3 +1,6 @@
+\section{Reparameterized and REINFORCE gradients}
+\label{sec:reparam_details}
+
 The ELBO objective~\eqref{eq:elbo} is of the form
 \begin{align}
     \mathcal{L}(\eta) = \Expect_{q_\eta(z)}[f_\eta(z)].
@@ -26,6 +29,30 @@ The REINFORCE estimate is unbiased for the true gradient:
 \end{align}
 assuming that $f$ is well-behaved so that integration and differentiation can be interchanged.
 
+In many applications,
+the REINFORCE estimator has too high variance to be useful. One way to lower the variance is to introduce a control variate $C$
+\citep{ranganath2013black}, and estimate the gradient as 
+\begin{align}
+    g_{\textrm{cv}}(z) = \nabla_\eta f_\eta(z) +
+        (f_\eta(z) - C)  \nabla_\eta \log q_\eta(z)
+    \quad \text{for }
+    z\sim q_\eta(z).
+\end{align}
+This estimate remains unbiased because the score function 
+$\nabla_\eta \log q_\eta(z)$ is zero mean under $q$.
+
+A simple but often effective choice of control variate that we use in the main text is to let 
+$C$ be a second evaluation of $f_\eta$ at an independently drawn $z'\sim q$:
+\begin{align}
+    g_{\textrm{cv}}(z) = \nabla_\eta f_\eta(z) +
+        (f_\eta(z) - f_\eta(z')  \nabla_\eta \log q_\eta(z)
+    \quad \text{for }
+    z, z' \overset{\mathrm{iid}} \sim q_\eta.
+    \label{eq:control_var}
+\end{align}
+This estimate is unbiased conditional on $z'$ and hence unconditionally unbiased as well. 
+
+
 Alternatively, the reparameterized gradient~\citep{rezende2014stochastic, kingma2013autoencoding} can be used when there exists some distribution $F$ not involving $\eta$ and a differentiable mapping $h_\eta$ such that
 \begin{align}
     w \sim F \implies h_\eta(w) \sim q_\eta.
@@ -48,59 +75,65 @@ Unbiased gradients arise from the chain rule:
 The reparameterized gradient includes gradient information $\nabla_z f_\eta(z)$, while the REINFORCE gradient does not. Taking into account the structure of $f$ through its gradient lowers the variance of reparameterized gradient in comparison to the REINFORCE gradient.
 However, if $z$ contains discrete components, there cannot be a differentiable mapping $h_\eta$, and the reparameterization trick will not apply.
 
-%TODO need to talk about the fact that we use a baseline. 
-
-\subsection{Gradients for our ELBO vs sleep experiment}
-In Section~\ref{sec:elbo_sleep_compare}, we used a combination of reparameterized and REINFORCE gradients.
-Let $N$ be the discrete component of $z$ (the number of stars) and $y$ be the continuous components (the locations and fluxes).
+\subsection{Gradients for the empirical comparison of KL objectives}
+In experiments of Section~\ref{sec:elbo_sleep_compare}, 
+we used a combination of reparameterized and REINFORCE plus control variate gradients.
+Let $\tilde N$ be the vector of per-tile number of stars (a discrete component) and $y$ be the locations and fluxes (continuous components)
 Our variational distribution factorizes, so we write the expectation as
 \begin{align}
- \mathcal{L}(\eta) = \Expect_{q_\eta(N)}\Expect_{q_\eta(y)}[f_\eta(N, y)].
+ \mathcal{L}(\eta) = \Expect_{q_\eta(\tilde N)}\Expect_{q_\eta(y)}[f_\eta(\tilde N, y)].
  \label{eq:elbo_factorized}
 \end{align}
-We use the REINFORCE estimator for the outer expectation and the reparameterization trick for the inner expectation. We first apply the REINFORCE to the outer expectation:
+We use the REINFORCE estimator with control variate \eqref{eq:control_var} for the outer expectation and the reparameterization trick for the inner expectation. 
+We first apply REINFORCE to the outer expectation:
 \begin{align}
-    \nabla_\eta  \Expect_{q_\eta(N)}&\Expect_{q_\eta(y)}\Big[f_\eta(N, y)\Big] \\
-    &=  \Expect_{q_\eta(N)}\Big[ \nabla_\eta \log q_\eta(N) \Expect_{q_\eta(y)}[f_\eta(N, y)] +
-    \nabla_\eta \Expect_{q_\eta(y)}[f_\eta(N, y)] \Big]\\
-    &\approx \nabla_\eta \log q_\eta(N) \Expect_{q_\eta(y)}[f_\eta(N, y)] +
-    \nabla_\eta \Expect_{q_\eta(y)}[f_\eta(N, y)] \quad \text{for } N \sim q_\eta(N).
+    \nabla_\eta  &
+    \Expect_{q_\eta(\tilde N)}\Expect_{q_\eta(y)}\Big[f_\eta(\tilde N, y)\Big] \\
+    &=  \Expect_{q_\eta(\tilde N)}\Big[ \nabla_\eta \log q_\eta(\tilde N) \Expect_{q_\eta(y)}\big[f_\eta(\tilde N, y) - 
+    \Expect_{q_\eta(\tilde N)}[f_\eta(\tilde N, y)]\big] +
+    \nabla_\eta \Expect_{q_\eta(y)}[f_\eta(\tilde N, y)] \Big]\\
+    &\approx \nabla_\eta \log q_\eta(\tilde N) \Expect_{q_\eta(y)}[f_\eta(\tilde N, y) - f_\eta(\tilde M, y)] +
+    \nabla_\eta \Expect_{q_\eta(y)}[f_\eta(\tilde N, y)]
     \label{eq:reinforce_partial}
 \end{align}
+ for $\tilde N,\tilde M \overset{iid}\sim q_\eta$.
 Then we use the reparameterization trick for $y$, so
 \begin{align}
-    \Expect_{q_\eta(y)}[f_\eta(N, y)] &\approx f_\eta(N, h_\eta(w))\\
-    \nabla_\eta \Expect_{q_\eta(y)}[f_\eta(N, y)] &\approx  \nabla_y f_\eta(N, y)\Big|_{y = h_\eta(w)}
+    \Expect_{q_\eta(y)}[f_\eta(\tilde N, y) - f_\eta( \tilde M, y)] &\approx f_\eta(\tilde N, h_\eta(w)) - f_\eta(\tilde M, h_\eta(w))\\
+    \nabla_\eta \Expect_{q_\eta(y)}[f_\eta(\tilde N, y)] &\approx  \nabla_y f_\eta(\tilde N, y)\Big|_{y = h_\eta(w)}
     \nabla_\eta h_\eta(w)
     \label{eq:reparam_partial}
 \end{align}
 for $w \sim F$, where $h_\eta$ and $F$ are chosen appropriately. Combining~\eqref{eq:reinforce_partial} and~\eqref{eq:reparam_partial}, our gradient estimator is
 \begin{align}
-    g(z) = \nabla_\eta \log q_\eta(N)
-    f_\eta(N, h_\eta(w)) +
-    \nabla_y f_\eta(N, y)\Big|_{y = h_\eta(w)}
+    g(z) = \nabla_\eta \log q_\eta(\tilde N)
+    [f_\eta(\tilde N, h_\eta(w)) - f_\eta(\tilde M, h_\eta(w))] +
+    \nabla_y f_\eta(\tilde N, y)\Big|_{y = h_\eta(w)}
     \nabla_\eta h_\eta(w).
     \label{eq:appendix_reinforce}
 \end{align}
 Equation~\ref{eq:appendix_reinforce} is what our main text called the ``REINFORCE gradient."
 These gradients produced the optimization path in Figure~\ref{fig:optim_path}(a).
 
-The ``reparameterized" gradient in Section~\ref{sec:elbo_sleep_compare} requires integrating out $N$.
-Here, we write the outer expectation in~\eqref{eq:elbo_factorized} as a summation of $4^{N_{max}}$ terms (recall our experiments have four tiles, and at most $N_{max}$ stars per tile):
+The ``reparameterized" gradient in Section~\ref{sec:elbo_sleep_compare} requires integrating out $\tilde N$.
+Here, we write the outer expectation in~\eqref{eq:elbo_factorized} as a summation of $4^{N_{max}+1}$ terms
+(recall our experiments have four tiles, and at most $N_{max}$ stars per tile), 
+with each term representing a different possible 
+assignment of the number of stars to each tile: 
 \begin{align}
-\mathcal{L}(\eta) = \sum_{n=1}^{4^{N_{max}}}\Expect_{q_\eta(y)}[f_\eta(n, y)].
+\mathcal{L}(\eta) = \sum_{\tilde n}\Expect_{q_\eta(y)}[f_\eta(\tilde n, y)].
 \end{align}
 Then, the reparameterization trick is applied to each term of the summation.
 Stochastic gradients are computed as,
 \begin{align}
-g(z) = \sum_{n=1}^{4^{N_{max}}}\nabla_y f_\eta(n, y)\Big|_{y = h_\eta(w)}
+g(z) = \sum_{\tilde n=1}\nabla_y f_\eta(\tilde n, y)\Big|_{y = h_\eta(w)}
 \nabla_\eta h_\eta(w) \quad \text{for } w\sim F.
 \end{align}
 Gradients of this form produced the optimization path in Figure~\ref{fig:optim_path}(b).
 No REINFORCE estimates were required. 
 
 Notice that to compute these re-parameterized gradients we require 
-a summation of $(S \times T)^{N_{max}}$ terms 
+a summation of $(S \times T)^{N_{max}+1}$ terms 
 (recall from the main text that $S \times T$ is the total number 
 of tiles in an image). 
 For large images, i.e. those requiring many tiles, computing re-parameterized gradients would be infeasible. 

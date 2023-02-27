@@ -1,12 +1,12 @@
-\subsection{Results on the DECaPS survey}
+\subsection{Results on the DECam survey}
 \label{sec:results_on_decam}
 
 We next demostrate StarNet on a larger region of the sky.
-The DECaPS survey imaged stars in our own Milky Way, and we chose
+The DECam survey imaged stars in our own Milky Way, and we chose
 a $4000 \times 2000$ frame centered at coordinates $\text{RA} = 266.044^\circ$ and
 $\text{DEC} = -28.88111^\circ$. See Figure~\ref{fig:decaps} for an example image.
 
-The DECaPS image is somewhat sparser than M2.
+The DECam image is somewhat sparser than M2.
 Thus, we set the Poisson mean parameter of the star density lower smaller than on M2 to fifty stars per $100 \times 100$-pixel image.
 This allowed us to use larger $10\times 10$-pixel tiles with $20\times20$-pixel
 padded tiles. 
@@ -26,8 +26,8 @@ stars that are reddened at fainter magnitudes.
     \centering
     \includegraphics[width=\textwidth]{./figures/decaps/decaps_cmd.png}
     \end{subfigure}
-    \caption{(Left) A 1000 x 1000 pixel subregion of the DECaPS survey. 
-    (Right) Color magnitude diagram for the DECaPS image. Red dashed line highlights
+    \caption{(Left) A 1000 x 1000 pixel subregion of the DECam survey. 
+    (Right) Color magnitude diagram for the DECam image. Red dashed line highlights
     the inferred blue main-sequence stars}
     \label{fig:decaps}
 \end{figure}
@@ -71,7 +71,7 @@ this fitting procedure took one hour.
 After fitting the model and variational posterior,
 computing the approximate posterior
 (that is, producing the distributional parameters of the variational approximation) takes less than a second for either the $1000\times1000$ M2 image
-or the $4000 \times 2000$ DECaPS image. 
+or the $4000 \times 2000$ DECam image. 
 By comparison, the reported runtime of PCAT, which uses MCMC, is 30 minutes on the a $100 \times 100$ pixel image~\citep{Feder_2019}.
 
 The speed at inference time (which excludes training time) gives StarNet the scaling characteristics necessary for processing large astronomical surveys.

@@ -11,14 +11,13 @@
 \usepackage{booktabs}
 
 \usepackage{epstopdf}
+% apparently you need the next line for some versions/installations of latex to work
+\epstopdfsetup{suffix=}
+
 \usepackage{svg}
 
-\usepackage{lineno}
-\linenumbers
-
-% TODO delete this
-\usepackage{setspace}
-\doublespacing
+% \usepackage{lineno}
+% \linenumbers
 
 
 % Any additional packages needed should be included after jmlr2e.
@@ -46,7 +45,7 @@
 
 % Heading arguments are {volume}{year}{pages}{date submitted}{date published}{paper id}{author-full-names}
 
-\jmlrheading{1}{2000}{1-48}{2/21}{00/00}{meila00a}{Runjing Liu and Jon D. McAuliffe and Jeffrey Regier and the LSST Dark Energy Science Collaboration}
+\jmlrheading{1}{2023}{1-48}{2/21}{00/00}{meila00a}{Runjing Liu, Jon D. McAuliffe, Jeffrey Regier, and the LSST Dark Energy Science Collaboration}
 
 % Short headings should be running head and authors last names
 
@@ -60,7 +59,7 @@
 \author{\name Runjing Liu
     \email runjing\_liu@berkeley.edu \\
     \addr Department of Statistics\\
-    University of California\\
+    University of California, Berkeley\\
     Berkeley, CA 94720, USA
     \AND
     \name Jon D. McAuliffe
@@ -70,7 +69,7 @@
     Berkeley, CA 94704, USA \\
     and\\
     Department of Statistics\\
-    University of California\\
+    University of California, Berkeley\\
     Berkeley, CA 94720, USA
     \AND
     \name Jeffrey Regier
@@ -88,47 +87,26 @@
 \maketitle
 
 \begin{abstract}%   <- trailing '%' for backward compatibility of .sty file
-\input{abstract}
+\input{sections/abstract}
 \end{abstract}
 
 \begin{keywords}
   Bayesian methods, amortized inference, approximate inference, cataloging astronomical surveys
 \end{keywords}
 
-\section{Introduction}
-\label{sec:intro}
-\input{1-introduction}
-
-\section{The generative model}
-\label{sec:gen_model}
-\input{2-generative_model}
-
-\section{The variational distribution}
-\label{sec:var_inference}
-\input{3-var_inference}
-
-\section{The expected forward Kullback-Leibler divergence}
-\label{sec:wake_sleep}
-\input{4a-wake_sleep}
-\input{4b-variational_em}
-\input{4c-sleep_details}
-
-\section{Empirical comparison of KL objectives}
-\input{5-results-synth_data}
-
-\section{Results on astronomical surveys}
-\input{6-results-m2}
-\input{6a-results-decaps}
-
-
-\section{Conclusion}
-\label{sec:conclusion}
-\input{7-conclusion}
-
+\input{sections/1-introduction}
+\input{sections/2-generative_model}
+\input{sections/3-var_inference}
+\input{sections/4a-wake_sleep}
+\input{sections/4b-variational_em}
+\input{sections/4c-sleep_details}
+\input{sections/5-results-synth_data}
+\input{sections/6-results-m2}
+\input{sections/6a-results-decaps}
+\input{sections/7-conclusion}
 
 % Acknowledgements should go at the end, before appendices and references
-
-\acks{\input{acknowledgements}}
+\acks{\input{sections/acknowledgements}}
 
 % Manual newpage inserted to improve layout of sample file - not
 % needed in general before appendices/bibliography.
@@ -143,37 +121,14 @@
 \setcounter{table}{0}
 
 
-\section{Evaluating the variational distribution}
-\label{sec:eval_var_distr}
-\input{A1a-evaluating_var_distr}
-
-\section{Reparameterized and REINFORCE gradients}
-\label{sec:reparam_details}
-\input{A1-reparam_details}
-
-\section{Experiments on synthetic data}
-\input{A5-synthetic_tests}
-
-\section{Sensitivity to prior parameters}
-\label{sec:prior_sensitivity}
-\input{A3-prior_sensitivity}
-
-\section{Sensitivity to refits}
-\label{sec:refits}
-\input{A7-refits.tex}
-
-\section{Results on other M2 subregions}
-\label{sec:test_m2}
-\input{A2-m2_test_image}
-
-
-% \section{Results on SDSS Stripe 82}
-% \label{sec:results_sparse_field}
-% \input{A4-results-sparse_field}
-
-\section{Neural network architecture details}
-\label{sec:supp_nn_architecture}
-\input{A6-nn-architecture}
+\input{sections/A1a-evaluating_var_distr}
+\input{sections/A1-reparam_details}
+\input{sections/A5-synthetic_tests}
+\input{sections/A7-refits.tex}
+\input{sections/A3-prior_sensitivity}
+\input{sections/A2-m2_test_image}
+% \input{sections/A4-results-sparse_field}
+\input{sections/A6-nn-architecture}
 
 
 \clearpage

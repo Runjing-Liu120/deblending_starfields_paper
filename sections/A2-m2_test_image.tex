@@ -1,3 +1,5 @@
+\section{Results on other M2 subregions}
+\label{sec:test_m2}
 
 The initial $100\times100$ subregion of M2 considered in our main paper was located at pixel coordinates (630, 310) in SDSS run 2583, field 136, camera column 6. 
 We evaluate StarNet on two other subregions of M2.
@@ -7,9 +9,11 @@ the second is in the center of globular cluster
 
 The performance metrics on the center of the globular cluster 
 suggest that deblending in this region is nearly impossible --- there are $15,000$ stars in this $100\times100$ subregion, 
-averaging to more than one star per pixel. 
+averaging to more than one star per pixel
+and is 
+ten times as dense as the region considered in the main text.
 
-In all the considered regions, our comparison with DAOPHOT is unchanged, and we continue to outperform DAOPHOT in F1 score. 
+In all the considered regions, our comparison with DAOPHOT is unchanged, and we continue to outperform DAOPHOT in F1 score (Table~\ref{tab:summary_stats_m2test}). 
 
 \begin{figure}[tb]
     \centering
