@@ -25,7 +25,7 @@ full width at half maximum.
     \end{subfigure}
     \caption{(Top row) Simulated images with two stars separated by distance $\delta$ in pixels.
     True locations are in blue. StarNet MAP locations in red. 
-    In these examples, the StarNet MAP catalog correctly contains two stars when separated by $\delta \geq 1.2$,
+    In these examples,tiles the StarNet MAP catalog correctly contains two stars when separated by $\delta \geq 1.2$,
     but only estimated one star when $\delta \leq 1$.
     (Bottom left) The probability that $N$, the number of sources in the image, equals two
     under the variational posterior, as $\delta$ varies.
@@ -34,6 +34,7 @@ full width at half maximum.
 \end{figure}
 
 \subsection{Coverage of credible intervals}
+\label{sec:coverage}
 
 We have seen that on M2, the StarNet 95\% posterior interval did not contain the ground truth number of stars (Section~\ref{sec:results_on_m2}).
 On M2, we attribute this to model mis-specification, specifically due to an imperfectly
@@ -113,7 +114,7 @@ over-estimated on tile edges (Figure~\ref{fig:starnet_edges_lesspad}).
     \includegraphics[width=0.8\textwidth]{./figures_vg/coverage/edges_example_lesspad.eps}
     %\vspace{-0.4cm}
     \caption{The same experimental setup as Figure~\ref{fig:starnet_edges}, but we 
-    study the effect of padding input tiles. 
+    study the effect of padding the neural network input tiles. 
     In dashed blue, the posterior when 
     StarNet uses three pixels of padding. 
     In solid orange, the posterior when only one pixel of padding is used.

@@ -37,10 +37,10 @@ The SDSS $r$-band and the Hubble F606W band are centered at roughly the same wav
 while the wavelength range of the Hubble F606W band is slightly broader.
 
 We compare the cataloging accuracy of StarNet
-against PCAT, the aforementioned MCMC-based approach which uses the same generative model as StarNet, 
+against PCAT, the aforementioned MCMC-based approach that uses the same generative model as StarNet;
 and DAOPHOT, an algorithmic routine for detecting stars in crowded starfields
 which does not use a probabilistic model~\citep{stetson2987daophot}.
-This software convolves the observed image with a Gaussian kernel and scans for peaks above a given threshold.
+DAOPHOT convolves the observed image with a Gaussian kernel and scans for peaks above a given threshold.
 The DAOPHOT catalog of M2 was reported in \cite{An_2008_m2}.
 
 
@@ -90,9 +90,10 @@ StarNet produced a catalog that outperforms DAOPHOT and PCAT in F1 score (Table~
 Figure~\ref{fig:example_subimages} compares the StarNet catalog to the PCAT, DAOPHOT, and HST catalogs.
 DAOPHOT estimated less than half the number of stars when compared to the other methods.
 It therefore had a large PPV but a small TPR.
-The StarNet catalog had similar TPR as PCAT while have 11\% higher PPV.
+The StarNet catalog had similar TPR as PCAT while having an 11\% higher PPV.
 
-The improvement of StarNet over PCAT in PPV was most pronounced for the brightest stars (Figure~\ref{fig:summary_stats}).
+The improvement of StarNet over PCAT in PPV was most pronounced for the brightest stars (Figure~\ref{fig:summary_stats}), 
+suggesting that the brightest stars in the PCAT catalog may have in truth been a collection of blended dim stars. 
 The TPR for StarNet was uniformly better than DAOPHOT across all magnitudes.
 Of all methods, StarNet best approximated the HST flux distribution (Figure~\ref{fig:luminosity_fun_m2}).
 
@@ -100,11 +101,14 @@ Table~\ref{tab:summary_stats} also shows the number of stars inferred by each me
 There are 1114 stars in the HST catalog.
 For probabilistic methods (StarNet and PCAT),
 we display the mean number of stars under the approximate posterior, along with the 5th and 95th percentiles.
-We compute the StarNet posterior quantiles by sampling from the variational posterior. 
+We compute the StarNet posterior mean and quantiles by sampling from the variational posterior. 
 Recall that on each tile, the variational posterior on the number of stars is a categorical random variable; 
 to construct a distribution for the number of stars on the whole image, we first sample from the per-tile categorical distribution, then sum over all tiles. 
 StarNet posterior intervals were three times wider than the PCAT intervals.
-The small PCAT intervals may indicate that the MCMC sampler failed to mix well.
+The small PCAT intervals may indicate that the MCMC sampler failed to mix well. 
+However, both StarNet and PCAT intervals fail to cover the ground truth. 
+We attribute the over-estimated number of stars by StarNet to the tiling structure of 
+the approximate posterior (Appendix~\ref{sec:coverage}). 
 
 \input{tables/summary_stats_m2.tex}
 
@@ -175,7 +179,7 @@ is undetectable without the ability of StarNet to
 scale to larger images. 
 
 However, 
-the patterns are less definite in the StarNet color-magnitude diagram than in Hubble color magnitude diagram.
+the patterns are less definite in the StarNet color-magnitude diagram than in the Hubble color magnitude diagram.
 There is more spread in the StarNet color estimates, particularly at faint magnitudes. 
 This is due to the superior resolution of the Hubble telescope; near the heavily saturated core of the M2 cluster, stars are near impossible to deblend in the SDSS image, and our performance suffers (Appendix~\ref{sec:test_m2}). 
 

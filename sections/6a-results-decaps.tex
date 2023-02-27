@@ -63,16 +63,17 @@ stars that are reddened at fainter magnitudes.
 \subsection{Runtime}
 \label{sec:runtime}
 We ran SGD to minimize the expected forward KL
-for 400 epochs; at each epoch, 200 images were sampled from the generative model.
+for 400 epochs; at each epoch, 200 images of size $100\times100$ pixels were sampled from the generative model.
 We performed optimization with Adam~\citep{kingma2014adam}.
 On a single NVIDIA GeForce RTX 2080 Ti GPU,
 this fitting procedure took one hour.
 
-After fitting the model and variational posterior,
+After fitting the variational posterior,
 computing the approximate posterior
-(that is, producing the distributional parameters of the variational approximation) takes less than a second for either the $1000\times1000$ M2 image
-or the $4000 \times 2000$ DECam image. 
-By comparison, the reported runtime of PCAT, which uses MCMC, is 30 minutes on the a $100 \times 100$ pixel image~\citep{Feder_2019}.
+(that is, producing the distributional parameters of the variational approximation) given either the $1000\times1000$ M2 image
+or the $4000 \times 2000$ DECam image
+takes less than a second. 
+By comparison, the reported runtime of PCAT, which uses MCMC, is 30 minutes on a $100 \times 100$ pixel image~\citep{Feder_2019}.
 
 The speed at inference time (which excludes training time) gives StarNet the scaling characteristics necessary for processing large astronomical surveys.
 A single SDSS image is $1489 \times 2048$ pixels.
@@ -96,5 +97,5 @@ amortizing over a range of model parameters such as the background and PSF.
 With appropriate priors on these model parameters,
 fitting StarNet using the  
 expected forward KL enables it to generalize across a diverse set of images 
-and eliminate the need for retraining.
+and further reduce the need for retraining.
 

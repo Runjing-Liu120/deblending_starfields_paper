@@ -52,7 +52,9 @@ However, the test ELBO increases nonetheless, because the variational posterior
 better approximates the exact posterior as the optimization proceeds.
 Optimizing $\mathcal{L}_{fwd}$ consistently converged to
 a similar ELBO across all restarts and avoided shallow local optima (Figure~\ref{fig:optim_path}c).
-The expected forward KL is quadratic in the logit-location estimate
+At each iteration of SGD, 
+the evaluated loss is quadratic in 
+the logit-location estimate
 $\mu_\ell$ (\ref{eq:gaussian_sleep_loss}),
 and the gradient does not vanish.
 By avoiding shallow local optima, the variational distribution fit with the forward KL
