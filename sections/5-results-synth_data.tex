@@ -1,4 +1,4 @@
-\section{Empirical comparison of KL objectives}
+\section{Empirical Comparison of KL Objectives}
 
 % Section~\ref{sec:estep_sleep_compare} motivates the wake-sleep approach by comparing variational posteriors obtained by optimizing the ELBO against those obtained by optimizing the sleep objective.
 % Then, StarNet is tested on blended simulated stars in Section~\ref{sec:deblending_test}.
@@ -92,7 +92,7 @@ $\mathcal{L}_{fwd}$ is shown in~Figure~\ref{fig:optim_path}(f).
 %    \vspace{-0.5cm}
     \caption{An illustration of local optima in the ELBO objective.
     To move an estimated location to a correct location,
-    the optimization path must traverse a region where the negative ELBO is larger than the current configuration.
+    the optimization path must traverse a region where the negative ELBO is flat, with small gradients.
     In contrast, when optimizing the expected forward KL with SGD, each iteration evaluates a
     quadratic loss between a true and estimated location,
     and the gradient does not vanish. }

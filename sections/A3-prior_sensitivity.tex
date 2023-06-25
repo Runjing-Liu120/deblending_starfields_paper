@@ -11,15 +11,15 @@ In fact, the variation in performance metrics
 due to prior choices is about the same as the 
 variation due to random refits.
 Thus, for these prior sensitivity experiments, 
-we initialize the refits using the M2 network
-fit at the original prior. 
+we initialize the neural network weights
+using the network fit at the original prior. 
 
-Over a  range of $\mu$ between 0.08, corresponding to 
-an prior average of 800 stars on a $100\times100$ image, 
-and 0.20, corresponding to 2000 stars, 
+Over a  range of $\mu$ between 0.08 (corresponding to 
+an prior average of 800 stars on a $100\times100$ image) 
+and 0.20 (corresponding to 2000 stars)
 the F1-score remains steady between 0.49 and 0.51 (Table~\ref{tab:mu_sensitivity}). 
 Similar robustness in F1 hold when $\alpha$ varies between 
-0.25 and 1.0. 
+0.25 and 1.0 (Table~\ref{tab:alpha_sensitivity}). 
 
 \begin{table}[!tb]
 \centering

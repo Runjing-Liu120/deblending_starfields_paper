@@ -1,4 +1,4 @@
-\section{The variational distribution}
+\section{The Variational Distribution}
 \label{sec:var_inference}
 
 The central quantity in Bayesian statistics is the posterior distribution $p(z\mid x)$.
@@ -50,7 +50,7 @@ where we instead minimize an \textit{expectation}
 of the KL divergence with its arguments $q$ and $p$ reversed.
 
 
-\subsection{Amortized variational inference}
+\subsection{Amortized Variational Inference}
 We describe the construction of the family $\mathcal{Q}$. 
 Traditionally in variational inference, the posterior approximation $q_\eta$ depends on the data $x$ only implicitly,
 in that $\eta^*$ is chosen according to~\eqref{eq:kl_objective}.
@@ -76,7 +76,7 @@ The following subsections detail the construction of our variational distributio
 be fitted in an amortized fashion. 
 
 
-\subsection{The factorization}
+\subsection{The Factorization}
 \label{sec:factorization}
 
 % \begin{wrapfigure}{r}{0.35\textwidth}
@@ -216,7 +216,7 @@ See Appendix~\ref{sec:eval_var_distr} for details on evaluating $q_\eta(z \mid x
 \end{figure}
 
 
-\subsection{Variational distributions on image tiles}
+\subsection{Variational Distributions on Image Tiles}
 \label{sec:distr_on_tiles}
 We describe the variational distribution for each tile,
 $\tilde q_\eta\big(\tilde N^{(s, t)}, \tilde \ell^{(s, t)}, \tilde f^{(s, t)} \mid x\big)$.
@@ -236,7 +236,7 @@ Note that in the exact posterior, $\tilde N$ has support on the nonnegative inte
 
 These distributions were taken to match the constraints of the latent variables: fluxes are positive and right skewed, suggesting a log-normal; locations are between zero and $R$, suggesting a scaled logit-normal.
 
-\subsection{Neural network architecture}
+\subsection{Neural Network Architecture}
 \label{sec:nn_architecture}
 
 In each tile, the distributional parameters in \eqref{eq:var_distr_n},

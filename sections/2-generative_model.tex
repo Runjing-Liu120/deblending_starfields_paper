@@ -1,4 +1,4 @@
-\section{The generative model}
+\section{The Generative Model}
 \label{sec:gen_model}
 
 In crowded starfields such as globular clusters and the galactic plane of the Milky Way, the vast majority of light sources are stars.
@@ -22,7 +22,7 @@ the flux of the star $i$ in band $b$ is $f_{i, b}\in\Reals^+$.
 A Bayesian approach requires specification of a prior over catalog space $\mathcal{Z}$ and a likelihood for the observed images. Our likelihood and prior, detailed below, are similar to previous approaches~\citep{Brewer_2013, Portillo_2017, Feder_2019}, 
 which facilitates the comparisons of inference algorithms in isolation of model differences. 
 
-\subsection{The prior}
+\subsection{The Prior}
 The prior over $\mathcal{Z}$ is a marked spatial Poisson process. To sample the prior, first draw the number of stars contained in the $H\times W$ image as
 \begin{align}
 	N &\sim \text{Poisson}(\mu HW),
@@ -56,7 +56,7 @@ specific image, not to model the population over many images.
 Appendix~\ref{sec:prior_sensitivity} evaluates the
 sensitivity of the resulting catalog to choices of the prior parameters.
 
-\subsection{The likelihood}
+\subsection{The Likelihood}
 Let $x_{hw}^b$ denote the observed number of photoelectrons at pixel $(h,w)$ in band $b$.
 For each band, at every pixel, the expected number of photoelectron arrivals is $\lambda^b_{hw}(z)$, a deterministic function of the catalog $z$. Motivated by the Poissonian nature of photon arrivals and
 the large photon arrival rate in SDSS and LSST images,
