@@ -1,4 +1,4 @@
-\section{Sensitivity to prior parameters}
+\section{Sensitivity to Prior Parameters}
 \label{sec:prior_sensitivity}
 
 We examine the sensitivity of StarNet to prior parameters $\mu$ and $\alpha$ on the image M2. 
@@ -12,7 +12,7 @@ due to prior choices is about the same as the
 variation due to random refits.
 Thus, for these prior sensitivity experiments, 
 we initialize the refits using the M2 network
-fit at the original priors. 
+fit at the original prior. 
 
 Over a  range of $\mu$ between 0.08, corresponding to 
 an prior average of 800 stars on a $100\times100$ image, 
@@ -23,12 +23,6 @@ Similar robustness in F1 hold when $\alpha$ varies between
 
 \begin{table}[!tb]
 \centering
-\caption{Performance metrics on M2 as a function of 
-the prior parameter $\mu$. 
-The smallest $\mu$, $\mu = 0.08$ corresponds to 
-an prior average of 800 stars on a $100\times100$ image, 
-while the largest, $\mu = 0.2$, corresponds to 2000 stars. }
-\label{tab:mu_sensitivity}
 \begin{tabular}{l|ccc}
 \toprule
 $\mu$ &   TPR &   PPV &  F1 score \\
@@ -41,14 +35,17 @@ $\mu$ &   TPR &   PPV &  F1 score \\
 0.20 &  0.51 &  0.48 & 0.49 \\
 \bottomrule
 \end{tabular}
+\caption{Performance metrics on M2 as a function of 
+the prior parameter $\mu$. 
+The smallest $\mu$, $\mu = 0.08$ corresponds to 
+an prior average of 800 stars on a $100\times100$ image, 
+while the largest, $\mu = 0.2$, corresponds to 2000 stars. }
+\label{tab:mu_sensitivity}
 \end{table}
 
 
 \begin{table}[!tb]
 \centering
-\caption{Performance metrics on M2 as a function of 
-the prior parameter $\alpha$. }
-\label{tab:alpha_sensitivity}
 \begin{tabular}{l|ccc}
 \toprule
 $\alpha$ &   TPR &   PPV &  F1 score \\
@@ -59,5 +56,8 @@ $\alpha$ &   TPR &   PPV &  F1 score \\
 1.00 &  0.55 &  0.47 & 0.51 \\
 \bottomrule
 \end{tabular}
+\caption{Performance metrics on M2 as a function of 
+the prior parameter $\alpha$. }
+\label{tab:alpha_sensitivity}
 \end{table}
 

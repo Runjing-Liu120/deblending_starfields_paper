@@ -29,6 +29,9 @@
 % is archived at http://www.jmlr.org/format/natbib.pdf
 \usepackage{jmlr2e}
 
+\usepackage{mathtools}
+\mathtoolsset{showonlyrefs}
+
 % Definitions of handy macros can go here
 \newcommand{\Prob}{P}
 \newcommand{\Expect}{\mathbb{E}}
@@ -44,11 +47,10 @@
 \newcommand{\rulesep}{\unskip\ \vrule\ }
 
 % Heading arguments are {volume}{year}{pages}{date submitted}{date published}{paper id}{author-full-names}
-
-\jmlrheading{1}{2023}{1-48}{2/21}{00/00}{meila00a}{Runjing Liu, Jon D. McAuliffe, Jeffrey Regier, and the LSST Dark Energy Science Collaboration}
+\usepackage{lastpage}
+\jmlrheading{24}{2023}{1-\pageref{LastPage}}{2/21}{6/23}{21-0169}{Runjing Liu, Jon D. McAuliffe, Jeffrey Regier, and the LSST Dark Energy Science Collaboration}
 
 % Short headings should be running head and authors last names
-
 \ShortHeadings{Variational Inference for Deblending Crowded Starfields}{Liu, McAuliffe, Regier, and LSST}
 \firstpageno{1}
 
@@ -77,12 +79,12 @@
     \addr
     Department of Statistics \\
     University of Michigan \\
-    Ann Arbor, MI 48109
+    Ann Arbor, MI 48109, USA
     \AND
     \name The LSST Dark Energy Science Collaboration
     }
 
-\editor{}
+\editor{Shakir Mohamed}
 
 \maketitle
 

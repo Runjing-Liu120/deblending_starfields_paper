@@ -1,4 +1,4 @@
-\section{Reparameterized and REINFORCE gradients}
+\section{Reparameterized and REINFORCE Gradients}
 \label{sec:reparam_details}
 
 The ELBO objective~\eqref{eq:elbo} is of the form
@@ -41,7 +41,7 @@ the REINFORCE estimator has too high variance to be useful. One way to lower the
 This estimate remains unbiased because the score function 
 $\nabla_\eta \log q_\eta(z)$ is zero mean under $q$.
 
-A simple but often effective choice of control variate that we use in the main text is to let 
+A simple but often effective choice of control variate is to let 
 $C$ be a second evaluation of $f_\eta$ at an independently drawn $z'\sim q$:
 \begin{align}
     g_{\textrm{cv}}(z) = \nabla_\eta f_\eta(z) +
@@ -51,6 +51,8 @@ $C$ be a second evaluation of $f_\eta$ at an independently drawn $z'\sim q$:
     \label{eq:control_var}
 \end{align}
 This estimate is unbiased conditional on $z'$ and hence unconditionally unbiased as well. 
+We use this control variate for our experiments involving 
+the REINFORCE estimator in Section~\ref{sec:elbo_sleep_compare}. 
 
 
 Alternatively, the reparameterized gradient~\citep{rezende2014stochastic, kingma2013autoencoding} can be used when there exists some distribution $F$ not involving $\eta$ and a differentiable mapping $h_\eta$ such that
@@ -75,7 +77,7 @@ Unbiased gradients arise from the chain rule:
 The reparameterized gradient includes gradient information $\nabla_z f_\eta(z)$, while the REINFORCE gradient does not. Taking into account the structure of $f$ through its gradient lowers the variance of reparameterized gradient in comparison to the REINFORCE gradient.
 However, if $z$ contains discrete components, there cannot be a differentiable mapping $h_\eta$, and the reparameterization trick will not apply.
 
-\subsection{Gradients for the empirical comparison of KL objectives}
+\subsection{Gradients for the Empirical Comparison of KL Objectives}
 In experiments of Section~\ref{sec:elbo_sleep_compare}, 
 we used a combination of reparameterized and REINFORCE plus control variate gradients.
 Let $\tilde N$ be the vector of per-tile number of stars (a discrete component) and $y$ be the locations and fluxes (continuous components)
@@ -110,9 +112,9 @@ for $w \sim F$, where $h_\eta$ and $F$ are chosen appropriately. Combining~\eqre
     [f_\eta(\tilde N, h_\eta(w)) - f_\eta(\tilde M, h_\eta(w))] +
     \nabla_y f_\eta(\tilde N, y)\Big|_{y = h_\eta(w)}
     \nabla_\eta h_\eta(w).
-    \label{eq:appendix_reinforce}
+    \label{eq:reiforce_final}
 \end{align}
-Equation~\ref{eq:appendix_reinforce} is what our main text called the ``REINFORCE gradient."
+Equation~\eqref{eq:reiforce_final} is what our main text called the ``REINFORCE gradient."
 These gradients produced the optimization path in Figure~\ref{fig:optim_path}(a).
 
 The ``reparameterized" gradient in Section~\ref{sec:elbo_sleep_compare} requires integrating out $\tilde N$.

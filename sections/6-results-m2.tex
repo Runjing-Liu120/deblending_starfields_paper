@@ -93,7 +93,7 @@ It therefore had a large PPV but a small TPR.
 The StarNet catalog had similar TPR as PCAT while having an 11\% higher PPV.
 
 The improvement of StarNet over PCAT in PPV was most pronounced for the brightest stars (Figure~\ref{fig:summary_stats}), 
-suggesting that the brightest stars in the PCAT catalog may have in truth been a collection of blended dim stars. 
+suggesting that some of the brightest stars in the PCAT catalog may have in truth been collections of blended stars. 
 The TPR for StarNet was uniformly better than DAOPHOT across all magnitudes.
 Of all methods, StarNet best approximated the HST flux distribution (Figure~\ref{fig:luminosity_fun_m2}).
 
@@ -106,8 +106,8 @@ Recall that on each tile, the variational posterior on the number of stars is a 
 to construct a distribution for the number of stars on the whole image, we first sample from the per-tile categorical distribution, then sum over all tiles. 
 StarNet posterior intervals were three times wider than the PCAT intervals.
 The small PCAT intervals may indicate that the MCMC sampler failed to mix well. 
-However, both StarNet and PCAT intervals fail to cover the ground truth. 
-We attribute the over-estimated number of stars by StarNet to the tiling structure of 
+While neither the StarNet intervals nor the PCAT intervals cover the ground truth, though the StarNet intervals come closer to doing so. 
+For StarNet, we attribute the over-estimated number of stars by StarNet to the tiling structure of 
 the approximate posterior (Appendix~\ref{sec:coverage}). 
 
 \input{tables/summary_stats_m2.tex}
