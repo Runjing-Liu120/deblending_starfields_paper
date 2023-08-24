@@ -25,7 +25,7 @@ The input to the network is a $10\times 10$ tile with no padding.
 Note that the expected forward KL does not depend on $x_{test}$.
 Optimizing $\mathcal{L}_{fwd}$ only requires sampling catalogs from the prior
 and simulating images conditional on each catalog.
-The prior on the number of stars was set to Poisson with mean $\mu = 4$.
+The prior on the number of stars per image was set to be Poisson with mean $\mu = 4$.
 
 Figure~\ref{fig:optim_path}~(top row) charts the test ELBO~\eqref{eq:elbo_on_test}
 as optimization proceeds in our three approaches.
@@ -92,7 +92,7 @@ $\mathcal{L}_{fwd}$ is shown in~Figure~\ref{fig:optim_path}(f).
 %    \vspace{-0.5cm}
     \caption{An illustration of local optima in the ELBO objective.
     To move an estimated location to a correct location,
-    the optimization path must traverse a region where the negative ELBO is flat, with small gradients.
+    the optimization path must traverse a region where the negative ELBO is flat, with near-zero gradients.
     In contrast, when optimizing the expected forward KL with SGD, each iteration evaluates a
     quadratic loss between a true and estimated location,
     and the gradient does not vanish. }
